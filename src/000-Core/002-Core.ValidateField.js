@@ -4,9 +4,11 @@
 //---------------------------------------------------------------------
 let Schema = {
 	id: '002',
+	member_of: 'Core',
 	name: 'ValidateField',
 	type: 'function',
 	returns: '*',
+	returns_description: '',
 	description: [
 		'Validate values according to a given schema.',
 		'Return the value if validation succeeds.',
@@ -32,7 +34,7 @@ let Schema = {
 				'Schema is required to have at least a "name" and a "type".',
 				'You can also supply a "required" flag and a "default" value.',
 			],
-			examples:[
+			examples: [
 				`{ name: 'Name', type: 'string' }`,
 				`{ name: 'options', type: 'object', default: { hoist: true, swab: 'decks' } }`,
 				`{ name: 'max_tries', type: 'number', format: 'integer', required: true, default: 3 }`,
@@ -42,8 +44,9 @@ let Schema = {
 			name: 'Context',
 			type: 'string',
 			required: false,
+			default: '',
 			description: [
-				'A context to include in any error messages.',
+				'A context name (e.g. function name) to include in any error messages.',
 			],
 		},
 	},
@@ -54,7 +57,30 @@ let Schema = {
 module.exports = function ( Liquicode )
 {
 
-	//---------------------------------------------------------------------
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function ValidateField
+	 * @returns {*}
+	 * @description
+	 * Validate values according to a given schema.
+	 * Return the value if validation succeeds.
+	 * Otherwise, this function throws an error.
+	 * See the "GetSchema()" function for a more detailed explanation of schemas.
+	 * @param {*} Value
+	 * The value to validate.
+	 * @param {object} Schema
+	 * The schema to validate against.
+	 * This is an object which describes the expected Value.
+	 * Schema is required to have at least a "name" and a "type".
+	 * You can also supply a "required" flag and a "default" value.
+	 * @param {string} [Context]
+	 * A context name (e.g. function name) to include in any error messages.
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
 	function ValidateField( Value, Schema, Context )
 	{
 		if ( !Schema ) { throw new Error( `The parameter [Schema] is missing. In [ValidateField].` ); }

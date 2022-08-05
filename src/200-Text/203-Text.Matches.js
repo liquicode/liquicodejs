@@ -4,6 +4,7 @@
 //---------------------------------------------------------------------
 let Schema = {
 	id: '203',
+	member_of: 'Text',
 	name: 'Matches',
 	type: 'function',
 	returns: 'string',
@@ -32,7 +33,21 @@ let Schema = {
 module.exports = function ( Liquicode )
 {
 
-	//---------------------------------------------------------------------
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function Matches
+	 * @returns {string}
+	 * @description
+	 * Matches the text against a wildcard-lik pattern.
+	 * Returns true If the match succeeds, otherwise false.
+	 * @param {string} Text
+	 * @param {string} Pattern
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
 	function Matches( Text, Pattern ) 
 	{
 		// Validate Parameters

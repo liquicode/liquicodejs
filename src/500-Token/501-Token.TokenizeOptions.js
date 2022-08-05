@@ -4,6 +4,7 @@
 //---------------------------------------------------------------------
 let Schema = {
 	id: '501',
+	member_of: 'Token',
 	name: 'TokenizeOptions',
 	type: 'function',
 	returns: 'object',
@@ -31,7 +32,21 @@ module.exports = function ( Liquicode )
 {
 
 
-	//---------------------------------------------------------------------
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function TokenizeOptions
+	 * @returns {object}
+	 * @description
+	 * Returns a set of options for calling Tokenize().
+	 * Throws an error if an invalid value for PresetName is given.
+	 * @param {string} [PresetName]
+	 * To retrieve an options preset, use one of: 'csv', or 'cli'
+	 * You can leave this empty or 'default' for the default options.
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
 	function TokenizeOptions( PresetName )
 	{
 		let options = {

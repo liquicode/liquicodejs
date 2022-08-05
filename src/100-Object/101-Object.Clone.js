@@ -4,6 +4,7 @@
 //---------------------------------------------------------------------
 let Schema = {
 	id: '101',
+	member_of: 'Object',
 	name: 'Clone',
 	type: 'function',
 	returns: 'string',
@@ -26,7 +27,20 @@ let Schema = {
 module.exports = function ( Liquicode )
 {
 
-	//---------------------------------------------------------------------
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function Clone
+	 * @returns {string}
+	 * @description
+	 * Returns a clone of the given object.
+	 * This is equivalent to doing A = JSON.parse( JSON.stringify( B ) ).
+	 * @param {object} [From={}]
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
 	function Clone( From )
 	{
 		From = Liquicode.Core.ValidateField( From, Schema.Parameters.From );

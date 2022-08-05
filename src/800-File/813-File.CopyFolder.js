@@ -4,6 +4,7 @@
 //---------------------------------------------------------------------
 let Schema = {
 	id: '813',
+	member_of: 'File',
 	name: 'CopyFolder',
 	type: 'function',
 	returns: 'number',
@@ -49,7 +50,23 @@ module.exports = function ( Liquicode )
 {
 
 
-	//---------------------------------------------------------------------
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function CopyFolder
+	 * @returns {number}
+	 * @description
+	 * Copies files from one folder to another.
+	 * Returns the number of files copied.
+	 * @param {string} FromFolder
+	 * @param {string} ToFolder
+	 * @param {string} [FilePattern="*"]
+	 * @param {boolean} [Overwrite]
+	 * @param {boolean} [Recurse]
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
 	function CopyFolder( FromFolder, ToFolder, FilePattern, Overwrite, Recurse ) 
 	{
 		FromFolder = Liquicode.Core.ValidateField( FromFolder, Schema.Parameters.FromFolder );

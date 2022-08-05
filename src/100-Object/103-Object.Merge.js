@@ -4,6 +4,7 @@
 //---------------------------------------------------------------------
 let Schema = {
 	id: '103',
+	member_of: 'Object',
 	name: 'Merge',
 	type: 'function',
 	returns: 'object',
@@ -31,7 +32,21 @@ let Schema = {
 module.exports = function ( Liquicode )
 {
 
-	//---------------------------------------------------------------------
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function Merge
+	 * @returns {object}
+	 * @description
+	 * Returns a clone of the given object.
+	 * This is equivalent to doing A = JSON.parse( JSON.stringify( B ) ).
+	 * @param {object} Original
+	 * @param {object} [Updates={}]
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
 	function Merge( Original, Updates )
 	{
 		Original = Liquicode.Core.ValidateField( Original, Schema.Parameters.Original );

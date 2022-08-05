@@ -1,13 +1,10 @@
-/**
- * Test
- */
-
 "use strict";
 
 
 //---------------------------------------------------------------------
 let Schema = {
 	id: '001',
+	member_of: 'Core',
 	name: 'FieldSchema',
 	type: 'function',
 	returns: 'object',
@@ -27,6 +24,7 @@ let Schema = {
 			],
 		},
 	},
+	todo: [],
 };
 
 
@@ -34,13 +32,22 @@ let Schema = {
 module.exports = function ( Liquicode )
 {
 
+
 	//-start-jsdoc---------------------------------------------------------
 	/**
-	 * @description Infers a schema from the given value.
-	 * @param {any} Value - The value to infer a schema from.
-	 * @returns {object} A Schema object.
-	 */
+	 * @public
+	 * @function FieldSchema
+	 * @returns {object}
+	 * A Schema object.
+	 * @description
+	 * Infers a schema from the given value.
+	 * All it really does is set the `Schema.type` to the `typeof` of the value.
+	 * It does return a full schema object.
+	 * @param {*} [Value]
+	 * The value to infer a schema from.
+	*/
 	//-end-jsdoc-----------------------------------------------------------
+
 
 	function FieldSchema( Value )
 	{

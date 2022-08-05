@@ -4,6 +4,7 @@
 //---------------------------------------------------------------------
 let Schema = {
 	id: '222',
+	member_of: 'Text',
 	name: 'LastWord',
 	type: 'function',
 	returns: 'string',
@@ -33,7 +34,22 @@ let Schema = {
 module.exports = function ( Liquicode )
 {
 
-	//---------------------------------------------------------------------
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function LastWord
+	 * @returns {string}
+	 * @description
+	 * Returns the last word of a text phrase.
+	 * @param {string} [Phrase]
+	 * A text phrase containing words separated by delimiters.
+	 * @param {string} [Delimiters=" "]
+	 * A string of characters that break the phrase into words.
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
 	function LastWord( Phrase, Delimiters )
 	{
 		Phrase = Liquicode.Core.ValidateField( Phrase, Schema.Parameters.Phrase );

@@ -4,6 +4,7 @@
 //---------------------------------------------------------------------
 let Schema = {
 	id: '812',
+	member_of: 'File',
 	name: 'CountFolders',
 	type: 'function',
 	returns: 'number',
@@ -32,7 +33,20 @@ module.exports = function ( Liquicode )
 {
 
 
-	//---------------------------------------------------------------------
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function CountFolders
+	 * @returns {number}
+	 * @description
+	 * Scans a folder and calls the Visitor callback function for each folder/file encountered.
+	 * Returns the number of folders/files visited.
+	 * @param {string} StartFolder
+	 * @param {boolean} [Recurse]
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
 	function CountFolders( StartFolder, Recurse ) 
 	{
 		StartFolder = Liquicode.Core.ValidateField( StartFolder, Schema.Parameters.StartFolder );

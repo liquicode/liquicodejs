@@ -4,6 +4,7 @@
 //---------------------------------------------------------------------
 let Schema = {
 	id: '201',
+	member_of: 'Text',
 	name: 'NewTextBuffer',
 	type: 'function',
 	returns: 'string',
@@ -32,7 +33,20 @@ let Schema = {
 module.exports = function ( Liquicode )
 {
 
-	//---------------------------------------------------------------------
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function NewTextBuffer
+	 * @returns {string}
+	 * @description
+	 * Returns a new TextBuffer.
+	 * @param {string} [InitialValue]
+	 * @param {number} [BlockLength=100]
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
 	function NewTextBuffer( InitialValue, BlockLength )
 	{
 		InitialValue = Liquicode.Core.ValidateField( InitialValue, Schema.Parameters.InitialValue );

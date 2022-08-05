@@ -4,6 +4,7 @@
 //---------------------------------------------------------------------
 let Schema = {
 	id: '223',
+	member_of: 'Text',
 	name: 'BeforeLastWord',
 	type: 'function',
 	returns: 'string',
@@ -33,7 +34,22 @@ let Schema = {
 module.exports = function ( Liquicode )
 {
 
-	//---------------------------------------------------------------------
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function BeforeLastWord
+	 * @returns {string}
+	 * @description
+	 * Returns the remainder of a text phrase occurring befiore the last word.
+	 * @param {string} [Phrase]
+	 * A text phrase containing words separated by delimiters.
+	 * @param {string} [Delimiters=" "]
+	 * A string of characters that break the phrase into words.
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
 	function BeforeLastWord( Phrase, Delimiters )
 	{
 		Phrase = Liquicode.Core.ValidateField( Phrase, Schema.Parameters.Phrase );

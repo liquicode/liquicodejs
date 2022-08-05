@@ -1,25 +1,31 @@
 "use strict";
 
 
+
+
+//---------------------------------------------------------------------
+let Schema = {
+	id: '900',
+	name: 'Net',
+	type: 'namespace',
+	summary: 'Functions for working with networks',
+};
+
+
+//-start-jsdoc---------------------------------------------------------
+/**
+ * @public
+ * @namespace Net
+ * @summary Functions for working with networks
+*/
+//-end-jsdoc-----------------------------------------------------------
+
+
 //---------------------------------------------------------------------
 module.exports = function ( Liquicode )
 {
-
-
-	const LIB_HTTP = require( 'http' );
-
-
-	//---------------------------------------------------------------------
-	function AsyncDownloadFile( Url ) 
-	{
-		let content = '';
-		return content;
-	}
-
-
-	//---------------------------------------------------------------------
-	// Return the module exports.
 	return {
-		AsyncDownloadFile: AsyncDownloadFile,
+		_Schema: Schema,
+		// AsyncDownloadFile: AsyncDownloadFile,
 	};
 };

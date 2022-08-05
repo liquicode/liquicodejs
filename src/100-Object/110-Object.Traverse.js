@@ -4,6 +4,7 @@
 //---------------------------------------------------------------------
 let Schema = {
 	id: '110',
+	member_of: 'Object',
 	name: 'Traverse',
 	type: 'function',
 	returns: 'string',
@@ -30,7 +31,21 @@ let Schema = {
 module.exports = function ( Liquicode )
 {
 
-	//---------------------------------------------------------------------
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function Traverse
+	 * @returns {string}
+	 * @description
+	 * Traverses and calls a visitor callback function for each field in an object.
+	 * This functions recurses through sub-objects and traverses the entire object.
+	 * @param {object} Root
+	 * @param {function} Visitor
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
 	function Traverse( Root, Visitor )
 	{
 		Root = Liquicode.Core.ValidateField( Root, Schema.Parameters.Root );

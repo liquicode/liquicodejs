@@ -4,6 +4,7 @@
 //---------------------------------------------------------------------
 let Schema = {
 	id: '220',
+	member_of: 'Text',
 	name: 'FirstWord',
 	type: 'function',
 	returns: 'string',
@@ -33,7 +34,22 @@ let Schema = {
 module.exports = function ( Liquicode )
 {
 
-	//---------------------------------------------------------------------
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function FirstWord
+	 * @returns {string}
+	 * @description
+	 * Returns the first word of a text phrase.
+	 * @param {string} [Phrase]
+	 * A text phrase containing words separated by delimiters.
+	 * @param {string} [Delimiters=" "]
+	 * A string of whitespace and punctuation characters that break the phrase into words.
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
 	function FirstWord( Phrase, Delimiters )
 	{
 		Phrase = Liquicode.Core.ValidateField( Phrase, Schema.Parameters.Phrase );

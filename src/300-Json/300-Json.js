@@ -2,12 +2,27 @@
 
 
 //---------------------------------------------------------------------
+let Schema = {
+	id: '300',
+	name: 'Json',
+	type: 'namespace',
+	summary: 'Functions for manipulating Json.',
+};
+
+
+//-start-jsdoc---------------------------------------------------------
+/**
+ * @public
+ * @namespace Json
+ * @summary Functions for manipulating Json.
+*/
+//-end-jsdoc-----------------------------------------------------------
+
+
+//---------------------------------------------------------------------
 module.exports = function ( Liquicode )
 {
-	//---------------------------------------------------------------------
-	// Return the module exports.
 	return {
-		// GetSchema: require( './Core.GetSchema.js' )( Liquicode ).GetSchema,
-		// ValidateField: require( './Core.ValidateField.js' )( Liquicode ).ValidateField,
+		_Schema: Schema,
 	};
 };

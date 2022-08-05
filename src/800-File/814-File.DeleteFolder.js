@@ -4,6 +4,7 @@
 //---------------------------------------------------------------------
 let Schema = {
 	id: '814',
+	member_of: 'File',
 	name: 'DeleteFolder',
 	type: 'function',
 	returns: 'number',
@@ -38,7 +39,20 @@ module.exports = function ( Liquicode )
 {
 
 
-	//---------------------------------------------------------------------
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function DeleteFolder
+	 * @returns {number}
+	 * @description
+	 * Deletes a folder and all of its sub-folders and files.
+	 * Returns the number of folders and files deleted.
+	 * @param {string} Folder
+	 * @param {boolean} [Recurse]
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
 	function DeleteFolder( Folder, Recurse ) 
 	{
 		Folder = Liquicode.Core.ValidateField( Folder, Schema.Parameters.Folder );

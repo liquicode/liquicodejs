@@ -2,11 +2,31 @@
 
 
 //---------------------------------------------------------------------
+let Schema = {
+	id: '200',
+	name: 'Text',
+	type: 'namespace',
+	description: [
+		'Functions for text parsing and manipulation.',
+	],
+};
+
+
+//-start-jsdoc---------------------------------------------------------
+/**
+ * @public
+ * @namespace Text
+ * @description
+ * Functions for text parsing and manipulation.
+*/
+//-end-jsdoc-----------------------------------------------------------
+
+
+//---------------------------------------------------------------------
 module.exports = function ( Liquicode )
 {
-	//---------------------------------------------------------------------
-	// Return the module exports.
 	return {
+		_Schema: Schema,
 		NewTextBuffer: require( './201-Text.NewTextBuffer.js' )( Liquicode ).NewTextBuffer,
 		Compare: require( './202-Text.Compare.js' )( Liquicode ).Compare,
 		Matches: require( './203-Text.Matches.js' )( Liquicode ).Matches,

@@ -4,6 +4,7 @@
 //---------------------------------------------------------------------
 let Schema = {
 	id: '810',
+	member_of: 'File',
 	name: 'Visit',
 	type: 'function',
 	returns: 'number',
@@ -48,7 +49,22 @@ module.exports = function ( Liquicode )
 	const LIB_PATH = require( 'path' );
 
 
-	//---------------------------------------------------------------------
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function Visit
+	 * @returns {number}
+	 * @description
+	 * Scans a folder and calls the Visitor callback function for each folder/file encountered.
+	 * Returns the number of folders/files visited.
+	 * @param {string} StartFolder
+	 * @param {string} [FilePattern]
+	 * @param {boolean} [Recurse]
+	 * @param {function} [Visitor]
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
 	function Visit( StartFolder, FilePattern, Recurse, Visitor ) 
 	{
 		StartFolder = Liquicode.Core.ValidateField( StartFolder, Schema.Parameters.StartFolder );

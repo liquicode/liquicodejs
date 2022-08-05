@@ -2,12 +2,29 @@
 
 
 //---------------------------------------------------------------------
+let Schema = {
+	id: '400',
+	name: 'Date',
+	type: 'namespace',
+	summary: 'Functions for manipulating dates.',
+};
+
+
+//-start-jsdoc---------------------------------------------------------
+/**
+ * @public
+ * @namespace Date
+ * @summary Functions for manipulating dates.
+*/
+//-end-jsdoc-----------------------------------------------------------
+
+
+//---------------------------------------------------------------------
 module.exports = function ( Liquicode )
 {
-	//---------------------------------------------------------------------
-	// Return the module exports.
 	return {
-		// GetSchema: require( './001-Core.GetSchema.js' )( Liquicode ).GetSchema,
-		// ValidateField: require( './002-Core.ValidateField.js' )( Liquicode ).ValidateField,
+		_Schema: Schema,
+		Parse: require( './401-Date.Parse.js' )( Liquicode ).Parse,
+		ZuluTimestamp: require( './410-Date.ZuluTimestamp.js' )( Liquicode ).ZuluTimestamp,
 	};
 };

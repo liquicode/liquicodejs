@@ -4,6 +4,7 @@
 //---------------------------------------------------------------------
 let Schema = {
 	id: '210',
+	member_of: 'Text',
 	name: 'ReplaceCharacters',
 	type: 'function',
 	returns: 'string',
@@ -45,7 +46,23 @@ let Schema = {
 module.exports = function ( Liquicode )
 {
 
-	//---------------------------------------------------------------------
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function ReplaceCharacters
+	 * @returns {string}
+	 * @description
+	 * Replaces characters within a string.
+	 * Returns the modified string.
+	 * @param {string} Text
+	 * @param {string} SearchCharacters
+	 * @param {string} ReplacementText
+	 * @param {number} [MaxTimes=-1]
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
 	function ReplaceCharacters( Text, SearchCharacters, ReplacementText, MaxTimes )
 	{
 		// Validate Parameters

@@ -4,6 +4,7 @@
 //---------------------------------------------------------------------
 let Schema = {
 	id: '221',
+	member_of: 'Text',
 	name: 'AfterFirstWord',
 	type: 'function',
 	returns: 'string',
@@ -33,7 +34,22 @@ let Schema = {
 module.exports = function ( Liquicode )
 {
 
-	//---------------------------------------------------------------------
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function AfterFirstWord
+	 * @returns {string}
+	 * @description
+	 * Returns the remainder of a text phrase occurring after the first word.
+	 * @param {string} [Phrase]
+	 * A text phrase containing words separated by delimiters.
+	 * @param {string} [Delimiters=" "]
+	 * A string of characters that break the phrase into words.
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
 	function AfterFirstWord( Phrase, Delimiters )
 	{
 		Phrase = Liquicode.Core.ValidateField( Phrase, Schema.Parameters.Phrase );

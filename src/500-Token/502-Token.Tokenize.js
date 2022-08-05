@@ -4,6 +4,7 @@
 //---------------------------------------------------------------------
 let Schema = {
 	id: '502',
+	member_of: 'Token',
 	name: 'Tokenize',
 	type: 'function',
 	returns: 'object',
@@ -30,27 +31,20 @@ module.exports = function ( Liquicode )
 {
 
 
-	//---------------------------------------------------------------------
-	const TokenTypes =
-	{
-		whitespace: 'whitespace',
-		symbol: 'symbol',
-		delimiter: 'delimiter',
-		literal: 'literal',
-		identifier: 'identifier',
-		numeric: 'numeric',
-		keyword: 'keyword',
-	};
-
-
-	//---------------------------------------------------------------------
+	//-start-jsdoc---------------------------------------------------------
 	/**
-	 * Tokenizes a text string.
-	 * Returns an array of tokens.
-	 * @param {string} Text - The text to tokenize.
-	 * @param {object} Options - Options to apply while tokenizing. See: Token.TokenizeOptions().
-	 * @returns {array} An array of tokens.
-	 */
+	 * @public
+	 * @function Tokenize
+	 * @returns {object}
+	 * @description
+	 * Returns the parsed tokens.
+	 * @param {string} [PresetName]
+	 * To retrieve an options preset, use one of: 'csv', or 'cli'
+	 * You can leave this empty for the default options.
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
 	function Tokenize( Text, Options )
 	{
 		// Get the options.
@@ -91,6 +85,19 @@ module.exports = function ( Liquicode )
 
 		// Return the tokens.
 		return tokens;
+	};
+
+
+	//---------------------------------------------------------------------
+	const TokenTypes =
+	{
+		whitespace: 'whitespace',
+		symbol: 'symbol',
+		delimiter: 'delimiter',
+		literal: 'literal',
+		identifier: 'identifier',
+		numeric: 'numeric',
+		keyword: 'keyword',
 	};
 
 

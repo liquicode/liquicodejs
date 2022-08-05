@@ -4,6 +4,7 @@
 //---------------------------------------------------------------------
 let Schema = {
 	id: '201',
+	member_of: 'Text',
 	name: 'Compare',
 	type: 'function',
 	returns: 'string',
@@ -40,7 +41,24 @@ let Schema = {
 module.exports = function ( Liquicode )
 {
 
-	//---------------------------------------------------------------------
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function Compare
+	 * @returns {string}
+	 * @description
+	 * Compares two strings.
+	 * Returns a `-1` if `StringA` is less than `StringB`.
+	 * Returns a `1` if `StringA` is greater than than `StringB`.
+	 * Returns a `0` if `StringA` and `StringB` are the same.
+	 * @param {string} [StringA]
+	 * @param {string} [StringB]
+	 * @param {boolean} [CaseSensitive=true]
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
 	function Compare( StringA, StringB, CaseSensitive )
 	{
 		StringA = Liquicode.Core.ValidateField( StringA, Schema.Parameters.StringA );

@@ -4,6 +4,7 @@
 //---------------------------------------------------------------------
 let Schema = {
 	id: '401',
+	member_of: 'Date',
 	name: 'Parse',
 	type: 'function',
 	returns: 'object',
@@ -31,6 +32,141 @@ let Schema = {
 module.exports = function ( Liquicode )
 {
 
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function Parse
+	 * @returns {object}
+	 * @description
+	 * Converts a string to a date-time value.
+	 * Returns a `date_time_parts` structure.
+	 * @param {string} Text
+	 * @param {function} [TimeZoneOffset="+0000"]
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
+	//---------------------------------------------------------------------
+	function Parse( Text, TimeZoneOffset )
+	{
+		From = Liquicode.Core.ValidateField( From, Schema.Parameters.From );
+
+		// Prepare and validate the date string.
+		Text = Text.toLowerCase().trim();
+		if ( !Text ) { return get_date_parts( null, TimeZoneOffset ); }
+
+		// Validate AssumeTimeZone
+		if ( !TimeZoneOffset ) { TimeZoneOffset = '+0000'; }
+		if ( !TimeZoneOffset.startsWith( '+' ) && !TimeZoneOffset.startsWith( '-' ) )
+		{
+			throw new Error( `AssumeTimeZone must begin with a plus or minus sign.` );
+		}
+		let offset = TimeZoneOffset.substr( 1 );
+		if ( ( offset.length !== 4 ) || isNaN( offset ) )
+		{
+			throw new Error( `AssumeTimeZone must have a four digit offset component.` );
+		}
+
+		let date = null;
+
+		// Try some unusual cases of compressed timestamps.
+		if ( !isNaN( Number( Text ) ) )
+		{
+			let s = Number( Text ).toString(); // Remove any noise.
+			if ( s.length == 8 )
+			{
+				// 20180329 => 2018-03-29
+				s = (
+					s.substr( 0, 4 ) + '-' +
+					s.substr( 4, 2 ) + '-' +
+					s.substr( 6, 2 ) +
+					' 00:00:00 ' + TimeZoneOffset
+				);
+			}
+			else if ( s.length == 10 )
+			{
+				// 1465241631 => 1465241631000 => Date(1465241631000)
+				s += '000'; // milliseconds
+				s = Number( s );
+			}
+			else if ( s.length == 13 )
+			{
+				// 1465241631000 => Date(1465241631000)
+				s = s; // milliseconds
+				s = Number( s );
+			}
+			else if ( s.length == 14 )
+			{
+				// 20180329074753 => 2018-03-29 07:47:53
+				s = (
+					s.substr( 0, 4 ) + '-' +
+					s.substr( 4, 2 ) + '-' +
+					s.substr( 6, 2 ) + ' ' +
+					s.substr( 8, 2 ) + ':' +
+					s.substr( 10, 2 ) + ':' +
+					s.substr( 12, 2 ) +
+					' ' + TimeZoneOffset
+				);
+			}
+
+			// Try the javascript date parsing.
+			try { date = new Date( s ); }
+			catch ( e ) { }
+			if ( date ) { return get_date_parts( date, TimeZoneOffset ); }
+		}
+
+		// Test for ISO format: 2005-05-01T15:05:23.000Z
+		if (
+			( Text.length >= 24 )
+			&& ( Text.substr( 4, 1 ) === '-' )
+			&& ( Text.substr( 7, 1 ) === '-' )
+			&& ( Text.substr( 10, 1 ) === 't' )
+			&& ( Text.substr( 13, 1 ) === ':' )
+			&& ( Text.substr( 16, 1 ) === ':' )
+			&& ( Text.substr( 19, 1 ) === '.' )
+			&& ( Text.substr( 23, 1 ) === 'z' )
+		)
+		{
+			try { date = new Date( Text ); }
+			catch ( e ) { }
+			if ( date && !isNaN( date.getTime() ) )
+			{ return get_date_parts( date, TimeZoneOffset ); }
+			else { return get_date_parts( null, TimeZoneOffset ); }
+		}
+
+		// Test for ISO format (short): 2005-05-01T15:05:23Z
+		if (
+			( Text.length >= 20 )
+			&& ( Text.substr( 4, 1 ) === '-' )
+			&& ( Text.substr( 7, 1 ) === '-' )
+			&& ( Text.substr( 10, 1 ) === 't' )
+			&& ( Text.substr( 13, 1 ) === ':' )
+			&& ( Text.substr( 16, 1 ) === ':' )
+			&& ( Text.substr( 19, 1 ) === 'z' )
+		)
+		{
+			try { date = new Date( Text ); }
+			catch ( e ) { }
+			if ( date && !isNaN( date.getTime() ) )
+			{ return get_date_parts( date, TimeZoneOffset ); }
+			else { return get_date_parts( null, TimeZoneOffset ); }
+		}
+
+		// We know its not a javascript supported format.
+		// We have to do it the hard way.
+		let tokens = tokenize_date( Text );
+		let symbols = tokens2symbols( tokens );
+		date = symbols2date( symbols, TimeZoneOffset );
+
+		// Return the date.
+		if ( date && !isNaN( date.getTime() ) )
+		{ return get_date_parts( date, TimeZoneOffset ); }
+		else { return get_date_parts( null, TimeZoneOffset ); }
+	};
+
+
+	//---------------------------------------------------------------------
 	const REFS =
 	{
 		day_of_week: [ 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday' ],
@@ -328,125 +464,6 @@ module.exports = function ( Liquicode )
 
 		return datetime_parts;
 	}
-
-
-	//---------------------------------------------------------------------
-	function Parse( Text, TimeZoneOffset )
-	{
-		From = Liquicode.Core.ValidateField( From, Schema.Parameters.From );
-
-		// Prepare and validate the date string.
-		Text = Text.toLowerCase().trim();
-		if ( !Text ) { return get_date_parts( null, TimeZoneOffset ); }
-
-		// Validate AssumeTimeZone
-		if ( !TimeZoneOffset ) { TimeZoneOffset = '+0000'; }
-		if ( !TimeZoneOffset.startsWith( '+' ) && !TimeZoneOffset.startsWith( '-' ) )
-		{
-			throw new Error( `AssumeTimeZone must begin with a plus or minus sign.` );
-		}
-		let offset = TimeZoneOffset.substr( 1 );
-		if ( ( offset.length !== 4 ) || isNaN( offset ) )
-		{
-			throw new Error( `AssumeTimeZone must have a four digit offset component.` );
-		}
-
-		let date = null;
-
-		// Try some unusual cases of compressed timestamps.
-		if ( !isNaN( Number( Text ) ) )
-		{
-			let s = Number( Text ).toString(); // Remove any noise.
-			if ( s.length == 8 )
-			{
-				// 20180329 => 2018-03-29
-				s = (
-					s.substr( 0, 4 ) + '-' +
-					s.substr( 4, 2 ) + '-' +
-					s.substr( 6, 2 ) +
-					' 00:00:00 ' + TimeZoneOffset
-				);
-			}
-			else if ( s.length == 10 )
-			{
-				// 1465241631 => 1465241631000 => Date(1465241631000)
-				s += '000'; // milliseconds
-				s = Number( s );
-			}
-			else if ( s.length == 13 )
-			{
-				// 1465241631000 => Date(1465241631000)
-				s = s; // milliseconds
-				s = Number( s );
-			}
-			else if ( s.length == 14 )
-			{
-				// 20180329074753 => 2018-03-29 07:47:53
-				s = (
-					s.substr( 0, 4 ) + '-' +
-					s.substr( 4, 2 ) + '-' +
-					s.substr( 6, 2 ) + ' ' +
-					s.substr( 8, 2 ) + ':' +
-					s.substr( 10, 2 ) + ':' +
-					s.substr( 12, 2 ) +
-					' ' + TimeZoneOffset
-				);
-			}
-
-			// Try the javascript date parsing.
-			try { date = new Date( s ); }
-			catch ( e ) { }
-			if ( date ) { return get_date_parts( date, TimeZoneOffset ); }
-		}
-
-		// Test for ISO format: 2005-05-01T15:05:23.000Z
-		if (
-			( Text.length >= 24 )
-			&& ( Text.substr( 4, 1 ) === '-' )
-			&& ( Text.substr( 7, 1 ) === '-' )
-			&& ( Text.substr( 10, 1 ) === 't' )
-			&& ( Text.substr( 13, 1 ) === ':' )
-			&& ( Text.substr( 16, 1 ) === ':' )
-			&& ( Text.substr( 19, 1 ) === '.' )
-			&& ( Text.substr( 23, 1 ) === 'z' )
-		)
-		{
-			try { date = new Date( Text ); }
-			catch ( e ) { }
-			if ( date && !isNaN( date.getTime() ) )
-			{ return get_date_parts( date, TimeZoneOffset ); }
-			else { return get_date_parts( null, TimeZoneOffset ); }
-		}
-
-		// Test for ISO format (short): 2005-05-01T15:05:23Z
-		if (
-			( Text.length >= 20 )
-			&& ( Text.substr( 4, 1 ) === '-' )
-			&& ( Text.substr( 7, 1 ) === '-' )
-			&& ( Text.substr( 10, 1 ) === 't' )
-			&& ( Text.substr( 13, 1 ) === ':' )
-			&& ( Text.substr( 16, 1 ) === ':' )
-			&& ( Text.substr( 19, 1 ) === 'z' )
-		)
-		{
-			try { date = new Date( Text ); }
-			catch ( e ) { }
-			if ( date && !isNaN( date.getTime() ) )
-			{ return get_date_parts( date, TimeZoneOffset ); }
-			else { return get_date_parts( null, TimeZoneOffset ); }
-		}
-
-		// We know its not a javascript supported format.
-		// We have to do it the hard way.
-		let tokens = tokenize_date( Text );
-		let symbols = tokens2symbols( tokens );
-		date = symbols2date( symbols, TimeZoneOffset );
-
-		// Return the date.
-		if ( date && !isNaN( date.getTime() ) )
-		{ return get_date_parts( date, TimeZoneOffset ); }
-		else { return get_date_parts( null, TimeZoneOffset ); }
-	};
 
 
 	//---------------------------------------------------------------------
