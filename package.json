@@ -1,0 +1,65 @@
+{
+	"name": "@liquicode/liquicodejs",
+	"version": "0.0.1",
+	"description": "A utility library for JavaScript development.",
+	"license": "MIT",
+	"homepage": "http://lquicodejs.liquicode.com",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/liquicode/liquicodejs"
+	},
+	"authors": [
+		{
+			"name": "Andre' G. Bowlin",
+			"email": "agbowlin@gmail.com",
+			"homepage": "http://liquicode.com"
+		}
+	],
+	"main": "src/liquicode-node.js",
+	"files": [
+		"readme.md",
+		"license.md",
+		"VERSION",
+		"dist/*",
+		"docs/*",
+		"src/*",
+		"tests/*"
+	],
+	"ignore": [
+		".*",
+		"~*",
+		"bower_components",
+		"node_modules",
+		"build"
+	],
+	"keywords": [
+		"javascript",
+		"js",
+		"nodejs",
+		"node",
+		"json"
+	],
+	"dependencies": {},
+	"devDependencies": {
+		"@babel/core": "^7.18.10",
+		"@babel/preset-env": "^7.18.10",
+		"acorn": "^8.8.0",
+		"babel-loader": "^8.2.5",
+		"babel-polyfill": "^6.26.0",
+		"cross-env": "^7.0.3",
+		"mocha": "^10.0.0",
+		"uglifyjs-webpack-plugin": "^2.2.0",
+		"webpack": "^5.74.0",
+		"webpack-cli": "^4.10.0",
+		"webpack-node-externals": "^3.0.0"
+	},
+	"scripts": {
+		"run-tests": "mocha -u bdd tests/String/*.js --timeout 0 --slow 10 --colors",
+		"run-docs-web-server": "npx here --directory docs --port 4200 --watch 1 --silent",
+		"webpack-es5": "cross-env WEBPACK_ENV=es5 webpack",
+		"webpack-es6": "cross-env WEBPACK_ENV=es6 webpack",
+		"webpack-node-min": "cross-env WEBPACK_ENV=node-min webpack",
+		"webpack-node": "cross-env WEBPACK_ENV=node webpack",
+		"910-release-version": "node build/custom/910-release-version.js"
+	}
+}
