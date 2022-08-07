@@ -2,7 +2,7 @@
 
 
 //---------------------------------------------------------------------
-let Schema = {
+let _Schema = {
 	id: '203',
 	member_of: 'Text',
 	name: 'Matches',
@@ -51,8 +51,8 @@ module.exports = function ( Liquicode )
 	function Matches( Text, Pattern ) 
 	{
 		// Validate Parameters
-		Text = Liquicode.Core.ValidateField( Text, Schema.Parameters.Text );
-		Pattern = Liquicode.Core.ValidateField( Pattern, Schema.Parameters.Pattern );
+		Text = Liquicode.Schema.ValidateValue( Text, _Schema.Parameters.Text , { coerce_values: true, throw_errors: true });
+		Pattern = Liquicode.Schema.ValidateValue( Pattern, _Schema.Parameters.Pattern , { coerce_values: true, throw_errors: true });
 
 		//FROM: https://stackoverflow.com/a/57527468
 		let wildcard_exp = Pattern.replace( /[.+^${}()|[\]\\]/g, '\\$&' ); // regexp escape 
@@ -63,7 +63,7 @@ module.exports = function ( Liquicode )
 	//---------------------------------------------------------------------
 	// Return the module exports.
 	return {
-		_Schema: Schema,
+		_Schema: _Schema,
 		Matches: Matches,
 	};
 };

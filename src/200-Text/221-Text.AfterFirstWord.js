@@ -2,7 +2,7 @@
 
 
 //---------------------------------------------------------------------
-let Schema = {
+let _Schema = {
 	id: '221',
 	member_of: 'Text',
 	name: 'AfterFirstWord',
@@ -52,8 +52,8 @@ module.exports = function ( Liquicode )
 
 	function AfterFirstWord( Phrase, Delimiters )
 	{
-		Phrase = Liquicode.Core.ValidateField( Phrase, Schema.Parameters.Phrase );
-		Delimiters = Liquicode.Core.ValidateField( Delimiters, Schema.Parameters.Delimiters );
+		Phrase = Liquicode.Schema.ValidateValue( Phrase, _Schema.Parameters.Phrase , { coerce_values: true, throw_errors: true });
+		Delimiters = Liquicode.Schema.ValidateValue( Delimiters, _Schema.Parameters.Delimiters , { coerce_values: true, throw_errors: true });
 
 		for ( let index = 0; index < Phrase.length; index++ )
 		{
@@ -76,7 +76,7 @@ module.exports = function ( Liquicode )
 	//---------------------------------------------------------------------
 	// Return the module exports.
 	return {
-		_Schema: Schema,
+		_Schema: _Schema,
 		AfterFirstWord: AfterFirstWord,
 	};
 };

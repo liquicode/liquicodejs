@@ -2,7 +2,7 @@
 
 
 //---------------------------------------------------------------------
-let Schema = {
+let _Schema = {
 	id: '210',
 	member_of: 'Text',
 	name: 'ReplaceCharacters',
@@ -66,10 +66,10 @@ module.exports = function ( Liquicode )
 	function ReplaceCharacters( Text, SearchCharacters, ReplacementText, MaxTimes )
 	{
 		// Validate Parameters
-		Text = Liquicode.Core.ValidateField( Text, Schema.Parameters.Text );
-		SearchCharacters = Liquicode.Core.ValidateField( SearchCharacters, Schema.Parameters.SearchCharacters );
-		ReplacementText = Liquicode.Core.ValidateField( ReplacementText, Schema.Parameters.ReplacementText );
-		MaxTimes = Liquicode.Core.ValidateField( MaxTimes, Schema.Parameters.MaxTimes );
+		Text = Liquicode.Schema.ValidateValue( Text, _Schema.Parameters.Text , { coerce_values: true, throw_errors: true });
+		SearchCharacters = Liquicode.Schema.ValidateValue( SearchCharacters, _Schema.Parameters.SearchCharacters, { coerce_values: true, throw_errors: true } );
+		ReplacementText = Liquicode.Schema.ValidateValue( ReplacementText, _Schema.Parameters.ReplacementText , { coerce_values: true, throw_errors: true });
+		MaxTimes = Liquicode.Schema.ValidateValue( MaxTimes, _Schema.Parameters.MaxTimes , { coerce_values: true, throw_errors: true });
 
 		let new_text = '';
 		let count = 0;
@@ -95,7 +95,7 @@ module.exports = function ( Liquicode )
 	//---------------------------------------------------------------------
 	// Return the module exports.
 	return {
-		_Schema: Schema,
+		_Schema: _Schema,
 		ReplaceCharacters: ReplaceCharacters,
 	};
 };

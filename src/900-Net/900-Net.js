@@ -8,7 +8,7 @@ let Schema = {
 	id: '900',
 	name: 'Net',
 	type: 'namespace',
-	summary: 'Functions for working with networks',
+	summary: 'Functions for working with networks. (nodejs only)',
 };
 
 
@@ -16,7 +16,7 @@ let Schema = {
 /**
  * @public
  * @namespace Net
- * @summary Functions for working with networks
+ * @summary Functions for working with networks. (nodejs only)
 */
 //-end-jsdoc-----------------------------------------------------------
 

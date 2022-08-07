@@ -2,7 +2,7 @@
 
 
 //---------------------------------------------------------------------
-let Schema = {
+let _Schema = {
 	id: '401',
 	member_of: 'Date',
 	name: 'Parse',
@@ -50,7 +50,7 @@ module.exports = function ( Liquicode )
 	//---------------------------------------------------------------------
 	function Parse( Text, TimeZoneOffset )
 	{
-		From = Liquicode.Core.ValidateField( From, Schema.Parameters.From );
+		From = Liquicode.Schema.ValidateValue( From, _Schema.Parameters.From , { coerce_values: true, throw_errors: true });
 
 		// Prepare and validate the date string.
 		Text = Text.toLowerCase().trim();
@@ -469,7 +469,7 @@ module.exports = function ( Liquicode )
 	//---------------------------------------------------------------------
 	// Return the module exports.
 	return {
-		_Schema: Schema,
+		_Schema: _Schema,
 		Parse: Parse,
 	};
 };

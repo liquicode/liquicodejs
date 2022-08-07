@@ -2,7 +2,7 @@
 
 
 //---------------------------------------------------------------------
-let Schema = {
+let _Schema = {
 	id: '101',
 	member_of: 'Object',
 	name: 'Clone',
@@ -43,7 +43,7 @@ module.exports = function ( Liquicode )
 
 	function Clone( From )
 	{
-		From = Liquicode.Core.ValidateField( From, Schema.Parameters.From );
+		From = Liquicode.Schema.ValidateValue( From, _Schema.Parameters.From, { coerce_values: true, throw_errors: true } );
 		return JSON.parse( JSON.stringify( From ) );
 	};
 
@@ -51,7 +51,7 @@ module.exports = function ( Liquicode )
 	//---------------------------------------------------------------------
 	// Return the module exports.
 	return {
-		_Schema: Schema,
+		_Schema: _Schema,
 		Clone: Clone,
 	};
 };

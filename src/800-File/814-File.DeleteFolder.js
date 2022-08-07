@@ -2,7 +2,7 @@
 
 
 //---------------------------------------------------------------------
-let Schema = {
+let _Schema = {
 	id: '814',
 	member_of: 'File',
 	name: 'DeleteFolder',
@@ -55,9 +55,9 @@ module.exports = function ( Liquicode )
 
 	function DeleteFolder( Folder, Recurse ) 
 	{
-		Folder = Liquicode.Core.ValidateField( Folder, Schema.Parameters.Folder );
-		FilePattern = Liquicode.Core.ValidateField( FilePattern, Schema.Parameters.FilePattern );
-		Recurse = Liquicode.Core.ValidateField( Recurse, Schema.Parameters.Recurse );
+		Folder = Liquicode.Schema.ValidateValue( Folder, _Schema.Parameters.Folder, { coerce_values: true, throw_errors: true } );
+		FilePattern = Liquicode.Schema.ValidateValue( FilePattern, _Schema.Parameters.FilePattern, { coerce_values: true, throw_errors: true } );
+		Recurse = Liquicode.Schema.ValidateValue( Recurse, _Schema.Parameters.Recurse , { coerce_values: true, throw_errors: true });
 
 		if ( !LIB_FS.existsSync( Folder ) ) { return 0; }
 		let count = 0;
@@ -89,7 +89,7 @@ module.exports = function ( Liquicode )
 	//---------------------------------------------------------------------
 	// Return the module exports.
 	return {
-		_Schema: Schema,
+		_Schema: _Schema,
 		DeleteFolder: DeleteFolder,
 	};
 };

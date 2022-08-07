@@ -2,16 +2,13 @@
 
 
 //---------------------------------------------------------------------
-let Schema = {
+let _Schema = {
 	id: '103',
 	member_of: 'Object',
 	name: 'Merge',
 	type: 'function',
 	returns: 'object',
-	description: [
-		'Returns a clone of the given object.',
-		'This is equivalent to doing A = JSON.parse( JSON.stringify( B ) ).',
-	],
+	description: ``,
 	Parameters: {
 		Original: {
 			name: 'Original',
@@ -22,7 +19,6 @@ let Schema = {
 			name: 'Updates',
 			type: 'object',
 			required: false,
-			default: {},
 		},
 	},
 };
@@ -38,19 +34,16 @@ module.exports = function ( Liquicode )
 	 * @public
 	 * @function Merge
 	 * @returns {object}
-	 * @description
-	 * Returns a clone of the given object.
-	 * This is equivalent to doing A = JSON.parse( JSON.stringify( B ) ).
 	 * @param {object} Original
-	 * @param {object} [Updates={}]
+	 * @param {object} [Updates]
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 
 
 	function Merge( Original, Updates )
 	{
-		Original = Liquicode.Core.ValidateField( Original, Schema.Parameters.Original );
-		Updates = Liquicode.Core.ValidateField( Updates, Schema.Parameters.Updates );
+		Original = Liquicode.Schema.ValidateValue( Original, _Schema.Parameters.Original, { coerce_values: true, throw_errors: true } );
+		Updates = Liquicode.Schema.ValidateValue( Updates, _Schema.Parameters.Updates, { coerce_values: true, throw_errors: true } );
 
 		let new_object = JSON.parse( JSON.stringify( Original ) );
 
@@ -104,7 +97,7 @@ module.exports = function ( Liquicode )
 	//---------------------------------------------------------------------
 	// Return the module exports.
 	return {
-		_Schema: Schema,
+		_Schema: _Schema,
 		Merge: Merge,
 	};
 };

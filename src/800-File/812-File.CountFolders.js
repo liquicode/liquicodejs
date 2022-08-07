@@ -2,7 +2,7 @@
 
 
 //---------------------------------------------------------------------
-let Schema = {
+let _Schema = {
 	id: '812',
 	member_of: 'File',
 	name: 'CountFolders',
@@ -49,8 +49,8 @@ module.exports = function ( Liquicode )
 
 	function CountFolders( StartFolder, Recurse ) 
 	{
-		StartFolder = Liquicode.Core.ValidateField( StartFolder, Schema.Parameters.StartFolder );
-		Recurse = Liquicode.Core.ValidateField( Recurse, Schema.Parameters.Recurse );
+		StartFolder = Liquicode.Schema.ValidateValue( StartFolder, _Schema.Parameters.StartFolder, { coerce_values: true, throw_errors: true } );
+		Recurse = Liquicode.Schema.ValidateValue( Recurse, _Schema.Parameters.Recurse , { coerce_values: true, throw_errors: true });
 
 		let folder_count = 0;
 		Liquicode.File.Visit( StartFolder, '', Recurse,
@@ -68,7 +68,7 @@ module.exports = function ( Liquicode )
 	//---------------------------------------------------------------------
 	// Return the module exports.
 	return {
-		_Schema: Schema,
+		_Schema: _Schema,
 		CountFolders: CountFolders,
 	};
 };

@@ -6,9 +6,7 @@ let Schema = {
 	id: '200',
 	name: 'Text',
 	type: 'namespace',
-	description: [
-		'Functions for text parsing and manipulation.',
-	],
+	summary: 'Functions for text parsing and manipulation.',
 };
 
 
@@ -16,8 +14,7 @@ let Schema = {
 /**
  * @public
  * @namespace Text
- * @description
- * Functions for text parsing and manipulation.
+ * @summary Functions for text parsing and manipulation.
 */
 //-end-jsdoc-----------------------------------------------------------
 

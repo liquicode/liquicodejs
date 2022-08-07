@@ -11,9 +11,27 @@ const LQC = require( LIB_PATH.join( SOURCE_FOLDER, 'liquicode-node.js' ) );
 
 //---------------------------------------------------------------------
 // A helper object to keep track of all the bits.
-function NewJSDoc()
+function NewJSDocLines()
 {
 	let jsdoc = {
+
+		//---------------------------------------------------------------------
+		jsdoc_lines: [],
+
+		//---------------------------------------------------------------------
+		Add: function ( Text, LinePrefix = '' )
+		{
+			if ( Array.isArray( Text ) )
+			{
+				let lines = Text.map( item => LinePrefix + item );
+				this.jsdoc_lines.push( ...lines );
+			}
+			else
+			{
+				this.jsdoc_lines.push( LinePrefix + Text );
+			}
+			return;
+		},
 
 		//---------------------------------------------------------------------
 		filename: '',
@@ -22,7 +40,6 @@ function NewJSDoc()
 		jsdoc_first_index: -1,
 		jsdoc_last_index: -1,
 		block_prefix: '',
-		jsdoc_lines: [],
 
 		//---------------------------------------------------------------------
 		Load: function ( Filename )
@@ -51,21 +68,6 @@ function NewJSDoc()
 						break;
 					}
 				}
-			}
-			return;
-		},
-
-		//---------------------------------------------------------------------
-		Add: function ( Text, LinePrefix = '' )
-		{
-			if ( Array.isArray( Text ) )
-			{
-				let lines = Text.map( item => LinePrefix + item );
-				this.jsdoc_lines.push( ...lines );
-			}
-			else
-			{
-				this.jsdoc_lines.push( LinePrefix + Text );
 			}
 			return;
 		},
@@ -100,45 +102,9 @@ function NewJSDoc()
 
 //---------------------------------------------------------------------
 // Process a single file by inserting jsdoc tags.
-function process_file( Filename )
+function ProcessSchema( Schema )
 {
-
-	//---------------------------------------------------------------------
-	// Load the schema.
-	let source = require( Filename );
-	if ( typeof source !== 'function' ) 
-	{
-		let message = `File is not a Liquicode module [${Filename}].`;
-		// console.error( message );
-		throw new Error( message );
-	}
-	let schema = source( LQC )._Schema;
-	if ( !schema ) 
-	{
-		let message = `File has no schema [${Filename}].`;
-		// console.error( message );
-		throw new Error( message );
-	}
-
-	//---------------------------------------------------------------------
-	// Load the file content.
-	let jsdoc = NewJSDoc();
-	jsdoc.Load( Filename );
-
-	//---------------------------------------------------------------------
-	// Validate the insertion point.
-	if ( jsdoc.jsdoc_first_index < 0 ) 
-	{
-		let message = `Unable to find the insertion point in [${Filename}].`;
-		// console.error( message );
-		throw new Error( message );
-	}
-	if ( jsdoc.jsdoc_last_index < 0 ) 
-	{
-		let message = `Unable to find the ending point in [${Filename}].`;
-		// console.error( message );
-		throw new Error( message );
-	}
+	let jsdoc = NewJSDocLines();
 
 	//---------------------------------------------------------------------
 	// Generate the JSDoc tags.
@@ -147,72 +113,72 @@ function process_file( Filename )
 	jsdoc.Add( `@public` );
 
 	// - Is Async
-	if ( schema.is_async )
+	if ( Schema.is_async )
 	{
 		jsdoc.Add( `@async` );
 	}
 
 	// - Type and Name
-	if ( schema.type === 'function' )
+	if ( Schema.type === 'function' )
 	{
-		jsdoc.Add( `@function ${schema.name}` );
+		jsdoc.Add( `@function ${Schema.name}` );
 	}
-	else if ( schema.type === 'class' )
+	else if ( Schema.type === 'class' )
 	{
-		jsdoc.Add( `@class ${schema.name}` );
+		jsdoc.Add( `@class ${Schema.name}` );
 	}
-	else if ( schema.type === 'module' )
+	else if ( Schema.type === 'module' )
 	{
-		jsdoc.Add( `@module ${schema.name}` );
+		jsdoc.Add( `@module ${Schema.name}` );
 	}
-	else if ( schema.type === 'namespace' )
+	else if ( Schema.type === 'namespace' )
 	{
-		jsdoc.Add( `@namespace ${schema.name}` );
+		jsdoc.Add( `@namespace ${Schema.name}` );
 	}
 	else
 	{
-		jsdoc.Add( `@name ${schema.name}` );
+		jsdoc.Add( `@name ${Schema.name}` );
 	}
 
 	// - Member Of
-	if ( schema.member_of )
+	if ( Schema.member_of )
 	{
-		// jsdoc.Add( `@memberof ${schema.member_of}` );
+		// jsdoc.Add( `@memberof ${Schema.member_of}` );
 
 		//NOTE: Adding the 'memberof' tag for functions spurgs out the VSCode intellisense.
 		// Probably need to define the root 'Liquicode' object to fix it. :/
 	}
 
 	// - Returns
-	if ( schema.returns )
+	if ( Schema.returns )
 	{
-		jsdoc.Add( `@returns {${schema.returns}}` );
-		if ( schema.returns_description )
+		jsdoc.Add( `@returns {${Schema.returns}}` );
+		if ( Schema.returns_description )
 		{
-			jsdoc.Add( schema.returns_description );
+			jsdoc.Add( Schema.returns_description );
 		}
 	}
 
 	// - Summary
-	if ( schema.summary )
+	if ( Schema.summary )
 	{
-		jsdoc.Add( `@summary ${schema.summary}` );
+		jsdoc.Add( `@summary ${Schema.summary}` );
 	}
 
 	// - Description
-	if ( schema.description )
+	if ( Schema.description )
 	{
 		jsdoc.Add( `@description` );
-		jsdoc.Add( schema.description );
+		jsdoc.Add( Schema.description );
 	}
 
 	// - Params
-	if ( schema.Parameters )
+	if ( Schema.Parameters )
 	{
-		let parameter_keys = Object.keys( schema.Parameters );
+		let parameter_keys = Object.keys( Schema.Parameters );
 		for ( let index = 0; index < parameter_keys.length; index++ )
 		{
-			let parameter = schema.Parameters[ parameter_keys[ index ] ];
+			let parameter = Schema.Parameters[ parameter_keys[ index ] ];
 			let text = `@param {${parameter.type}}`;
 			if ( parameter.required )
 			{
@@ -238,9 +204,29 @@ function process_file( Filename )
 	}
 
 	// - Todo
-	if ( schema.todo )
+	if ( Schema.todo )
 	{
-		jsdoc.Add( schema.todo, '@todo ' );
+		jsdoc.Add( Schema.todo, '@todo ' );
+	}
+
+	//---------------------------------------------------------------------
+	// Load the file content.
+	let source_filename = LIB_PATH.join( SOURCE_FOLDER, Schema.source_filename );
+	jsdoc.Load( source_filename );
+
+	//---------------------------------------------------------------------
+	// Validate the insertion point.
+	if ( jsdoc.jsdoc_first_index < 0 ) 
+	{
+		let message = `Unable to find the insertion point in [${source_filename}].`;
+		// console.error( message );
+		throw new Error( message );
+	}
+	if ( jsdoc.jsdoc_last_index < 0 ) 
+	{
+		let message = `Unable to find the ending point in [${source_filename}].`;
+		// console.error( message );
+		throw new Error( message );
 	}
 
 	//---------------------------------------------------------------------
@@ -253,33 +239,21 @@ function process_file( Filename )
 
 
 //---------------------------------------------------------------------
-let count_total_files = 0;
-let count_files_with_errors = 0;
-let count_files_processed = 0;
-LQC.File.Visit( SOURCE_FOLDER, '*.js', true,
-	function ( Folder, Filename )
-	{
-		if ( !Filename ) { return; }
-		if ( Filename.endsWith( '.Tests.js' ) ) { return; }
-		let file_path = LIB_PATH.join( Folder, Filename );
-		try
-		{
-			count_total_files++;
-			process_file( file_path );
-			count_files_processed++;
-			console.log( file_path + ' ... OK' );
-		}
-		catch ( error )
-		{
-			console.log( file_path + ' ... ERROR' );
-			console.error( error.message );
-			count_files_with_errors++;
-		}
-		return;
-	} );
+// Load the schema document.
+let SchemaDoc = null;
+{
+	let filename = LIB_PATH.resolve( __dirname, '..', 'docs' );
+	filename = LIB_PATH.join( filename, 'liquicodejs.schema.json' );
+	SchemaDoc = JSON.parse( LIB_FS.readFileSync( filename, 'utf8' ) );
+	console.log( `Loaded [${SchemaDoc.schema.length}] schemas from file [${filename}].` );
+}
 
 
-console.log( `Total Files        : ${count_total_files}` );
-console.log( `Files with Errors  : ${count_files_with_errors}` );
-console.log( `Files Processed    : ${count_files_processed}` );
+//---------------------------------------------------------------------
+// Process the schemas.
+for ( let schema_index = 0; schema_index < SchemaDoc.schema.length; schema_index++ )
+{
+	let schema = SchemaDoc.schema[ schema_index ];
+	ProcessSchema( schema );
+}
 

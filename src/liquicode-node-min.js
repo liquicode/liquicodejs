@@ -6,7 +6,7 @@ var Liquicode = {};
 Liquicode.version = 'v0.0.1';
 Liquicode.environment = 'node-min';
 
-Liquicode.Core = require( './000-Core/000-Core.js' )( Liquicode );
+Liquicode.Schema = require( './000-Schema/000-Schema.js' )( Liquicode );
 Liquicode.Object = require( './100-Object/100-Object.js' )( Liquicode );
 Liquicode.Text = require( './200-Text/200-Text.js' )( Liquicode );
 Liquicode.Json = require( './300-Json/300-Json.js' )( Liquicode );

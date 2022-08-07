@@ -2,7 +2,7 @@
 
 
 //---------------------------------------------------------------------
-let Schema = {
+let _Schema = {
 	id: '110',
 	member_of: 'Object',
 	name: 'Traverse',
@@ -48,8 +48,8 @@ module.exports = function ( Liquicode )
 
 	function Traverse( Root, Visitor )
 	{
-		Root = Liquicode.Core.ValidateField( Root, Schema.Parameters.Root );
-		Visitor = Liquicode.Core.ValidateField( Visitor, Schema.Parameters.Visitor );
+		Root = Liquicode.Schema.ValidateValue( Root, _Schema.Parameters.Root );
+		Visitor = Liquicode.Schema.ValidateValue( Visitor, _Schema.Parameters.Visitor );
 
 		//---------------------------------------------------------------------
 		function traverse_recurse( Visitor, Parent, Name, Value, Path, Depth )
@@ -99,7 +99,7 @@ module.exports = function ( Liquicode )
 	//---------------------------------------------------------------------
 	// Return the module exports.
 	return {
-		_Schema: Schema,
+		_Schema: _Schema,
 		Traverse: Traverse,
 	};
 };

@@ -2,7 +2,7 @@
 
 
 //---------------------------------------------------------------------
-let Schema = {
+let _Schema = {
 	id: '201',
 	member_of: 'Text',
 	name: 'NewTextBuffer',
@@ -49,8 +49,8 @@ module.exports = function ( Liquicode )
 
 	function NewTextBuffer( InitialValue, BlockLength )
 	{
-		InitialValue = Liquicode.Core.ValidateField( InitialValue, Schema.Parameters.InitialValue );
-		BlockLength = Liquicode.Core.ValidateField( BlockLength, Schema.Parameters.BlockLength );
+		InitialValue = Liquicode.Schema.ValidateValue( InitialValue, _Schema.Parameters.InitialValue , { coerce_values: true, throw_errors: true });
+		BlockLength = Liquicode.Schema.ValidateValue( BlockLength, _Schema.Parameters.BlockLength , { coerce_values: true, throw_errors: true });
 		if ( BlockLength <= 0 ) { throw new Error( `The parameter [BlockLength] must be a positive number.` ); }
 
 		let text_buffer = {
@@ -98,7 +98,7 @@ module.exports = function ( Liquicode )
 	//---------------------------------------------------------------------
 	// Return the module exports.
 	return {
-		_Schema: Schema,
+		_Schema: _Schema,
 		NewTextBuffer: NewTextBuffer,
 	};
 };

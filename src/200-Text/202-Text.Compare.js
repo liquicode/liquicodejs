@@ -2,7 +2,7 @@
 
 
 //---------------------------------------------------------------------
-let Schema = {
+let _Schema = {
 	id: '201',
 	member_of: 'Text',
 	name: 'Compare',
@@ -61,9 +61,9 @@ module.exports = function ( Liquicode )
 
 	function Compare( StringA, StringB, CaseSensitive )
 	{
-		StringA = Liquicode.Core.ValidateField( StringA, Schema.Parameters.StringA );
-		StringB = Liquicode.Core.ValidateField( StringB, Schema.Parameters.StringB );
-		CaseSensitive = Liquicode.Core.ValidateField( CaseSensitive, Schema.Parameters.CaseSensitive );
+		StringA = Liquicode.Schema.ValidateValue( StringA, _Schema.Parameters.StringA , { coerce_values: true, throw_errors: true });
+		StringB = Liquicode.Schema.ValidateValue( StringB, _Schema.Parameters.StringB , { coerce_values: true, throw_errors: true });
+		CaseSensitive = Liquicode.Schema.ValidateValue( CaseSensitive, _Schema.Parameters.CaseSensitive, { coerce_values: true, throw_errors: true } );
 
 		try
 		{
@@ -87,7 +87,7 @@ module.exports = function ( Liquicode )
 	//---------------------------------------------------------------------
 	// Return the module exports.
 	return {
-		_Schema: Schema,
+		_Schema: _Schema,
 		Compare: Compare,
 	};
 };
