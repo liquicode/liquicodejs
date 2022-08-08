@@ -12,13 +12,10 @@
 
 ~~~javascript
 FieldSchema = {
-	name: '',				// Name of the field.
 	type: '',				// Javascript data type (boolean, number, string, object).
 	format: '',				// A data type specific designation.
-	required: false,		// True if field is required.
 	default: undefined,		// A default value used for missing fields.
-	description: '',		// A string or array of strings.
-	examples: '',			// A string or array of strings.
+	name: '',				// Name of the field.
 }
 ~~~
 
@@ -87,6 +84,9 @@ The functions "Schema.ObjectSchema()" and "Schema.ValidateObject()" take these c
 provides schemas functionality on an object level rather than an individual value level.
 
 
+**Additional References***
+
+- [You Don't Know JS: Types & Grammar - Chapter 4. Coercion](https://www.oreilly.com/library/view/you-dont-know/9781491905159/ch04.html)
 
 
 
@@ -175,11 +175,11 @@ While it does return an entire FieldSchema object, only the "FieldSchema.type" a
 <details>
 <summary>
 <strong>
-Schema.DefaultValue( Schema, ThrowsErrors ) - Returns the default value for the FieldSchema.
+Schema.DefaultValue( Schema, ThrowErrors ) - Returns the default value for the FieldSchema.
 </strong>
 </summary>
 
->## Function: DefaultValue( Schema, ThrowsErrors )
+>## Function: DefaultValue( Schema, ThrowErrors )
 > 
 > Returns the default value for the FieldSchema.
 > 
@@ -215,11 +215,11 @@ Otherwise, a default value is calculated based upon the type and format of the F
 <details>
 <summary>
 <strong>
-Schema.CoerceValue( Value, Schema, ThrowsErrors ) - Attempt to coerce the Value parameter to match the Schema's type.
+Schema.CoerceValue( Value, Schema, ThrowErrors ) - Attempt to coerce the Value parameter to match the Schema's type.
 </strong>
 </summary>
 
->## Function: CoerceValue( Value, Schema, ThrowsErrors )
+>## Function: CoerceValue( Value, Schema, ThrowErrors )
 > 
 > Attempt to coerce the Value parameter to match the Schema's type.
 > 
@@ -228,24 +228,16 @@ Schema.CoerceValue( Value, Schema, ThrowsErrors ) - Attempt to coerce the Value 
 ***Description***
 
 
-This function uses the "FieldSchema.type", "FieldSchema.format", "FieldSchema.required", and "FieldSchema.default" fields to coerce Value to a particular data type.
+
+This function uses the Schema to coerce the Value to a particular data type.
+
+If the "Schema.type" === "*", then no validation or coercion is performed and the Value is returned.
+If the "Schema.type" === "function", then no validation or coercion is performed and the Value is returned.
 
 If Value is "undefined" or "null", then the default value for "FieldSchema.type" will be returned.
 This is done by calling "Schema.DefaultValue()" for the FieldSchema.
 
-***Coercion Table***
-
-|    **From**   | **to boolean** |    **to number**    |      **to string**      |    **to object**    |
-|:-------------:|:--------------:|:-------------------:|:-----------------------:|:-------------------:|
-| **undefined** |  DefaultValue  |     DefaultValue    |       DefaultValue      |     DefaultValue    |
-|    **null**   |  DefaultValue  |     DefaultValue    |       DefaultValue      |     DefaultValue    |
-|  **boolean**  |      Value     |         0, 1        |      Value.toString     |        Error        |
-|   **number**  |   true, false  |        Value        |      Value.toString     |        Error        |
-|   **string**  |   true, false  | parseFloat( Value ) |          Value          | JSON.parse( Value ) |
-|   **object**  |   true, false  |        Error        | JSON.stringify( Value ) |        Value        |
-
-- **DefaultValue** is calculated by calling Schema.DefaultValue( Schema ).
-- **Error** is an "ErrorValue": { ok: false, error: '...', context: 'CoerceValue' }
+"Schema.ValueSchema()" is called the get the schema for Value, which is then compared against the expected Schema.
 
 	
 
@@ -279,6 +271,72 @@ If "Options.coerce = true", then an attempt will be made to coerce the given val
 (See: "Schema.CoerceValue()")
 
 	
+
+
+---
+
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+Schema.ObjectSchema( FromObject ) - Returns an array of FieldSchema describing the top-most members of "FromObject".
+</strong>
+</summary>
+
+>## Function: ObjectSchema( FromObject )
+> 
+> Returns an array of FieldSchema describing the top-most members of "FromObject".
+> 
+> **Returns**: ***object*** - An array of FieldSchema.
+
+***TODO***
+
+
+
+---
+
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+Schema.ValidateValues( Values, Schemas ) - Validate a set of values against an array of FieldSchema.
+</strong>
+</summary>
+
+>## Function: ValidateValues( Values, Schemas )
+> 
+> Validate a set of values against an array of FieldSchema.
+> 
+> **Returns**: ***object*** - An object containing the validation result.
+
+***Description***
+
+
+
+Takes an array of Values and an array of FieldSchema to validate a number of fields at once.
+This function does not throw validation errors.
+Instead, all validation errors are returned to the caller in the return value.
+Additionally, the number of fields processed and a set of coerced values is also returned.
+
+**The Return Value**
+
+~~~javascript
+ReturnValue = {
+	field_count: 0,				// The number of fields processed.
+	validation_errors: [],		// All validation errors encountered.
+	coerced_values: [],			// An array of coerced values.
+}
+~~~
+
+
+***TODO***
+
 
 
 ---
@@ -352,8 +410,251 @@ Object.Traverse( Root, Visitor ) - undefined
 
 ***Description***
 
+
+
 Traverses and calls a visitor callback function for each field in an object.
 This functions recurses through sub-objects and traverses the entire object.
+
+
+
+
+---
+
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+Object.HasPath( Root, Path ) - undefined
+</strong>
+</summary>
+
+>## Function: HasPath( Root, Path )
+> 
+> undefined
+> 
+> **Returns**: ***boolean*** - undefined
+
+
+---
+
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+Object.FindField( Root, Name ) - undefined
+</strong>
+</summary>
+
+>## Function: FindField( Root, Name )
+> 
+> undefined
+> 
+> **Returns**: ***string*** - undefined
+
+
+---
+
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+Object.FindValue( Root, Value ) - Locate a value stored within an object.
+</strong>
+</summary>
+
+>## Function: FindValue( Root, Value )
+> 
+> Locate a value stored within an object.
+> 
+> **Returns**: ***string*** - undefined
+
+
+---
+
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+Object.GetValue( Root, Path ) - undefined
+</strong>
+</summary>
+
+>## Function: GetValue( Root, Path )
+> 
+> undefined
+> 
+> **Returns**: ******* - undefined
+
+
+---
+
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+Object.SetValue( Root, Path, Value ) - undefined
+</strong>
+</summary>
+
+>## Function: SetValue( Root, Path, Value )
+> 
+> undefined
+> 
+> **Returns**: ******* - undefined
+
+
+---
+
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+Object.FromJson( JsonString ) - undefined
+</strong>
+</summary>
+
+>## Function: FromJson( JsonString )
+> 
+> undefined
+> 
+> **Returns**: ***object*** - undefined
+
+***Description***
+
+
+Parse a Json string and return an object value.
+This is identical Javascript's "JSON.parse()" function.
+
+There are some significant differences from Javascript's version.
+The parser is a bit more relaxed and allows:
+- Identifiers are not required to have quotes.
+- A comma can appear after the last element of an array or object.
+- String literals can use either single or double quotes.
+- Parsing automatically stops when the closing brace or bracket is found in the json string.
+
+
+
+
+---
+
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+Object.ToJsonOptions( PresetName ) - undefined
+</strong>
+</summary>
+
+>## Function: ToJsonOptions( PresetName )
+> 
+> undefined
+> 
+> **Returns**: ***object*** - undefined
+
+***Description***
+
+
+
+
+
+---
+
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+Object.ToJson( Value, JsonOptions ) - undefined
+</strong>
+</summary>
+
+>## Function: ToJson( Value, JsonOptions )
+> 
+> undefined
+> 
+> **Returns**: ***object*** - undefined
+
+***Description***
+
+
+
+
+
+---
+
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+Object.FromIni( IniString ) - undefined
+</strong>
+</summary>
+
+>## Function: FromIni( IniString )
+> 
+> undefined
+> 
+> **Returns**: ***object*** - undefined
+
+***Description***
+
+
+Parse an Ini string and return an object value.
+
+
+
+
+---
+
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+Object.ToIni( Value ) - undefined
+</strong>
+</summary>
+
+>## Function: ToIni( Value )
+> 
+> undefined
+> 
+> **Returns**: ***object*** - undefined
+
+***Description***
+
+
+Parse an Ini string and return an object value.
+
+
 
 
 ---
@@ -364,30 +665,6 @@ This functions recurses through sub-objects and traverses the entire object.
 <br>
 
 # ***Text***: Functions for text parsing and manipulation.
-
-<br>
-
-<details>
-<summary>
-<strong>
-Text.NewTextBuffer( InitialValue, BlockLength ) - undefined
-</strong>
-</summary>
-
->## Function: NewTextBuffer( InitialValue, BlockLength )
-> 
-> undefined
-> 
-> **Returns**: ***string*** - undefined
-
-***Description***
-
-Returns a new TextBuffer.
-
-
----
-
-</details>
 
 <br>
 
@@ -809,3 +1086,51 @@ Returns the number of folders and files deleted.
 <br>
 
 # ***Net***: Functions for working with networks. (nodejs only)
+
+<br>
+
+<details>
+<summary>
+<strong>
+Net.AsyncDownloadFile(  ) - undefined
+</strong>
+</summary>
+
+>## Function: AsyncDownloadFile(  )
+> 
+> undefined
+> 
+> **Returns**: ***string*** - undefined
+
+***Description***
+
+Download a file from an url.
+
+
+---
+
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+Net.AsyncGetRequest( Url ) - undefined
+</strong>
+</summary>
+
+>## Function: AsyncGetRequest( Url )
+> 
+> undefined
+> 
+> **Returns**: ***string*** - undefined
+
+***Description***
+
+Make an http get request for a an url.
+
+
+---
+
+</details>

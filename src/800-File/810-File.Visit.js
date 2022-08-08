@@ -45,10 +45,6 @@ module.exports = function ( Liquicode )
 {
 
 
-	const LIB_FS = require( 'fs' );
-	const LIB_PATH = require( 'path' );
-
-
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
@@ -63,6 +59,10 @@ module.exports = function ( Liquicode )
 	 * @param {function} [Visitor]
 	*/
 	//-end-jsdoc-----------------------------------------------------------
+
+
+	const LIB_FS = require( 'fs' );
+	const LIB_PATH = require( 'path' );
 
 
 	function Visit( StartFolder, FilePattern, Recurse, Visitor ) 
