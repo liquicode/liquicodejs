@@ -4,7 +4,7 @@
 
 
 //---------------------------------------------------------------------
-let Schema = {
+let _Schema = {
 	id: '900',
 	name: 'Net',
 	type: 'namespace',
@@ -25,7 +25,7 @@ let Schema = {
 module.exports = function ( Liquicode )
 {
 	return {
-		_Schema: Schema,
+		_Schema: _Schema,
 		// AsyncDownloadFile: AsyncDownloadFile,
 	};
 };

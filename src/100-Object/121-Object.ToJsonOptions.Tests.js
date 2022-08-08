@@ -4,17 +4,18 @@
 const LIB_PATH = require( 'path' );
 const LIB_ASSERT = require( 'assert' );
 
-const LQC = require( LIB_PATH.resolve( __dirname, '../../src/liquicode-node.js' ) );
+const LQC = require( LIB_PATH.resolve( __dirname, '../liquicode-node.js' ) );
 
 
 //---------------------------------------------------------------------
-describe( `500) Token Tests`, function ()
+describe( `121) Object.ToJsonOptions Tests`, function ()
 {
 
 	//---------------------------------------------------------------------
-	it( `should load the Token module`, function ()
+	it( `should load the default options`, function ()
 	{
-		LIB_ASSERT.ok( LQC.Token );
+		let options = LQC.Object.ToJsonOptions();
+		LIB_ASSERT.ok( options );
 		return;
 	} );
 

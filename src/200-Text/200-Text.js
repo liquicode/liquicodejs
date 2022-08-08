@@ -24,7 +24,7 @@ module.exports = function ( Liquicode )
 {
 	return {
 		_Schema: Schema,
-		NewTextBuffer: require( './201-Text.NewTextBuffer.js' )( Liquicode ).NewTextBuffer,
+		// TextBuffer: require( './201-Text.TextBuffer.js' )( Liquicode ).TextBuffer,
 		Compare: require( './202-Text.Compare.js' )( Liquicode ).Compare,
 		Matches: require( './203-Text.Matches.js' )( Liquicode ).Matches,
 		ReplaceCharacters: require( './210-Text.ReplaceCharacters.js' )( Liquicode ).ReplaceCharacters,

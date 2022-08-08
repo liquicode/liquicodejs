@@ -8,10 +8,12 @@ let _Schema = {
 	name: 'Traverse',
 	type: 'function',
 	returns: 'string',
-	description: [
-		'Traverses and calls a visitor callback function for each field in an object.',
-		'This functions recurses through sub-objects and traverses the entire object.',
-	],
+	description: `
+
+Traverses and calls a visitor callback function for each field in an object.
+This functions recurses through sub-objects and traverses the entire object.
+
+`,
 	Parameters: {
 		Root: {
 			name: 'Root',
@@ -48,8 +50,9 @@ module.exports = function ( Liquicode )
 
 	function Traverse( Root, Visitor )
 	{
-		Root = Liquicode.Schema.ValidateValue( Root, _Schema.Parameters.Root );
-		Visitor = Liquicode.Schema.ValidateValue( Visitor, _Schema.Parameters.Visitor );
+		// Root = Root || {};
+		Root = Liquicode.Schema.CoerceValue( Root, _Schema.Parameters.Root, true );
+		// Visitor = Liquicode.Schema.CoerceValue( Visitor, _Schema.Parameters.Visitor, true );
 
 		//---------------------------------------------------------------------
 		function traverse_recurse( Visitor, Parent, Name, Value, Path, Depth )

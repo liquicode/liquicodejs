@@ -14,9 +14,13 @@ let _Schema = {
 
 This function uses the Schema to coerce the Value to a particular data type.
 
+If the "Schema.type" === "*", then no validation or coercion is performed and the Value is returned.
+If the "Schema.type" === "function", then no validation or coercion is performed and the Value is returned.
+
 If Value is "undefined" or "null", then the default value for "FieldSchema.type" will be returned.
 This is done by calling "Schema.DefaultValue()" for the FieldSchema.
 
+"Schema.ValueSchema()" is called the get the schema for Value, which is then compared against the expected Schema.
 
 	`,
 	Parameters: {
@@ -101,6 +105,12 @@ This is done by calling "Schema.DefaultValue()" for the FieldSchema.
 		if ( !Schema.type ) { return send_error( `The parameter [Schema.type] is missing.` ); }
 		let schema_format = Schema.format ? Schema.format : Schema.type;
 
+		// If the schema allows any type, simply return the Value.
+		if ( Schema.type === '*' ) { return Value; }
+
+		// If the schema type is 'function', simply return the Value.
+		if ( Schema.type === 'function' ) { return Value; }
+
 		// If Value is undefined, return the default.
 		if ( Value === undefined ) { return Liquicode.Schema.DefaultValue( Schema ); }
 
@@ -180,7 +190,8 @@ This is done by calling "Schema.DefaultValue()" for the FieldSchema.
 						return send_error( `Unable to coerce a (non-json) value from string to object.` );
 
 					case 'object':			// Convert object to object.
-						return JSON.parse( JSON.stringify( Value ) );
+						// return JSON.parse( JSON.stringify( Value ) );
+						return Value;
 
 					default:				// Error: Unknown value type.
 						return send_error( `Value has an unknown type [${value_schema.type}].` );

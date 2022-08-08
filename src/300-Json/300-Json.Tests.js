@@ -8,7 +8,7 @@ const LQC = require( LIB_PATH.resolve( __dirname, '../liquicode-node.js' ) );
 
 
 //---------------------------------------------------------------------
-describe( `000) Json Module`, function ()
+describe( `300) Json Module`, function ()
 {
 
 	//---------------------------------------------------------------------

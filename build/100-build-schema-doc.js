@@ -18,7 +18,9 @@ LQC.File.Visit( SOURCE_FOLDER, '*.js', true,
 	function ( Folder, Filename )
 	{
 		if ( !Filename ) { return; }
-		if ( Filename.endsWith( '.Tests.js' ) ) { return; }
+		if ( Filename.startsWith( '~' ) ) { return; }			// Ignore hidden files.
+		if ( Filename.startsWith( '_' ) ) { return; }			// Ignore private files.
+		if ( Filename.endsWith( '.Tests.js' ) ) { return; }		// Ignore testing files.
 		let file_path = LIB_PATH.join( Folder, Filename );
 		try
 		{

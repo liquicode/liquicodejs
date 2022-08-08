@@ -1,60 +1,53 @@
 "use strict";
 
 
-const LIB_FS = require( 'fs' );
 const LIB_PATH = require( 'path' );
 const LIB_ASSERT = require( 'assert' );
 
-const LIB_JSON = require( LIB_PATH.resolve( __dirname, '../../src/lib-json.js' ) );
-
-let test_1_json = LIB_FS.readFileSync( LIB_PATH.resolve( __dirname, '../test-data/test_1.json' ), 'utf8' );
-let test_1_data = JSON.parse( test_1_json );
-
-let result = null;
+const LQC = require( LIB_PATH.resolve( __dirname, '../liquicode-node.js' ) );
 
 
 //---------------------------------------------------------------------
-describe( `012) Json Stringify`, function ()
+describe( `122) Object.ToJson Tests`, function ()
 {
-
 
 	//---------------------------------------------------------------------
 	describe( `Stringify Primitives`, function ()
 	{
 		it( `should stringify null [null]`, function ()
 		{
-			result = LIB_JSON.Stringify( null );
+			let result = LQC.Object.ToJson( null );
 			LIB_ASSERT.strictEqual( result, 'null' );
 		} );
 		it( `should stringify empty string [""]`, function ()
 		{
-			result = LIB_JSON.Stringify( "" );
+			let result = LQC.Object.ToJson( "" );
 			LIB_ASSERT.strictEqual( result, '""' );
 		} );
 		it( `should stringify empty array [[]]`, function ()
 		{
-			result = LIB_JSON.Stringify( [] );
+			let result = LQC.Object.ToJson( [] );
 			LIB_ASSERT.strictEqual( result, '[]' );
 		} );
 		it( `should stringify empty object [{}]`, function ()
 		{
-			result = LIB_JSON.Stringify( {} );
+			let result = LQC.Object.ToJson( {} );
 			LIB_ASSERT.strictEqual( result, '{}' );
 		} );
 		it( `should stringify [true]`, function ()
 		{
-			result = LIB_JSON.Stringify( true );
+			let result = LQC.Object.ToJson( true );
 			LIB_ASSERT.strictEqual( result, 'true' );
 		} );
 		it( `should stringify [3.14]`, function ()
 		{
-			result = LIB_JSON.Stringify( 3.14 );
+			let result = LQC.Object.ToJson( 3.14 );
 			LIB_ASSERT.strictEqual( result, '3.14' );
 		} );
 		it( `should stringify ["Hello World!"]`, function ()
 		{
-			result = JSON.stringify( "Hello World!" );
-			result = LIB_JSON.Stringify( "Hello World!" );
+			// let result = JSON.stringify( "Hello World!" );
+			let result = LQC.Object.ToJson( "Hello World!" );
 			LIB_ASSERT.strictEqual( result, `"Hello World!"` );
 		} );
 	} );
@@ -66,55 +59,78 @@ describe( `012) Json Stringify`, function ()
 		it( `should stringify null [null] the same way`, function ()
 		{
 			LIB_ASSERT.strictEqual(
-				LIB_JSON.Stringify( null ),
+				LQC.Object.ToJson( null ),
 				JSON.stringify( null )
 			);
 		} );
 		it( `should stringify empty string [""] the same way`, function ()
 		{
 			LIB_ASSERT.strictEqual(
-				LIB_JSON.Stringify( "" ),
+				LQC.Object.ToJson( "" ),
 				JSON.stringify( "" )
 			);
 		} );
 		it( `should stringify empty array [[]] the same way`, function ()
 		{
 			LIB_ASSERT.strictEqual(
-				LIB_JSON.Stringify( [] ),
+				LQC.Object.ToJson( [] ),
 				JSON.stringify( [] )
 			);
 		} );
 		it( `should stringify empty object [{}] the same way`, function ()
 		{
 			LIB_ASSERT.strictEqual(
-				LIB_JSON.Stringify( {} ),
+				LQC.Object.ToJson( {} ),
 				JSON.stringify( {} )
 			);
 		} );
 		it( `should stringify [true] the same way`, function ()
 		{
 			LIB_ASSERT.strictEqual(
-				LIB_JSON.Stringify( true ),
+				LQC.Object.ToJson( true ),
 				JSON.stringify( true )
 			);
 		} );
 		it( `should stringify [3.14] the same way`, function ()
 		{
 			LIB_ASSERT.strictEqual(
-				LIB_JSON.Stringify( 3.14 ),
+				LQC.Object.ToJson( 3.14 ),
 				JSON.stringify( 3.14 )
 			);
 		} );
 		it( `should stringify ["Hello World!"] the same way`, function ()
 		{
 			LIB_ASSERT.strictEqual(
-				LIB_JSON.Stringify( "Hello World!" ),
+				LQC.Object.ToJson( "Hello World!" ),
 				JSON.stringify( "Hello World!" )
 			);
 		} );
 		it( `should stringify test_1.json the same way`, function ()
 		{
-			let v1 = LIB_JSON.Stringify( test_1_data );
+			let test_1_data = {
+				one: 1,
+				two: 2,
+				three: [
+					'three-1',
+					'three-2',
+					'three-3',
+				],
+				four: {
+					four_1: 4.1,
+					four_2: 4.2,
+					four_3: 4.3,
+				},
+				five: {
+					six: {
+						seven: 7,
+						eight: 8,
+						nine: 9,
+					},
+				},
+				none: null,
+				done: true,
+			};
+			let v1 = LQC.Object.ToJson( test_1_data );
 			let v2 = JSON.stringify( test_1_data );
 			LIB_ASSERT.strictEqual( v1, v2 );
 		} );
@@ -129,7 +145,7 @@ describe( `012) Json Stringify`, function ()
 			it( `should stringify faster than Node's JSON`, function ()
 			{
 				let t0 = new Date();
-				let json = LIB_JSON.Stringify( test_small_data );
+				let json = LQC.Object.ToJson( test_small_data );
 				let duration1 = ( ( new Date() ) - t0 );
 	
 				t0 = new Date();
@@ -156,4 +172,6 @@ describe( `012) Json Stringify`, function ()
 	*/
 
 
+	//---------------------------------------------------------------------
+	return;
 } );

@@ -85,13 +85,21 @@ The functions "Schema.ObjectSchema()" and "Schema.ValidateObject()" take these c
 provides schemas functionality on an object level rather than an individual value level.
 
 
+**Additional References***
+
+- [You Don't Know JS: Types & Grammar - Chapter 4. Coercion](https://www.oreilly.com/library/view/you-dont-know/9781491905159/ch04.html)
 
 `,
 	examples: [
 		`Schema = { name: 'PersonName', type: 'string' }`,
 		`Schema = { name: 'options', type: 'object', default: { hoist: true, swab: 'decks' } }`,
 		`Schema = { name: 'max_tries', type: 'number', format: 'integer', required: true, default: 3 }`,
-	]
+	],
+	todo: [
+		'Support extended number formats: positive-integer, negative-integer, positive-float, negative-float',
+		'Support type: function',
+		'Support format plugin-ins. Must implement: get_default(), is_type_of(value), can_coerce(type), coerce(value)',
+	],
 
 };
 
