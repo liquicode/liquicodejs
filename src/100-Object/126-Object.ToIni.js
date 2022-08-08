@@ -30,12 +30,14 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function Clone
-	 * @returns {string}
+	 * @function ToIni
+	 * @returns {object}
 	 * @description
-	 * Returns a clone of the given object.
-	 * This is equivalent to doing A = JSON.parse( JSON.stringify( B ) ).
-	 * @param {object} [From={}]
+	 * 
+Parse an Ini string and return an object value.
+
+
+	 * @param {object} [Value]
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 

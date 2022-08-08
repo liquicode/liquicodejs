@@ -35,6 +35,14 @@ module.exports = function ( Liquicode )
 
 
 	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function SetValue
+	 * @returns {*}
+	 * @param {object} Root
+	 * @param {string} Path
+	 * @param {*} Value
+	*/
 	//-end-jsdoc-----------------------------------------------------------
 
 

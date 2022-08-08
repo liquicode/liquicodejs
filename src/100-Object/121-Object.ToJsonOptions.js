@@ -28,12 +28,12 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function Clone
-	 * @returns {string}
+	 * @function ToJsonOptions
+	 * @returns {object}
 	 * @description
-	 * Returns a clone of the given object.
-	 * This is equivalent to doing A = JSON.parse( JSON.stringify( B ) ).
-	 * @param {object} [From={}]
+	 * 
+
+	 * @param {string} [PresetName]
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 

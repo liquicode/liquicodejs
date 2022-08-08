@@ -29,6 +29,15 @@ module.exports = function ( Liquicode )
 
 
 	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function ObjectSchema
+	 * @returns {object}
+	 * An array of FieldSchema.
+	 * @summary Returns an array of FieldSchema describing the top-most members of "FromObject".
+	 * @param {object} FromObject
+	 * An object to retrieve the schema for.
+	*/
 	//-end-jsdoc-----------------------------------------------------------
 
 

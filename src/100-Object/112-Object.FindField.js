@@ -30,6 +30,13 @@ module.exports = function ( Liquicode )
 
 
 	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function FindField
+	 * @returns {string}
+	 * @param {object} Root
+	 * @param {string} Name
+	*/
 	//-end-jsdoc-----------------------------------------------------------
 
 

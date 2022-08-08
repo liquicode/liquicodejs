@@ -40,8 +40,12 @@ module.exports = function ( Liquicode )
 	 * @function Traverse
 	 * @returns {string}
 	 * @description
-	 * Traverses and calls a visitor callback function for each field in an object.
-	 * This functions recurses through sub-objects and traverses the entire object.
+	 * 
+
+Traverses and calls a visitor callback function for each field in an object.
+This functions recurses through sub-objects and traverses the entire object.
+
+
 	 * @param {object} Root
 	 * @param {function} Visitor
 	*/

@@ -38,12 +38,22 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function Clone
-	 * @returns {string}
+	 * @function FromJson
+	 * @returns {object}
 	 * @description
-	 * Returns a clone of the given object.
-	 * This is equivalent to doing A = JSON.parse( JSON.stringify( B ) ).
-	 * @param {object} [From={}]
+	 * 
+Parse a Json string and return an object value.
+This is identical Javascript's "JSON.parse()" function.
+
+There are some significant differences from Javascript's version.
+The parser is a bit more relaxed and allows:
+- Identifiers are not required to have quotes.
+- A comma can appear after the last element of an array or object.
+- String literals can use either single or double quotes.
+- Parsing automatically stops when the closing brace or bracket is found in the json string.
+
+
+	 * @param {string} [JsonString]
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 

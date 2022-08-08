@@ -116,13 +116,10 @@ provides schemas functionality on an object level rather than an individual valu
 
 ~~~javascript
 FieldSchema = {
-	name: '',				// Name of the field.
 	type: '',				// Javascript data type (boolean, number, string, object).
 	format: '',				// A data type specific designation.
-	required: false,		// True if field is required.
 	default: undefined,		// A default value used for missing fields.
-	description: '',		// A string or array of strings.
-	examples: '',			// A string or array of strings.
+	name: '',				// Name of the field.
 }
 ~~~
 
@@ -191,8 +188,14 @@ The functions "Schema.ObjectSchema()" and "Schema.ValidateObject()" take these c
 provides schemas functionality on an object level rather than an individual value level.
 
 
+**Additional References***
+
+- [You Don't Know JS: Types & Grammar - Chapter 4. Coercion](https://www.oreilly.com/library/view/you-dont-know/9781491905159/ch04.html)
 
 
+ * @todo Support extended number formats: positive-integer, negative-integer, positive-float, negative-float
+ * @todo Support type: function
+ * @todo Support format plugin-ins. Must implement: get_default(), is_type_of(value), can_coerce(type), coerce(value)
 */
 //-end-jsdoc-----------------------------------------------------------
 

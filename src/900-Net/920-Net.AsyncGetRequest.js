@@ -27,10 +27,11 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function ZuluTimestamp
+	 * @function AsyncGetRequest
 	 * @returns {string}
 	 * @description
-	 * Returns the current date and time as a string.
+	 * Make an http get request for a an url.
+	 * @param {string} Url
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 

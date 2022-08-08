@@ -21,10 +21,10 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function ZuluTimestamp
+	 * @function AsyncDownloadFile
 	 * @returns {string}
 	 * @description
-	 * Returns the current date and time as a string.
+	 * Download a file from an url.
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 

@@ -51,6 +51,35 @@ module.exports = function ( Liquicode )
 
 
 	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function ValidateValues
+	 * @returns {object}
+	 * An object containing the validation result.
+	 * @summary Validate a set of values against an array of FieldSchema.
+	 * @description
+	 * 
+
+Takes an array of Values and an array of FieldSchema to validate a number of fields at once.
+This function does not throw validation errors.
+Instead, all validation errors are returned to the caller in the return value.
+Additionally, the number of fields processed and a set of coerced values is also returned.
+
+**The Return Value**
+
+~~~javascript
+ReturnValue = {
+	field_count: 0,				// The number of fields processed.
+	validation_errors: [],		// All validation errors encountered.
+	coerced_values: [],			// An array of coerced values.
+}
+~~~
+
+	 * @param {object} Values
+	 * The values to validate. This can be an array of values, or an object described by Schemas.
+	 * @param {object} Schemas
+	 * An array of FieldSchemas to validate the Values with. Can also be an object whose top-most fields are instances of FieldSchema.
+	*/
 	//-end-jsdoc-----------------------------------------------------------
 
 

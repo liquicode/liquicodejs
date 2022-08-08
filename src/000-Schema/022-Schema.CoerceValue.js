@@ -63,24 +63,16 @@ module.exports = function ( Liquicode )
 	 * @summary Attempt to coerce the Value parameter to match the Schema's type.
 	 * @description
 	 * 
-This function uses the "FieldSchema.type", "FieldSchema.format", "FieldSchema.required", and "FieldSchema.default" fields to coerce Value to a particular data type.
+
+This function uses the Schema to coerce the Value to a particular data type.
+
+If the "Schema.type" === "*", then no validation or coercion is performed and the Value is returned.
+If the "Schema.type" === "function", then no validation or coercion is performed and the Value is returned.
 
 If Value is "undefined" or "null", then the default value for "FieldSchema.type" will be returned.
 This is done by calling "Schema.DefaultValue()" for the FieldSchema.
 
-***Coercion Table***
-
-|    **From**   | **to boolean** |    **to number**    |      **to string**      |    **to object**    |
-|:-------------:|:--------------:|:-------------------:|:-----------------------:|:-------------------:|
-| **undefined** |  DefaultValue  |     DefaultValue    |       DefaultValue      |     DefaultValue    |
-|    **null**   |  DefaultValue  |     DefaultValue    |       DefaultValue      |     DefaultValue    |
-|  **boolean**  |      Value     |         0, 1        |      Value.toString     |        Error        |
-|   **number**  |   true, false  |        Value        |      Value.toString     |        Error        |
-|   **string**  |   true, false  | parseFloat( Value ) |          Value          | JSON.parse( Value ) |
-|   **object**  |   true, false  |        Error        | JSON.stringify( Value ) |        Value        |
-
-- **DefaultValue** is calculated by calling Schema.DefaultValue( Schema ).
-- **Error** is an "ErrorValue": { ok: false, error: '...', context: 'CoerceValue' }
+"Schema.ValueSchema()" is called the get the schema for Value, which is then compared against the expected Schema.
 
 	
 	 * @param {*} Value

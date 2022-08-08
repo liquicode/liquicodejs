@@ -32,6 +32,15 @@ module.exports = function ( Liquicode )
 
 
 	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function FindValue
+	 * @returns {string}
+	 * @summary Locate a value stored within an object.
+	 * @param {object} Root
+	 * @param {*} Value
+	 * The value to search for. This must be primitive data type (boolean, number, or string).
+	*/
 	//-end-jsdoc-----------------------------------------------------------
 
 
