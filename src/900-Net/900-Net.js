@@ -26,6 +26,7 @@ module.exports = function ( Liquicode )
 {
 	return {
 		_Schema: _Schema,
-		// AsyncDownloadFile: AsyncDownloadFile,
+		AsyncDownloadFile: require( './910-Net.AsyncDownloadFile.js' )( Liquicode ).AsyncDownloadFile,
+		AsyncGetRequest: require( './920-Net.AsyncGetRequest.js' )( Liquicode ).AsyncGetRequest,
 	};
 };

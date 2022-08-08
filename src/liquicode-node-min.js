@@ -14,6 +14,14 @@ Liquicode.Token = require( './500-Token/500-Token.js' )( Liquicode );
 Liquicode.File = require( './800-File/800-File.js' )( Liquicode );
 Liquicode.Net = require( './900-Net/900-Net.js' )( Liquicode );
 
+delete Liquicode.Schema._Schema;
+delete Liquicode.Object._Schema;
+delete Liquicode.Text._Schema;
+delete Liquicode.Date._Schema;
+delete Liquicode.Token._Schema;
+delete Liquicode.File._Schema;
+delete Liquicode.Net._Schema;
+
 
 module.exports = Liquicode;
 

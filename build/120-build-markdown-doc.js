@@ -5,8 +5,8 @@ const LIB_FS = require( 'fs' );
 const LIB_PATH = require( 'path' );
 
 
-const SOURCE_FOLDER = LIB_PATH.resolve( __dirname, '..', 'src' );
-const LQC = require( LIB_PATH.join( SOURCE_FOLDER, 'liquicode-node.js' ) );
+const BASE_FOLDER = LIB_PATH.resolve( __dirname, '..' );
+const SOURCE_FOLDER = LIB_PATH.join( BASE_FOLDER, 'src' );
 
 
 //---------------------------------------------------------------------
@@ -167,9 +167,9 @@ let SchemaDoc = null;
 //---------------------------------------------------------------------
 // Process the schemas.
 let markdown_content = '';
-for ( let schema_index = 0; schema_index < SchemaDoc.schema.length; schema_index++ )
+for ( let schema_index = 0; schema_index < SchemaDoc.Schemas.length; schema_index++ )
 {
-	let schema = SchemaDoc.schema[ schema_index ];
+	let schema = SchemaDoc.Schemas[ schema_index ];
 	markdown_content += ProcessSchema( schema );
 }
 
@@ -183,3 +183,4 @@ for ( let schema_index = 0; schema_index < SchemaDoc.schema.length; schema_index
 	console.log( `Updated markdown file [${filename}].` );
 }
 
+console.log( `Build complete.` );

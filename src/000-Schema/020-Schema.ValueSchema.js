@@ -1,7 +1,5 @@
 "use strict";
 
-const { interfaces } = require( 'mocha' );
-
 
 //---------------------------------------------------------------------
 let _Schema = {

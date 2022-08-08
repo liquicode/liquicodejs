@@ -11,7 +11,10 @@ const COPYRIGHT = `Copyright (c) 2010-2022 Andre' G. Bowlin (http://liquicode.co
 const BABEL_PROCESSING_RULE = {
 	// Only run `.js` files through Babel
 	test: /\.m?js$/,
-	exclude: /(node_modules)/,
+	exclude: [
+		/(node_modules)/,
+		/\.Tests\.js$/,
+	],
 	use: {
 		loader: 'babel-loader',
 		options: {
@@ -33,7 +36,7 @@ let config = {
 	],
 	target: '',
 	output: {
-		path: LIB_PATH.resolve( BASE_PATH, '..', 'dist' ),
+		path: '',
 		filename: '',
 		libraryTarget: 'umd',
 		umdNamedDefine: true,
@@ -52,6 +55,7 @@ switch ( process.env.WEBPACK_ENV )
 		config.module.rules.push( BABEL_PROCESSING_RULE );
 		config.plugins.push( new LIB_UGLIFYJS_WEBPACK_PLUGIN() );
 		config.target = 'web';
+		config.output.path = LIB_PATH.resolve( BASE_PATH, '..', 'dist', 'es5' );
 		config.output.filename = 'liquicode.es5.js';
 		break;
 
@@ -61,6 +65,7 @@ switch ( process.env.WEBPACK_ENV )
 		config.entry.push( './src/liquicode-es6.js' );
 		config.plugins.push( new LIB_UGLIFYJS_WEBPACK_PLUGIN() );
 		config.target = 'web';
+		config.output.path = LIB_PATH.resolve( BASE_PATH, '..', 'dist', 'es6' );
 		config.output.filename = 'liquicode.es6.js';
 		break;
 
@@ -69,6 +74,7 @@ switch ( process.env.WEBPACK_ENV )
 		config.entry.push( './src/liquicode-node-min.js' );
 		config.plugins.push( new LIB_UGLIFYJS_WEBPACK_PLUGIN() );
 		config.target = 'node';
+		config.output.path = LIB_PATH.resolve( BASE_PATH, '..', 'dist', 'node-min' );
 		config.output.filename = 'liquicode.node-min.js';
 		break;
 
@@ -76,6 +82,7 @@ switch ( process.env.WEBPACK_ENV )
 		config.mode = 'development';
 		config.entry.push( './src/liquicode-node.js' );
 		config.target = 'node';
+		config.output.path = LIB_PATH.resolve( BASE_PATH, '..', 'dist', 'node' );
 		config.output.filename = 'liquicode.js';
 		config.devtool = 'source-map';
 		break;

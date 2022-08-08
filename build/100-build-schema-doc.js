@@ -5,12 +5,18 @@ const LIB_FS = require( 'fs' );
 const LIB_PATH = require( 'path' );
 
 
-const SOURCE_FOLDER = LIB_PATH.resolve( __dirname, '..', 'src' );
+const BASE_FOLDER = LIB_PATH.resolve( __dirname, '..' );
+const SOURCE_FOLDER = LIB_PATH.join( BASE_FOLDER, 'src' );
 const LQC = require( LIB_PATH.join( SOURCE_FOLDER, 'liquicode-node.js' ) );
 
+const VERSION = LIB_FS.readFileSync( LIB_PATH.join( BASE_FOLDER, 'VERSION' ), 'utf8' );
 
 //---------------------------------------------------------------------
-let schema_doc = { schema: [] };
+let schema_doc =
+{
+	version: VERSION,
+	Schemas: []
+};
 let count_total_files = 0;
 let count_files_with_errors = 0;
 let count_files_processed = 0;
@@ -33,7 +39,7 @@ LQC.File.Visit( SOURCE_FOLDER, '*.js', true,
 
 			// Process the schema
 			schema.source_filename = file_path.substring( SOURCE_FOLDER.length + 1 );
-			schema_doc.schema.push( schema );
+			schema_doc.Schemas.push( schema );
 			count_files_processed++;
 			console.log( file_path + ' ... OK' );
 		}
@@ -58,3 +64,5 @@ console.log( `Files Processed    : ${count_files_processed}` );
 	LIB_FS.writeFileSync( filename, JSON.stringify( schema_doc, null, '    ' ) );
 	console.log( `Updated schema file [${filename}].` );
 }
+
+console.log( `Build complete.` );

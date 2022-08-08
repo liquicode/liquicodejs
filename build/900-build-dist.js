@@ -48,10 +48,10 @@ execute( `npx webpack-cli --config ${WEBPACK_CONFIG}`, { WEBPACK_ENV: 'node-min'
 console.log( `Building node ...` );
 execute( `npx webpack-cli --config ${WEBPACK_CONFIG}`, { WEBPACK_ENV: 'node' } );
 
-console.log( `Copying [license.md] ...` );
+console.log( `Copying [LICENSE] ...` );
 {
-	let from = LIB_PATH.join( BASE_PATH, 'license.md' );
-	let to = LIB_PATH.join( BASE_PATH, 'dist', 'license.md' );
+	let from = LIB_PATH.join( BASE_PATH, 'LICENSE' );
+	let to = LIB_PATH.join( BASE_PATH, 'dist', 'LICENSE' );
 	LIB_FS.copyFileSync( from, to );
 }
 

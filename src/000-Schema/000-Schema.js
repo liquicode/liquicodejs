@@ -7,7 +7,7 @@ let _Schema = {
 	name: 'Schema',
 	type: 'namespace',
 	summary: 'Data value and type handling',
-	description: `
+	description: [`
 
 **The FieldSchema Object**
 
@@ -39,8 +39,8 @@ Possible values for "FieldSchema.type" and "FieldSchema.format" are as follows:
 | object  | string-array  | []            | [ 'one', 'two', 'three' ]         |
 | object  | object-array  | []            | [ { foo: 'bar' }, [1,2,3], null ] |
 | object  | array-array   | []            | [ [1,2,3], [], [4,5] ]            |
-
-
+`,
+`
 **The ErrorValue Object**
 
 ~~~javascript
@@ -58,8 +58,8 @@ and you want to avoid the expensive cost of a Javascript Error that includes a c
 
 Use the "Schema.ErrorValue()" function to create ErrorValue objects and "Schema.IsErrorValue()" to test for errors.
 An ErrorValue will always have "ErrorValue.ok = false" and "ErrorValue.error" equal to a string.
-
-
+`,
+`
 **Value Coercion**
 
 The functions "Schema.CoerceValue()", "Schema.ValidateValue()", and "Schema.ValidateObject()" can optionally coerce values
@@ -75,21 +75,21 @@ This tables describes how values are converted from one data type to another dur
 | Number    | Boolean()      | Value          | toString()       | ErrorValue     |
 | String    | Boolean()      | Number()       | Value            | JSON.parse()   |
 | Object    | Boolean()      | Number()       | JSON.stringify() | Value          |
-
-
+`,
+`
 **Object Schema and Validation**
 
 All of this is very interesting, I am sure.
 
 The functions "Schema.ObjectSchema()" and "Schema.ValidateObject()" take these concepts to the next level and
 provides schemas functionality on an object level rather than an individual value level.
-
-
+`,
+`
 **Additional References***
 
 - [You Don't Know JS: Types & Grammar - Chapter 4. Coercion](https://www.oreilly.com/library/view/you-dont-know/9781491905159/ch04.html)
-
 `,
+	],
 	examples: [
 		`Schema = { name: 'PersonName', type: 'string' }`,
 		`Schema = { name: 'options', type: 'object', default: { hoist: true, swab: 'decks' } }`,
