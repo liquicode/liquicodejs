@@ -21,8 +21,8 @@ FieldSchema = {
 ~~~
 
 LiquicodeJS can classify and identify value types beyond the primitive data types supported by Javascript.
-When obtaining FieldSchema objects from "Schema.ValueSchema()" or "Schema.ObjectSchema()",
-"FieldSchema.type" will contain the Javascript data type and "FieldSchema.format" will have a more specific type description.
+When obtaining FieldSchema objects from \`Schema.ValueSchema()\` or \`Schema.ObjectSchema()\`,
+\`FieldSchema.type\` will contain the Javascript data type and \`FieldSchema.format\` will have a more specific type description.
 
 Possible values for "FieldSchema.type" and "FieldSchema.format" are as follows:
 
@@ -79,13 +79,11 @@ This tables describes how values are converted from one data type to another dur
 `
 **Object Schema and Validation**
 
-All of this is very interesting, I am sure.
-
 The functions "Schema.ObjectSchema()" and "Schema.ValidateObject()" take these concepts to the next level and
 provides schemas functionality on an object level rather than an individual value level.
 `,
 `
-**Additional References***
+**Additional References**
 
 - [You Don't Know JS: Types & Grammar - Chapter 4. Coercion](https://www.oreilly.com/library/view/you-dont-know/9781491905159/ch04.html)
 `,

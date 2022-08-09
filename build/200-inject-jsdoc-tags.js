@@ -9,6 +9,9 @@ const BASE_FOLDER = LIB_PATH.resolve( __dirname, '..' );
 const SOURCE_FOLDER = LIB_PATH.join( BASE_FOLDER, 'src' );
 
 
+console.log( `Inject JSDoc Tags into source files:` );
+
+
 //---------------------------------------------------------------------
 // A helper object to keep track of all the bits.
 function NewJSDocLines()
@@ -257,4 +260,4 @@ for ( let schema_index = 0; schema_index < SchemaDoc.Schemas.length; schema_inde
 	ProcessSchema( schema );
 }
 
-console.log( `Build complete.` );
+console.log( `Injection complete.` );

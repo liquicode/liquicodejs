@@ -1,38 +1,4 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>LiquicodeJS (v0.0.1)</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Righteous|Roboto">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
-    <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular-sanitize.js"></script>
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    <link rel="stylesheet" href="components/PrismJS-v1.28.0/prism-okaidia.css">
-    <script type="text/javascript" src="components/PrismJS-v1.28.0/prism-okaidia.js"></script>
-    <script type="text/javascript" src="liquicodejs.html.js"></script>
-    <link rel="stylesheet" href="liquicodejs.html.css">
-  </head>
-</html>
-<body>
-  <script>window.Locals = {};
-window.Locals.VersionNumber = "0.0.1";
-window.Locals.Schemas = [{"id":"000","name":"Schema","type":"namespace","summary":"Data value and type handling","description":["\n\n**The FieldSchema Object**\n\n~~~javascript\nFieldSchema = {\n\ttype: '',\t\t\t\t// Javascript data type (boolean, number, string, object).\n\tformat: '',\t\t\t\t// A data type specific designation.\n\tdefault: undefined,\t\t// A default value used for missing fields.\n\tname: '',\t\t\t\t// Name of the field.\n}\n~~~\n\nLiquicodeJS can classify and identify value types beyond the primitive data types supported by Javascript.\nWhen obtaining FieldSchema objects from `Schema.ValueSchema()` or `Schema.ObjectSchema()`,\n`FieldSchema.type` will contain the Javascript data type and `FieldSchema.format` will have a more specific type description.\n\nPossible values for \"FieldSchema.type\" and \"FieldSchema.format\" are as follows:\n\n| Type    | Format        | Default Value | Examples                          |\n|---------|---------------|---------------|-----------------------------------|\n| boolean | boolean       | false         | true, or false                    |\n| number  | integer       | 0             | 1, 2, or 3.0                      |\n| number  | float         | 0             | 1.1, 2.071, or 3.14               |\n| string  | string        | \"\"            | Hello', or ''                     |\n| object  | object        | {}            | { foo: 'bar' }                    |\n| object  | array         | []            | [ 1, 'two', 3.14, null ]          |\n| object  | boolean-array | []            | [ true, false, true ]             |\n| object  | number-array  | []            | [ 1, 2, 3.14 ]                    |\n| object  | string-array  | []            | [ 'one', 'two', 'three' ]         |\n| object  | object-array  | []            | [ { foo: 'bar' }, [1,2,3], null ] |\n| object  | array-array   | []            | [ [1,2,3], [], [4,5] ]            |\n","\n**The ErrorValue Object**\n\n~~~javascript\nErrorValue = {\n\tok: false,\t\t// Always set to \"false\".\n\terror: '',\t\t// Error message.\n\tcontext: '',\t// Context for the error (e.g. a function name).\n}\n~~~\n\nLiquicodeJS introduces an \"ErrorValue\" object that it can use to indicate errors.\nSome functions will optionally return an \"ErrorValue\" object instead of throwing a Javascript Error.\nIn some cases, this can make code more efficient and legible when certain errors are tolerable\nand you want to avoid the expensive cost of a Javascript Error that includes a call stack.\n\nUse the \"Schema.ErrorValue()\" function to create ErrorValue objects and \"Schema.IsErrorValue()\" to test for errors.\nAn ErrorValue will always have \"ErrorValue.ok = false\" and \"ErrorValue.error\" equal to a string.\n","\n**Value Coercion**\n\nThe functions \"Schema.CoerceValue()\", \"Schema.ValidateValue()\", and \"Schema.ValidateObject()\" can optionally coerce values\nfrom their given type to the types specified in Schema.\n\nThis tables describes how values are converted from one data type to another during coercion:\n\n| From Type | To Boolean     | To Number      | To String        | To Object      |\n|-----------|----------------|----------------|------------------|----------------|\n| undefined | DefaultValue() | DefaultValue() | DefaultValue()   | DefaultValue() |\n| null      | DefaultValue() | DefaultValue() | DefaultValue()   | DefaultValue() |\n| Boolean   | Value          | Number()       | toString()       | ErrorValue     |\n| Number    | Boolean()      | Value          | toString()       | ErrorValue     |\n| String    | Boolean()      | Number()       | Value            | JSON.parse()   |\n| Object    | Boolean()      | Number()       | JSON.stringify() | Value          |\n","\n**Object Schema and Validation**\n\nThe functions \"Schema.ObjectSchema()\" and \"Schema.ValidateObject()\" take these concepts to the next level and\nprovides schemas functionality on an object level rather than an individual value level.\n","\n**Additional References**\n\n- [You Don't Know JS: Types & Grammar - Chapter 4. Coercion](https://www.oreilly.com/library/view/you-dont-know/9781491905159/ch04.html)\n"],"examples":["Schema = { name: 'PersonName', type: 'string' }","Schema = { name: 'options', type: 'object', default: { hoist: true, swab: 'decks' } }","Schema = { name: 'max_tries', type: 'number', format: 'integer', required: true, default: 3 }"],"todo":["Support extended number formats: positive-integer, negative-integer, positive-float, negative-float","Support type: function","Support format plugin-ins. Must implement: get_default(), is_type_of(value), can_coerce(type), coerce(value)"],"source_filename":"000-Schema\\000-Schema.js"},{"id":"010","member_of":"Schema","name":"ErrorValue","type":"function","returns":"object","returns_description":"An ErrorValue object.","summary":"Returns an ErrorValue object containing error information.","description":[""],"Parameters":{"Message":{"name":"Message","type":"string","required":false,"default":"error","description":"The error message."},"Context":{"name":"Context","type":"string","required":false,"description":"Context for the error (e.g. a function name)."}},"todo":[],"source_filename":"000-Schema\\010-Schema.ErrorValue.js"},{"id":"011","member_of":"Schema","name":"IsErrorValue","type":"function","returns":"boolean","returns_description":"True if Value is an ErrorValue object, otherwise false.","summary":"Tests if a Value is an ErrorValue object.","description":"","Parameters":{"Value":{"name":"Value","type":"object","required":false,"description":"The value to test."}},"todo":[],"source_filename":"000-Schema\\011-Schema.IsErrorValue.js"},{"id":"020","member_of":"Schema","name":"ValueSchema","type":"function","returns":"object","returns_description":"A FieldSchema object.","summary":"Returns a FieldSchema based upon a specific value.","description":["\nThis function is used to obtain extended type information about a value.\nWhile it does return an entire FieldSchema object, only the \"FieldSchema.type\" and \"FieldSchema.format\" fields are set.\n"],"Parameters":{"Value":{"name":"Value","type":"*","required":false,"description":"The value to infer a schema from."}},"todo":[],"source_filename":"000-Schema\\020-Schema.ValueSchema.js"},{"id":"021","member_of":"Schema","name":"DefaultValue","type":"function","returns":"*","returns_description":"The default value.","summary":"Returns the default value for the FieldSchema.","description":"\nIf the FieldSchema specifies a default value, then that value will be returned.\nOtherwise, a default value is calculated based upon the type and format of the FieldSchema.\n\n| Type    | Format        | Default\n|---------|---------------|-----------\n| boolean | -             | false\n| number  | integer       | 0\n| number  | float         | 0\n| string  | -             | ''\n| object  | -             | {}\n| object  | array         | []\n| object  | boolean-array | []\n| object  | number-array  | []\n| object  | string-array  | []\n| object  | object-array  | []\n","Parameters":{"Schema":{"name":"Schema","type":"object","required":true,"description":"The schema to use when calculating a default value."},"ThrowErrors":{"name":"ThrowErrors","type":"boolean","required":false,"default":false,"description":"Errors are thrown if true, otherwise an ErrorValue object is returned."}},"source_filename":"000-Schema\\021-Schema.DefaultValue.js"},{"id":"022","member_of":"Schema","name":"CoerceValue","type":"function","returns":"*","returns_description":"The coerced value or an error object.","summary":"Attempt to coerce the Value parameter to match the Schema's type.","description":"\n\nThis function uses the Schema to coerce the Value to a particular data type.\n\nIf the \"Schema.type\" === \"*\", then no validation or coercion is performed and the Value is returned.\nIf the \"Schema.type\" === \"function\", then no validation or coercion is performed and the Value is returned.\n\nIf Value is \"undefined\" or \"null\", then the default value for \"FieldSchema.type\" will be returned.\nThis is done by calling \"Schema.DefaultValue()\" for the FieldSchema.\n\n\"Schema.ValueSchema()\" is called the get the schema for Value, which is then compared against the expected Schema.\n\n\t","Parameters":{"Value":{"name":"Value","type":"*","required":true,"description":["The value to coerce."]},"Schema":{"name":"Schema","type":"object","required":true,"description":"The schema to use when coercing Value."},"ThrowErrors":{"name":"ThrowErrors","type":"boolean","required":false,"default":false,"description":"Errors are thrown if true, otherwise an ErrorValue object is returned."}},"source_filename":"000-Schema\\022-Schema.CoerceValue.js"},{"id":"023","member_of":"Schema","name":"ValidateValue","type":"function","returns":"*","returns_description":"The validated/coerced Value or an ErrorValue object.","summary":"Validates a field value according to a schema and optionally coerces the value to match.","description":"\n\nThis function uses \"Schema.type\", \"Schema.format\", \"Schema.required', and \"Schema.default\" to validate the given Value.\n\nIf \"Options.coerce = true\", then an attempt will be made to coerce the given value to match the type and format specified in the FieldSchema.\n(See: \"Schema.CoerceValue()\")\n\n\t","Parameters":{"Value":{"name":"Value","type":"*","required":true,"description":["The value to validate."]},"Schema":{"name":"Schema","type":"object","required":true,"description":"The FieldSchema object to validate against.","examples":["{ name: 'Name', type: 'string' }","{ name: 'options', type: 'object', default: { hoist: true, swab: 'decks' } }","{ name: 'max_tries', type: 'number', format: 'integer', required: true, default: 3 }"]},"Options":{"name":"Options","type":"object","required":false,"default":"{ coerce: false, throw_errors: false, context: null }","description":"An options object to control validation:\n~~~javascript\nOptions = {\n\tcoerce_values: false,\t// Attempt to coerce the provided value to match the schema's type.\n\tthrow_errors: false,\t// When true, throw an error validation errors are encountered.\n\tcontext: null,\t\t\t// A context name (function name) to include in any error messages.\n}\n~~~"}},"source_filename":"000-Schema\\023-Schema.ValidateValue.js"},{"id":"030","member_of":"Schema","name":"ObjectSchema","type":"function","returns":"object","returns_description":"An array of FieldSchema.","summary":"Returns an array of FieldSchema describing the top-most members of \"FromObject\".","description":"","Parameters":{"FromObject":{"name":"FromObject","type":"object","required":true,"description":"An object to retrieve the schema for."}},"todo":[],"source_filename":"000-Schema\\030-Schema.ObjectSchema.js"},{"id":"031","member_of":"Schema","name":"ValidateValues","type":"function","returns":"object","returns_description":"An object containing the validation result.","summary":"Validate a set of values against an array of FieldSchema.","description":"\n\nTakes an array of Values and an array of FieldSchema to validate a number of fields at once.\nThis function does not throw validation errors.\nInstead, all validation errors are returned to the caller in the return value.\nAdditionally, the number of fields processed and a set of coerced values is also returned.\n\n**The Return Value**\n\n~~~javascript\nReturnValue = {\n\tfield_count: 0,\t\t\t\t// The number of fields processed.\n\tvalidation_errors: [],\t\t// All validation errors encountered.\n\tcoerced_values: [],\t\t\t// An array of coerced values.\n}\n~~~\n","Parameters":{"Values":{"name":"Values","type":"object","required":true,"description":"The values to validate. This can be an array of values, or an object described by Schemas."},"Schemas":{"name":"Schemas","type":"object","required":true,"description":"An array of FieldSchemas to validate the Values with. Can also be an object whose top-most fields are instances of FieldSchema."}},"todo":[],"source_filename":"000-Schema\\031-Schema.ValidateValues.js"},{"id":"100","name":"Object","type":"namespace","summary":"Functions for manipulating Javascript objects.","source_filename":"100-Object\\100-Object.js"},{"id":"101","member_of":"Object","name":"Clone","type":"function","returns":"string","description":["Returns a clone of the given object.","This is equivalent to doing A = JSON.parse( JSON.stringify( B ) )."],"Parameters":{"From":{"name":"From","type":"object","default":{}}},"source_filename":"100-Object\\101-Object.Clone.js"},{"id":"103","member_of":"Object","name":"Merge","type":"function","returns":"object","description":"","Parameters":{"Original":{"name":"Original","type":"object","required":true},"Updates":{"name":"Updates","type":"object","required":false}},"source_filename":"100-Object\\103-Object.Merge.js"},{"id":"110","member_of":"Object","name":"Traverse","type":"function","returns":"string","description":"\n\nTraverses and calls a visitor callback function for each field in an object.\nThis functions recurses through sub-objects and traverses the entire object.\n\n","Parameters":{"Root":{"name":"Root","type":"object","required":true},"Visitor":{"name":"Visitor","type":"function","required":true}},"source_filename":"100-Object\\110-Object.Traverse.js"},{"id":"111","member_of":"Object","name":"HasPath","type":"function","returns":"boolean","description":"","Parameters":{"Root":{"name":"Root","type":"object","required":true},"Path":{"name":"Path","type":"string","required":true}},"source_filename":"100-Object\\111-Object.HasPath.js"},{"id":"112","member_of":"Object","name":"FindField","type":"function","returns":"string","description":"","Parameters":{"Root":{"name":"Root","type":"object","required":true},"Name":{"name":"Name","type":"string","required":true}},"source_filename":"100-Object\\112-Object.FindField.js"},{"id":"113","member_of":"Object","name":"FindValue","type":"function","returns":"string","summary":"Locate a value stored within an object.","description":"","Parameters":{"Root":{"name":"Root","type":"object","required":true},"Value":{"name":"Value","type":"*","required":true,"description":"The value to search for. This must be primitive data type (boolean, number, or string)."}},"source_filename":"100-Object\\113-Object.FindValue.js"},{"id":"114","member_of":"Object","name":"GetValue","type":"function","returns":"*","description":"","Parameters":{"Root":{"name":"Root","type":"object","required":true},"Path":{"name":"Path","type":"string","required":true}},"source_filename":"100-Object\\114-Object.GetValue.js"},{"id":"115","member_of":"Object","name":"SetValue","type":"function","returns":"*","description":"","Parameters":{"Root":{"name":"Root","type":"object","required":true},"Path":{"name":"Path","type":"string","required":true},"Value":{"name":"Value","type":"*","required":true}},"source_filename":"100-Object\\115-Object.SetValue.js"},{"id":"120","member_of":"Object","name":"FromJson","type":"function","returns":"object","description":"\nParse a Json string and return an object value.\nThis is identical Javascript's \"JSON.parse()\" function.\n\nThere are some significant differences from Javascript's version.\nThe parser is a bit more relaxed and allows:\n- Identifiers are not required to have quotes.\n- A comma can appear after the last element of an array or object.\n- String literals can use either single or double quotes.\n- Parsing automatically stops when the closing brace or bracket is found in the json string.\n\n","Parameters":{"JsonString":{"name":"JsonString","type":"string"}},"source_filename":"100-Object\\120-Object.FromJson.js"},{"id":"121","member_of":"Object","name":"ToJsonOptions","type":"function","returns":"object","description":"\n","Parameters":{"PresetName":{"name":"PresetName","type":"string"}},"source_filename":"100-Object\\121-Object.ToJsonOptions.js"},{"id":"122","member_of":"Object","name":"ToJson","type":"function","returns":"object","description":"\n","Parameters":{"Value":{"name":"Value","type":"*","description":"The value to convert to a json string."},"JsonOptions":{"name":"JsonOptions","type":"object|string","description":"Can be an options object or the name of an options preset (\"default\", \"pretty\", or \"pretty-2\")"}},"source_filename":"100-Object\\122-Object.ToJson.js"},{"id":"125","member_of":"Object","name":"FromIni","type":"function","returns":"object","description":"\nParse an Ini string and return an object value.\n\n","Parameters":{"IniString":{"name":"IniString","type":"string"}},"source_filename":"100-Object\\125-Object.FromIni.js"},{"id":"126","member_of":"Object","name":"ToIni","type":"function","returns":"object","description":"\nParse an Ini string and return an object value.\n\n","Parameters":{"Value":{"name":"Value","type":"object"}},"source_filename":"100-Object\\126-Object.ToIni.js"},{"id":"200","name":"Text","type":"namespace","summary":"Functions for text parsing and manipulation.","source_filename":"200-Text\\200-Text.js"},{"id":"201","member_of":"Text","name":"Compare","type":"function","returns":"string","description":["Compares two strings.","Returns a `-1` if `StringA` is less than `StringB`.","Returns a `1` if `StringA` is greater than than `StringB`.","Returns a `0` if `StringA` and `StringB` are the same."],"Parameters":{"StringA":{"name":"StringA","type":"string","default":""},"StringB":{"name":"StringB","type":"string","default":""},"CaseSensitive":{"name":"CaseSensitive","type":"boolean","default":true}},"source_filename":"200-Text\\202-Text.Compare.js"},{"id":"203","member_of":"Text","name":"Matches","type":"function","returns":"string","description":["Matches the text against a wildcard-lik pattern.","Returns true If the match succeeds, otherwise false."],"Parameters":{"Text":{"name":"Text","type":"string","required":true,"default":""},"Pattern":{"name":"Pattern","type":"string","required":true,"default":""}},"source_filename":"200-Text\\203-Text.Matches.js"},{"id":"210","member_of":"Text","name":"ReplaceCharacters","type":"function","returns":"string","description":["Replaces characters within a string.","Returns the modified string."],"Parameters":{"Text":{"name":"Text","type":"string","required":true,"default":""},"SearchCharacters":{"name":"SearchCharacters","type":"string","required":true,"default":""},"ReplacementText":{"name":"ReplacementText","type":"string","required":true,"default":""},"MaxTimes":{"name":"MaxTimes","type":"number","format":"integer","required":false,"default":-1}},"source_filename":"200-Text\\210-Text.ReplaceCharacters.js"},{"id":"211","member_of":"Text","name":"ReplaceText","type":"function","returns":"string","description":"","Parameters":{"Text":{"name":"Text","type":"string","required":true,"default":""},"SearchText":{"name":"SearchText","type":"string","required":true,"default":""},"ReplacementText":{"name":"ReplacementText","type":"string","required":true,"default":""}},"source_filename":"200-Text\\211-Text.ReplaceText.js"},{"id":"220","member_of":"Text","name":"FirstWord","type":"function","returns":"string","description":["Returns the first word of a text phrase."],"Parameters":{"Phrase":{"name":"Phrase","type":"string","required":false,"default":"","description":"A text phrase containing words separated by delimiters."},"Delimiters":{"name":"Delimiters","type":"string","required":false,"default":" ","description":"A string of whitespace and punctuation characters that break the phrase into words."}},"source_filename":"200-Text\\220-Text.FirstWord.js"},{"id":"221","member_of":"Text","name":"AfterFirstWord","type":"function","returns":"string","description":["Returns the remainder of a text phrase occurring after the first word."],"Parameters":{"Phrase":{"name":"Phrase","type":"string","required":false,"default":"","description":"A text phrase containing words separated by delimiters."},"Delimiters":{"name":"Delimiters","type":"string","required":false,"default":" ","description":"A string of characters that break the phrase into words."}},"source_filename":"200-Text\\221-Text.AfterFirstWord.js"},{"id":"222","member_of":"Text","name":"LastWord","type":"function","returns":"string","description":["Returns the last word of a text phrase."],"Parameters":{"Phrase":{"name":"Phrase","type":"string","required":false,"default":"","description":"A text phrase containing words separated by delimiters."},"Delimiters":{"name":"Delimiters","type":"string","required":false,"default":" ","description":"A string of characters that break the phrase into words."}},"source_filename":"200-Text\\222-Text.LastWord.js"},{"id":"223","member_of":"Text","name":"BeforeLastWord","type":"function","returns":"string","description":["Returns the remainder of a text phrase occurring befiore the last word."],"Parameters":{"Phrase":{"name":"Phrase","type":"string","required":false,"default":"","description":"A text phrase containing words separated by delimiters."},"Delimiters":{"name":"Delimiters","type":"string","required":false,"default":" ","description":"A string of characters that break the phrase into words."}},"source_filename":"200-Text\\223-Text.BeforeLastWord.js"},{"id":"300","name":"Json","type":"namespace","summary":"Functions for manipulating Json.","source_filename":"300-Json\\300-Json.js"},{"id":"400","name":"Date","type":"namespace","summary":"Functions for manipulating dates.","source_filename":"400-Date\\400-Date.js"},{"id":"401","member_of":"Date","name":"Parse","type":"function","returns":"object","description":["Converts a string to a date-time value.","Returns a `date_time_parts` structure."],"Parameters":{"Text":{"name":"Text","type":"string","required":true},"TimeZoneOffset":{"name":"TimeZoneOffset","type":"function","required":false,"default":"+0000"}},"source_filename":"400-Date\\401-Date.Parse.js"},{"id":"410","member_of":"Date","name":"ZuluTimestamp","type":"function","returns":"string","description":["Returns the current date and time as a string."],"Parameters":{},"source_filename":"400-Date\\410-Date.ZuluTimestamp.js"},{"id":"500","name":"Token","type":"namespace","summary":"Functions for tokenizing text strings.","source_filename":"500-Token\\500-Token.js"},{"id":"501","member_of":"Token","name":"TokenizeOptions","type":"function","returns":"object","description":["Returns a set of options for calling Tokenize().","Throws an error if an invalid value for PresetName is given."],"Parameters":{"Text":{"name":"PresetName","type":"string","required":false,"default":"","description":["To retrieve an options preset, use one of: 'csv', or 'cli'","You can leave this empty or 'default' for the default options."]}},"source_filename":"500-Token\\501-Token.TokenizeOptions.js"},{"id":"502","member_of":"Token","name":"Tokenize","type":"function","returns":"object","description":["Returns the parsed tokens."],"Parameters":{"Text":{"name":"PresetName","type":"string","required":false,"default":"","description":["To retrieve an options preset, use one of: 'csv', or 'cli'","You can leave this empty for the default options."]}},"source_filename":"500-Token\\502-Token.Tokenize.js"},{"id":"800","name":"File","type":"namespace","summary":"Functions for manipulating files. (nodejs only)","source_filename":"800-File\\800-File.js"},{"id":"810","member_of":"File","name":"Visit","type":"function","returns":"number","description":["Scans a folder and calls the Visitor callback function for each folder/file encountered.","Returns the number of folders/files visited."],"Parameters":{"StartFolder":{"name":"StartFolder","type":"string","required":true},"FilePattern":{"name":"FilePattern","type":"string","required":false,"default":""},"Recurse":{"name":"Recurse","type":"boolean","required":false,"default":false},"Visitor":{"name":"Visitor","type":"function","required":false,"default":null}},"source_filename":"800-File\\810-File.Visit.js"},{"id":"811","member_of":"File","name":"CountFiles","type":"function","returns":"number","description":["Scans a folder and calls the Visitor callback function for each folder/file encountered.","Returns the number of folders/files visited."],"Parameters":{"StartFolder":{"name":"StartFolder","type":"string","required":true},"FilePattern":{"name":"FilePattern","type":"string","required":false,"default":"*"},"Recurse":{"name":"Recurse","type":"boolean","required":false,"default":false}},"source_filename":"800-File\\811-File.CountFiles.js"},{"id":"812","member_of":"File","name":"CountFolders","type":"function","returns":"number","description":["Scans a folder and calls the Visitor callback function for each folder/file encountered.","Returns the number of folders/files visited."],"Parameters":{"StartFolder":{"name":"StartFolder","type":"string","required":true},"Recurse":{"name":"Recurse","type":"boolean","required":false,"default":false}},"source_filename":"800-File\\812-File.CountFolders.js"},{"id":"813","member_of":"File","name":"CopyFolder","type":"function","returns":"number","description":["Copies files from one folder to another.","Returns the number of files copied."],"Parameters":{"FromFolder":{"name":"FromFolder","type":"string","required":true},"ToFolder":{"name":"ToFolder","type":"string","required":true},"FilePattern":{"name":"FilePattern","type":"string","required":false,"default":"*"},"Overwrite":{"name":"Overwrite","type":"boolean","required":false,"default":false},"Recurse":{"name":"Recurse","type":"boolean","required":false,"default":false}},"source_filename":"800-File\\813-File.CopyFolder.js"},{"id":"814","member_of":"File","name":"DeleteFolder","type":"function","returns":"number","description":["Deletes a folder and all of its sub-folders and files.","Returns the number of folders and files deleted."],"Parameters":{"Folder":{"name":"Folder","type":"string","required":true},"Recurse":{"name":"Recurse","type":"boolean","required":false,"default":false}},"source_filename":"800-File\\814-File.DeleteFolder.js"},{"id":"820","member_of":"OS","name":"AsyncSleep","type":"function","description":"","Parameters":{"Milliseconds":{"name":"Milliseconds","type":"number","format":"integer"}},"source_filename":"800-File\\820-OS.AsyncSleep.js"},{"id":"821","member_of":"OS","name":"AsyncExecute","type":"function","description":"","Parameters":{"Milliseconds":{"name":"Milliseconds","type":"number","format":"integer"}},"source_filename":"800-File\\821-OS.AsyncExecute.js"},{"id":"900","name":"Net","type":"namespace","summary":"Functions for working with networks. (nodejs only)","source_filename":"900-Net\\900-Net.js"},{"id":"910","member_of":"Net","name":"AsyncDownloadFile","type":"function","returns":"string","description":"Download a file from an url.","Parameters":{},"source_filename":"900-Net\\910-Net.AsyncDownloadFile.js"},{"id":"920","member_of":"Net","name":"AsyncGetRequest","type":"function","returns":"string","description":"Make an http get request for a an url.","Parameters":{"Url":{"name":"Url","type":"string","required":true}},"source_filename":"900-Net\\920-Net.AsyncGetRequest.js"}];
-
-  </script>
-  <div ng-app="Application_Module" ng-cloak>
-    <nav class="w3-bar w3-border w3-light-grey" role="navigation">
-      <div class="w3-bar-item w3-text-grey">LiquicodeJS (v0.0.1) ~ A General Purpose Toolkit Library for Javascript</div>
-    </nav>
-    <div ng-controller="Home_Controller">
-      <div class="w3-container w3-margin">
-        <div class="w3-panel w3-border w3-round-large w3-sand w3-center">
-          <h3>Welcome to LiquicodeJS!</h3>
-          <p>A General Purpose Toolkit Library for Javascript</p>
-        </div><br>
+<br>
 <br>
 
 <h2 id="schema-data-value-and-type-handling"><em><strong>Schema</strong></em>: Data value and type handling</h2>
@@ -54,8 +20,8 @@ Schema Details
 }
 </code></pre>
 <p>LiquicodeJS can classify and identify value types beyond the primitive data types supported by Javascript.
-When obtaining FieldSchema objects from <code class="language-markdown">Schema.ValueSchema()</code> or <code class="language-markdown">Schema.ObjectSchema()</code>,
-<code class="language-markdown">FieldSchema.type</code> will contain the Javascript data type and <code class="language-markdown">FieldSchema.format</code> will have a more specific type description.</p>
+When obtaining FieldSchema objects from <code>Schema.ValueSchema()</code> or <code>Schema.ObjectSchema()</code>,
+<code>FieldSchema.type</code> will contain the Javascript data type and <code>FieldSchema.format</code> will have a more specific type description.</p>
 <p>Possible values for &quot;FieldSchema.type&quot; and &quot;FieldSchema.format&quot; are as follows:</p>
 <table>
 <thead>
@@ -230,7 +196,7 @@ ErrorValue( Message, Context )
 <blockquote>
 <h3 id="schemaerrorvalue-message-context-">Schema.<em><strong>ErrorValue</strong></em>( Message, Context )</h3>
 <p>Returns an ErrorValue object containing error information.</p>
-<p><strong>Returns</strong>: <code class="language-markdown">object</code> - An ErrorValue object.</p>
+<p><strong>Returns</strong>: <code>object</code> - An ErrorValue object.</p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -245,14 +211,14 @@ ErrorValue( Message, Context )
 </thead>
 <tbody><tr>
 <td>Message</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>-</td>
 <td>&quot;error&quot;</td>
 <td>The error message.</td>
 </tr>
 <tr>
 <td>Context</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>-</td>
 <td></td>
 <td>Context for the error (e.g. a function name).</td>
@@ -276,7 +242,7 @@ IsErrorValue( Value )
 <blockquote>
 <h3 id="schemaiserrorvalue-value-">Schema.<em><strong>IsErrorValue</strong></em>( Value )</h3>
 <p>Tests if a Value is an ErrorValue object.</p>
-<p><strong>Returns</strong>: <code class="language-markdown">boolean</code> - True if Value is an ErrorValue object, otherwise false.</p>
+<p><strong>Returns</strong>: <code>boolean</code> - True if Value is an ErrorValue object, otherwise false.</p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -291,7 +257,7 @@ IsErrorValue( Value )
 </thead>
 <tbody><tr>
 <td>Value</td>
-<td><code class="language-markdown">object</code></td>
+<td><code>object</code></td>
 <td>-</td>
 <td></td>
 <td>The value to test.</td>
@@ -314,7 +280,7 @@ ValueSchema( Value )
 <blockquote>
 <h3 id="schemavalueschema-value-">Schema.<em><strong>ValueSchema</strong></em>( Value )</h3>
 <p>Returns a FieldSchema based upon a specific value.</p>
-<p><strong>Returns</strong>: <code class="language-markdown">object</code> - A FieldSchema object.</p>
+<p><strong>Returns</strong>: <code>object</code> - A FieldSchema object.</p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -329,7 +295,7 @@ ValueSchema( Value )
 </thead>
 <tbody><tr>
 <td>Value</td>
-<td><code class="language-markdown">*</code></td>
+<td><code>*</code></td>
 <td>-</td>
 <td></td>
 <td>The value to infer a schema from.</td>
@@ -355,7 +321,7 @@ DefaultValue( Schema, ThrowErrors )
 <blockquote>
 <h3 id="schemadefaultvalue-schema-throwerrors-">Schema.<em><strong>DefaultValue</strong></em>( Schema, ThrowErrors )</h3>
 <p>Returns the default value for the FieldSchema.</p>
-<p><strong>Returns</strong>: <code class="language-markdown">*</code> - The default value.</p>
+<p><strong>Returns</strong>: <code>*</code> - The default value.</p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -370,14 +336,14 @@ DefaultValue( Schema, ThrowErrors )
 </thead>
 <tbody><tr>
 <td>Schema</td>
-<td><code class="language-markdown">object</code></td>
+<td><code>object</code></td>
 <td>required</td>
 <td></td>
 <td>The schema to use when calculating a default value.</td>
 </tr>
 <tr>
 <td>ThrowErrors</td>
-<td><code class="language-markdown">boolean</code></td>
+<td><code>boolean</code></td>
 <td>-</td>
 <td></td>
 <td>Errors are thrown if true, otherwise an ErrorValue object is returned.</td>
@@ -462,7 +428,7 @@ CoerceValue( Value, Schema, ThrowErrors )
 <blockquote>
 <h3 id="schemacoercevalue-value-schema-throwerrors-">Schema.<em><strong>CoerceValue</strong></em>( Value, Schema, ThrowErrors )</h3>
 <p>Attempt to coerce the Value parameter to match the Schema&#39;s type.</p>
-<p><strong>Returns</strong>: <code class="language-markdown">*</code> - The coerced value or an error object.</p>
+<p><strong>Returns</strong>: <code>*</code> - The coerced value or an error object.</p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -477,21 +443,21 @@ CoerceValue( Value, Schema, ThrowErrors )
 </thead>
 <tbody><tr>
 <td>Value</td>
-<td><code class="language-markdown">*</code></td>
+<td><code>*</code></td>
 <td>required</td>
 <td></td>
 <td>The value to coerce.</td>
 </tr>
 <tr>
 <td>Schema</td>
-<td><code class="language-markdown">object</code></td>
+<td><code>object</code></td>
 <td>required</td>
 <td></td>
 <td>The schema to use when coercing Value.</td>
 </tr>
 <tr>
 <td>ThrowErrors</td>
-<td><code class="language-markdown">boolean</code></td>
+<td><code>boolean</code></td>
 <td>-</td>
 <td></td>
 <td>Errors are thrown if true, otherwise an ErrorValue object is returned.</td>
@@ -521,7 +487,7 @@ ValidateValue( Value, Schema, Options )
 <blockquote>
 <h3 id="schemavalidatevalue-value-schema-options-">Schema.<em><strong>ValidateValue</strong></em>( Value, Schema, Options )</h3>
 <p>Validates a field value according to a schema and optionally coerces the value to match.</p>
-<p><strong>Returns</strong>: <code class="language-markdown">*</code> - The validated/coerced Value or an ErrorValue object.</p>
+<p><strong>Returns</strong>: <code>*</code> - The validated/coerced Value or an ErrorValue object.</p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -536,21 +502,21 @@ ValidateValue( Value, Schema, Options )
 </thead>
 <tbody><tr>
 <td>Value</td>
-<td><code class="language-markdown">*</code></td>
+<td><code>*</code></td>
 <td>required</td>
 <td></td>
 <td>The value to validate.</td>
 </tr>
 <tr>
 <td>Schema</td>
-<td><code class="language-markdown">object</code></td>
+<td><code>object</code></td>
 <td>required</td>
 <td></td>
 <td>The FieldSchema object to validate against.</td>
 </tr>
 <tr>
 <td>Options</td>
-<td><code class="language-markdown">object</code></td>
+<td><code>object</code></td>
 <td>-</td>
 <td>&quot;{ coerce: false, throw_errors: false, context: null }&quot;</td>
 <td>An options object to control validation:</td>
@@ -583,7 +549,7 @@ ObjectSchema( FromObject )
 <blockquote>
 <h3 id="schemaobjectschema-fromobject-">Schema.<em><strong>ObjectSchema</strong></em>( FromObject )</h3>
 <p>Returns an array of FieldSchema describing the top-most members of &quot;FromObject&quot;.</p>
-<p><strong>Returns</strong>: <code class="language-markdown">object</code> - An array of FieldSchema.</p>
+<p><strong>Returns</strong>: <code>object</code> - An array of FieldSchema.</p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -598,7 +564,7 @@ ObjectSchema( FromObject )
 </thead>
 <tbody><tr>
 <td>FromObject</td>
-<td><code class="language-markdown">object</code></td>
+<td><code>object</code></td>
 <td>required</td>
 <td></td>
 <td>An object to retrieve the schema for.</td>
@@ -621,7 +587,7 @@ ValidateValues( Values, Schemas )
 <blockquote>
 <h3 id="schemavalidatevalues-values-schemas-">Schema.<em><strong>ValidateValues</strong></em>( Values, Schemas )</h3>
 <p>Validate a set of values against an array of FieldSchema.</p>
-<p><strong>Returns</strong>: <code class="language-markdown">object</code> - An object containing the validation result.</p>
+<p><strong>Returns</strong>: <code>object</code> - An object containing the validation result.</p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -636,14 +602,14 @@ ValidateValues( Values, Schemas )
 </thead>
 <tbody><tr>
 <td>Values</td>
-<td><code class="language-markdown">object</code></td>
+<td><code>object</code></td>
 <td>required</td>
 <td></td>
 <td>The values to validate. This can be an array of values, or an object described by Schemas.</td>
 </tr>
 <tr>
 <td>Schemas</td>
-<td><code class="language-markdown">object</code></td>
+<td><code>object</code></td>
 <td>required</td>
 <td></td>
 <td>An array of FieldSchemas to validate the Values with. Can also be an object whose top-most fields are instances of FieldSchema.</td>
@@ -682,7 +648,7 @@ Clone( From )
 <blockquote>
 <h3 id="objectclone-from-">Object.<em><strong>Clone</strong></em>( From )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+<p><strong>Returns</strong>: <code>string</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -697,7 +663,7 @@ Clone( From )
 </thead>
 <tbody><tr>
 <td>From</td>
-<td><code class="language-markdown">object</code></td>
+<td><code>object</code></td>
 <td>-</td>
 <td>{}</td>
 <td></td>
@@ -720,7 +686,7 @@ Merge( Original, Updates )
 <blockquote>
 <h3 id="objectmerge-original-updates-">Object.<em><strong>Merge</strong></em>( Original, Updates )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">object</code></p>
+<p><strong>Returns</strong>: <code>object</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -735,14 +701,14 @@ Merge( Original, Updates )
 </thead>
 <tbody><tr>
 <td>Original</td>
-<td><code class="language-markdown">object</code></td>
+<td><code>object</code></td>
 <td>required</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>Updates</td>
-<td><code class="language-markdown">object</code></td>
+<td><code>object</code></td>
 <td>-</td>
 <td></td>
 <td></td>
@@ -762,7 +728,7 @@ Traverse( Root, Visitor )
 <blockquote>
 <h3 id="objecttraverse-root-visitor-">Object.<em><strong>Traverse</strong></em>( Root, Visitor )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+<p><strong>Returns</strong>: <code>string</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -777,14 +743,14 @@ Traverse( Root, Visitor )
 </thead>
 <tbody><tr>
 <td>Root</td>
-<td><code class="language-markdown">object</code></td>
+<td><code>object</code></td>
 <td>required</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>Visitor</td>
-<td><code class="language-markdown">function</code></td>
+<td><code>function</code></td>
 <td>required</td>
 <td></td>
 <td></td>
@@ -807,7 +773,7 @@ HasPath( Root, Path )
 <blockquote>
 <h3 id="objecthaspath-root-path-">Object.<em><strong>HasPath</strong></em>( Root, Path )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">boolean</code></p>
+<p><strong>Returns</strong>: <code>boolean</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -822,14 +788,14 @@ HasPath( Root, Path )
 </thead>
 <tbody><tr>
 <td>Root</td>
-<td><code class="language-markdown">object</code></td>
+<td><code>object</code></td>
 <td>required</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>Path</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>required</td>
 <td></td>
 <td></td>
@@ -849,7 +815,7 @@ FindField( Root, Name )
 <blockquote>
 <h3 id="objectfindfield-root-name-">Object.<em><strong>FindField</strong></em>( Root, Name )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+<p><strong>Returns</strong>: <code>string</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -864,14 +830,14 @@ FindField( Root, Name )
 </thead>
 <tbody><tr>
 <td>Root</td>
-<td><code class="language-markdown">object</code></td>
+<td><code>object</code></td>
 <td>required</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>Name</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>required</td>
 <td></td>
 <td></td>
@@ -894,7 +860,7 @@ FindValue( Root, Value )
 <blockquote>
 <h3 id="objectfindvalue-root-value-">Object.<em><strong>FindValue</strong></em>( Root, Value )</h3>
 <p>Locate a value stored within an object.</p>
-<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+<p><strong>Returns</strong>: <code>string</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -909,14 +875,14 @@ FindValue( Root, Value )
 </thead>
 <tbody><tr>
 <td>Root</td>
-<td><code class="language-markdown">object</code></td>
+<td><code>object</code></td>
 <td>required</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>Value</td>
-<td><code class="language-markdown">*</code></td>
+<td><code>*</code></td>
 <td>required</td>
 <td></td>
 <td>The value to search for. This must be primitive data type (boolean, number, or string).</td>
@@ -936,7 +902,7 @@ GetValue( Root, Path )
 <blockquote>
 <h3 id="objectgetvalue-root-path-">Object.<em><strong>GetValue</strong></em>( Root, Path )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">*</code></p>
+<p><strong>Returns</strong>: <code>*</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -951,14 +917,14 @@ GetValue( Root, Path )
 </thead>
 <tbody><tr>
 <td>Root</td>
-<td><code class="language-markdown">object</code></td>
+<td><code>object</code></td>
 <td>required</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>Path</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>required</td>
 <td></td>
 <td></td>
@@ -978,7 +944,7 @@ SetValue( Root, Path, Value )
 <blockquote>
 <h3 id="objectsetvalue-root-path-value-">Object.<em><strong>SetValue</strong></em>( Root, Path, Value )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">*</code></p>
+<p><strong>Returns</strong>: <code>*</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -993,21 +959,21 @@ SetValue( Root, Path, Value )
 </thead>
 <tbody><tr>
 <td>Root</td>
-<td><code class="language-markdown">object</code></td>
+<td><code>object</code></td>
 <td>required</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>Path</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>required</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>Value</td>
-<td><code class="language-markdown">*</code></td>
+<td><code>*</code></td>
 <td>required</td>
 <td></td>
 <td></td>
@@ -1027,7 +993,7 @@ FromJson( JsonString )
 <blockquote>
 <h3 id="objectfromjson-jsonstring-">Object.<em><strong>FromJson</strong></em>( JsonString )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">object</code></p>
+<p><strong>Returns</strong>: <code>object</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -1042,7 +1008,7 @@ FromJson( JsonString )
 </thead>
 <tbody><tr>
 <td>JsonString</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>-</td>
 <td></td>
 <td></td>
@@ -1073,7 +1039,7 @@ ToJsonOptions( PresetName )
 <blockquote>
 <h3 id="objecttojsonoptions-presetname-">Object.<em><strong>ToJsonOptions</strong></em>( PresetName )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">object</code></p>
+<p><strong>Returns</strong>: <code>object</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -1088,7 +1054,7 @@ ToJsonOptions( PresetName )
 </thead>
 <tbody><tr>
 <td>PresetName</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>-</td>
 <td></td>
 <td></td>
@@ -1109,7 +1075,7 @@ ToJson( Value, JsonOptions )
 <blockquote>
 <h3 id="objecttojson-value-jsonoptions-">Object.<em><strong>ToJson</strong></em>( Value, JsonOptions )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">object</code></p>
+<p><strong>Returns</strong>: <code>object</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -1124,7 +1090,7 @@ ToJson( Value, JsonOptions )
 </thead>
 <tbody><tr>
 <td>Value</td>
-<td><code class="language-markdown">*</code></td>
+<td><code>*</code></td>
 <td>-</td>
 <td></td>
 <td>The value to convert to a json string.</td>
@@ -1152,7 +1118,7 @@ FromIni( IniString )
 <blockquote>
 <h3 id="objectfromini-inistring-">Object.<em><strong>FromIni</strong></em>( IniString )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">object</code></p>
+<p><strong>Returns</strong>: <code>object</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -1167,7 +1133,7 @@ FromIni( IniString )
 </thead>
 <tbody><tr>
 <td>IniString</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>-</td>
 <td></td>
 <td></td>
@@ -1189,7 +1155,7 @@ ToIni( Value )
 <blockquote>
 <h3 id="objecttoini-value-">Object.<em><strong>ToIni</strong></em>( Value )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">object</code></p>
+<p><strong>Returns</strong>: <code>object</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -1204,7 +1170,7 @@ ToIni( Value )
 </thead>
 <tbody><tr>
 <td>Value</td>
-<td><code class="language-markdown">object</code></td>
+<td><code>object</code></td>
 <td>-</td>
 <td></td>
 <td></td>
@@ -1233,7 +1199,7 @@ Compare( StringA, StringB, CaseSensitive )
 <blockquote>
 <h3 id="textcompare-stringa-stringb-casesensitive-">Text.<em><strong>Compare</strong></em>( StringA, StringB, CaseSensitive )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+<p><strong>Returns</strong>: <code>string</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -1248,21 +1214,21 @@ Compare( StringA, StringB, CaseSensitive )
 </thead>
 <tbody><tr>
 <td>StringA</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>-</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>StringB</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>-</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>CaseSensitive</td>
-<td><code class="language-markdown">boolean</code></td>
+<td><code>boolean</code></td>
 <td>-</td>
 <td>true</td>
 <td></td>
@@ -1270,9 +1236,9 @@ Compare( StringA, StringB, CaseSensitive )
 </tbody></table>
 <p><em><strong>Description</strong></em></p>
 <p>Compares two strings.
-Returns a <code class="language-markdown">-1</code> if <code class="language-markdown">StringA</code> is less than <code class="language-markdown">StringB</code>.
-Returns a <code class="language-markdown">1</code> if <code class="language-markdown">StringA</code> is greater than than <code class="language-markdown">StringB</code>.
-Returns a <code class="language-markdown">0</code> if <code class="language-markdown">StringA</code> and <code class="language-markdown">StringB</code> are the same.</p>
+Returns a <code>-1</code> if <code>StringA</code> is less than <code>StringB</code>.
+Returns a <code>1</code> if <code>StringA</code> is greater than than <code>StringB</code>.
+Returns a <code>0</code> if <code>StringA</code> and <code>StringB</code> are the same.</p>
 <hr>
 </details>
 <br>
@@ -1287,7 +1253,7 @@ Matches( Text, Pattern )
 <blockquote>
 <h3 id="textmatches-text-pattern-">Text.<em><strong>Matches</strong></em>( Text, Pattern )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+<p><strong>Returns</strong>: <code>string</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -1302,14 +1268,14 @@ Matches( Text, Pattern )
 </thead>
 <tbody><tr>
 <td>Text</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>required</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>Pattern</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>required</td>
 <td></td>
 <td></td>
@@ -1332,7 +1298,7 @@ ReplaceCharacters( Text, SearchCharacters, ReplacementText, MaxTimes )
 <blockquote>
 <h3 id="textreplacecharacters-text-searchcharacters-replacementtext-maxtimes-">Text.<em><strong>ReplaceCharacters</strong></em>( Text, SearchCharacters, ReplacementText, MaxTimes )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+<p><strong>Returns</strong>: <code>string</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -1347,28 +1313,28 @@ ReplaceCharacters( Text, SearchCharacters, ReplacementText, MaxTimes )
 </thead>
 <tbody><tr>
 <td>Text</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>required</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>SearchCharacters</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>required</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>ReplacementText</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>required</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>MaxTimes</td>
-<td><code class="language-markdown">number</code></td>
+<td><code>number</code></td>
 <td>-</td>
 <td>-1</td>
 <td></td>
@@ -1391,7 +1357,7 @@ ReplaceText( Text, SearchText, ReplacementText )
 <blockquote>
 <h3 id="textreplacetext-text-searchtext-replacementtext-">Text.<em><strong>ReplaceText</strong></em>( Text, SearchText, ReplacementText )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+<p><strong>Returns</strong>: <code>string</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -1406,21 +1372,21 @@ ReplaceText( Text, SearchText, ReplacementText )
 </thead>
 <tbody><tr>
 <td>Text</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>required</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>SearchText</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>required</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>ReplacementText</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>required</td>
 <td></td>
 <td></td>
@@ -1440,7 +1406,7 @@ FirstWord( Phrase, Delimiters )
 <blockquote>
 <h3 id="textfirstword-phrase-delimiters-">Text.<em><strong>FirstWord</strong></em>( Phrase, Delimiters )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+<p><strong>Returns</strong>: <code>string</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -1455,14 +1421,14 @@ FirstWord( Phrase, Delimiters )
 </thead>
 <tbody><tr>
 <td>Phrase</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>-</td>
 <td></td>
 <td>A text phrase containing words separated by delimiters.</td>
 </tr>
 <tr>
 <td>Delimiters</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>-</td>
 <td>&quot; &quot;</td>
 <td>A string of whitespace and punctuation characters that break the phrase into words.</td>
@@ -1484,7 +1450,7 @@ AfterFirstWord( Phrase, Delimiters )
 <blockquote>
 <h3 id="textafterfirstword-phrase-delimiters-">Text.<em><strong>AfterFirstWord</strong></em>( Phrase, Delimiters )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+<p><strong>Returns</strong>: <code>string</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -1499,14 +1465,14 @@ AfterFirstWord( Phrase, Delimiters )
 </thead>
 <tbody><tr>
 <td>Phrase</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>-</td>
 <td></td>
 <td>A text phrase containing words separated by delimiters.</td>
 </tr>
 <tr>
 <td>Delimiters</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>-</td>
 <td>&quot; &quot;</td>
 <td>A string of characters that break the phrase into words.</td>
@@ -1528,7 +1494,7 @@ LastWord( Phrase, Delimiters )
 <blockquote>
 <h3 id="textlastword-phrase-delimiters-">Text.<em><strong>LastWord</strong></em>( Phrase, Delimiters )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+<p><strong>Returns</strong>: <code>string</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -1543,14 +1509,14 @@ LastWord( Phrase, Delimiters )
 </thead>
 <tbody><tr>
 <td>Phrase</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>-</td>
 <td></td>
 <td>A text phrase containing words separated by delimiters.</td>
 </tr>
 <tr>
 <td>Delimiters</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>-</td>
 <td>&quot; &quot;</td>
 <td>A string of characters that break the phrase into words.</td>
@@ -1572,7 +1538,7 @@ BeforeLastWord( Phrase, Delimiters )
 <blockquote>
 <h3 id="textbeforelastword-phrase-delimiters-">Text.<em><strong>BeforeLastWord</strong></em>( Phrase, Delimiters )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+<p><strong>Returns</strong>: <code>string</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -1587,14 +1553,14 @@ BeforeLastWord( Phrase, Delimiters )
 </thead>
 <tbody><tr>
 <td>Phrase</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>-</td>
 <td></td>
 <td>A text phrase containing words separated by delimiters.</td>
 </tr>
 <tr>
 <td>Delimiters</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>-</td>
 <td>&quot; &quot;</td>
 <td>A string of characters that break the phrase into words.</td>
@@ -1630,7 +1596,7 @@ Parse( Text, TimeZoneOffset )
 <blockquote>
 <h3 id="dateparse-text-timezoneoffset-">Date.<em><strong>Parse</strong></em>( Text, TimeZoneOffset )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">object</code></p>
+<p><strong>Returns</strong>: <code>object</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -1645,14 +1611,14 @@ Parse( Text, TimeZoneOffset )
 </thead>
 <tbody><tr>
 <td>Text</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>required</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>TimeZoneOffset</td>
-<td><code class="language-markdown">function</code></td>
+<td><code>function</code></td>
 <td>-</td>
 <td>&quot;+0000&quot;</td>
 <td></td>
@@ -1660,7 +1626,7 @@ Parse( Text, TimeZoneOffset )
 </tbody></table>
 <p><em><strong>Description</strong></em></p>
 <p>Converts a string to a date-time value.
-Returns a <code class="language-markdown">date_time_parts</code> structure.</p>
+Returns a <code>date_time_parts</code> structure.</p>
 <hr>
 </details>
 <br>
@@ -1675,7 +1641,7 @@ ZuluTimestamp(  )
 <blockquote>
 <h3 id="datezulutimestamp--">Date.<em><strong>ZuluTimestamp</strong></em>(  )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+<p><strong>Returns</strong>: <code>string</code></p>
 </blockquote>
 <p><em><strong>Description</strong></em></p>
 <p>Returns the current date and time as a string.</p>
@@ -1700,7 +1666,7 @@ TokenizeOptions( PresetName )
 <blockquote>
 <h3 id="tokentokenizeoptions-presetname-">Token.<em><strong>TokenizeOptions</strong></em>( PresetName )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">object</code></p>
+<p><strong>Returns</strong>: <code>object</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -1715,7 +1681,7 @@ TokenizeOptions( PresetName )
 </thead>
 <tbody><tr>
 <td>PresetName</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>-</td>
 <td></td>
 <td>To retrieve an options preset, use one of: &#39;csv&#39;, or &#39;cli&#39; You can leave this empty or &#39;default&#39; for the default options.</td>
@@ -1738,7 +1704,7 @@ Tokenize( PresetName )
 <blockquote>
 <h3 id="tokentokenize-presetname-">Token.<em><strong>Tokenize</strong></em>( PresetName )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">object</code></p>
+<p><strong>Returns</strong>: <code>object</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -1753,7 +1719,7 @@ Tokenize( PresetName )
 </thead>
 <tbody><tr>
 <td>PresetName</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>-</td>
 <td></td>
 <td>To retrieve an options preset, use one of: &#39;csv&#39;, or &#39;cli&#39; You can leave this empty for the default options.</td>
@@ -1782,7 +1748,7 @@ Visit( StartFolder, FilePattern, Recurse, Visitor )
 <blockquote>
 <h3 id="filevisit-startfolder-filepattern-recurse-visitor-">File.<em><strong>Visit</strong></em>( StartFolder, FilePattern, Recurse, Visitor )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">number</code></p>
+<p><strong>Returns</strong>: <code>number</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -1797,28 +1763,28 @@ Visit( StartFolder, FilePattern, Recurse, Visitor )
 </thead>
 <tbody><tr>
 <td>StartFolder</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>required</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>FilePattern</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>-</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>Recurse</td>
-<td><code class="language-markdown">boolean</code></td>
+<td><code>boolean</code></td>
 <td>-</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>Visitor</td>
-<td><code class="language-markdown">function</code></td>
+<td><code>function</code></td>
 <td>-</td>
 <td></td>
 <td></td>
@@ -1841,7 +1807,7 @@ CountFiles( StartFolder, FilePattern, Recurse )
 <blockquote>
 <h3 id="filecountfiles-startfolder-filepattern-recurse-">File.<em><strong>CountFiles</strong></em>( StartFolder, FilePattern, Recurse )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">number</code></p>
+<p><strong>Returns</strong>: <code>number</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -1856,21 +1822,21 @@ CountFiles( StartFolder, FilePattern, Recurse )
 </thead>
 <tbody><tr>
 <td>StartFolder</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>required</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>FilePattern</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>-</td>
 <td>&quot;*&quot;</td>
 <td></td>
 </tr>
 <tr>
 <td>Recurse</td>
-<td><code class="language-markdown">boolean</code></td>
+<td><code>boolean</code></td>
 <td>-</td>
 <td></td>
 <td></td>
@@ -1893,7 +1859,7 @@ CountFolders( StartFolder, Recurse )
 <blockquote>
 <h3 id="filecountfolders-startfolder-recurse-">File.<em><strong>CountFolders</strong></em>( StartFolder, Recurse )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">number</code></p>
+<p><strong>Returns</strong>: <code>number</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -1908,14 +1874,14 @@ CountFolders( StartFolder, Recurse )
 </thead>
 <tbody><tr>
 <td>StartFolder</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>required</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>Recurse</td>
-<td><code class="language-markdown">boolean</code></td>
+<td><code>boolean</code></td>
 <td>-</td>
 <td></td>
 <td></td>
@@ -1938,7 +1904,7 @@ CopyFolder( FromFolder, ToFolder, FilePattern, Overwrite, Recurse )
 <blockquote>
 <h3 id="filecopyfolder-fromfolder-tofolder-filepattern-overwrite-recurse-">File.<em><strong>CopyFolder</strong></em>( FromFolder, ToFolder, FilePattern, Overwrite, Recurse )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">number</code></p>
+<p><strong>Returns</strong>: <code>number</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -1953,35 +1919,35 @@ CopyFolder( FromFolder, ToFolder, FilePattern, Overwrite, Recurse )
 </thead>
 <tbody><tr>
 <td>FromFolder</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>required</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>ToFolder</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>required</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>FilePattern</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>-</td>
 <td>&quot;*&quot;</td>
 <td></td>
 </tr>
 <tr>
 <td>Overwrite</td>
-<td><code class="language-markdown">boolean</code></td>
+<td><code>boolean</code></td>
 <td>-</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>Recurse</td>
-<td><code class="language-markdown">boolean</code></td>
+<td><code>boolean</code></td>
 <td>-</td>
 <td></td>
 <td></td>
@@ -2004,7 +1970,7 @@ DeleteFolder( Folder, Recurse )
 <blockquote>
 <h3 id="filedeletefolder-folder-recurse-">File.<em><strong>DeleteFolder</strong></em>( Folder, Recurse )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">number</code></p>
+<p><strong>Returns</strong>: <code>number</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -2019,14 +1985,14 @@ DeleteFolder( Folder, Recurse )
 </thead>
 <tbody><tr>
 <td>Folder</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>required</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>Recurse</td>
-<td><code class="language-markdown">boolean</code></td>
+<td><code>boolean</code></td>
 <td>-</td>
 <td></td>
 <td></td>
@@ -2063,7 +2029,7 @@ AsyncSleep( Milliseconds )
 </thead>
 <tbody><tr>
 <td>Milliseconds</td>
-<td><code class="language-markdown">number</code></td>
+<td><code>number</code></td>
 <td>-</td>
 <td></td>
 <td></td>
@@ -2097,7 +2063,7 @@ AsyncExecute( Milliseconds )
 </thead>
 <tbody><tr>
 <td>Milliseconds</td>
-<td><code class="language-markdown">number</code></td>
+<td><code>number</code></td>
 <td>-</td>
 <td></td>
 <td></td>
@@ -2124,7 +2090,7 @@ AsyncDownloadFile(  )
 <blockquote>
 <h3 id="netasyncdownloadfile--">Net.<em><strong>AsyncDownloadFile</strong></em>(  )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+<p><strong>Returns</strong>: <code>string</code></p>
 </blockquote>
 <p><em><strong>Description</strong></em></p>
 <p>Download a file from an url.</p>
@@ -2142,7 +2108,7 @@ AsyncGetRequest( Url )
 <blockquote>
 <h3 id="netasyncgetrequest-url-">Net.<em><strong>AsyncGetRequest</strong></em>( Url )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+<p><strong>Returns</strong>: <code>string</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -2157,7 +2123,7 @@ AsyncGetRequest( Url )
 </thead>
 <tbody><tr>
 <td>Url</td>
-<td><code class="language-markdown">string</code></td>
+<td><code>string</code></td>
 <td>required</td>
 <td></td>
 <td></td>
@@ -2167,8 +2133,3 @@ AsyncGetRequest( Url )
 <p>Make an http get request for a an url.</p>
 <hr>
 </details>
-
-      </div>
-    </div>
-  </div>
-</body>

@@ -47,7 +47,9 @@
 		"babel-loader": "^8.2.5",
 		"babel-polyfill": "^6.26.0",
 		"cross-env": "^7.0.3",
+		"marked": "^4.0.18",
 		"mocha": "^10.0.0",
+		"pug": "^3.0.2",
 		"pug-cli": "^1.0.0-alpha6",
 		"uglifyjs-webpack-plugin": "^2.2.0",
 		"webpack": "^5.74.0",
@@ -56,6 +58,7 @@
 	},
 	"scripts": {
 		"run-tests": "mocha -u bdd tests/String/*.js --timeout 0 --slow 10 --colors",
+		"build-docs": "node build/100-build-schema-docs.js && node build/110-compile-html-docs.js",
 		"run-docs-web-server": "npx here --directory docs --port 4200 --watch 1 --silent",
 		"webpack-es5": "cross-env WEBPACK_ENV=es5 webpack",
 		"webpack-es6": "cross-env WEBPACK_ENV=es6 webpack",

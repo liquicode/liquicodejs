@@ -6,7 +6,7 @@ var app = angular.module(
 	[
 		// 'ngCookies',
 		// 'ngResource',
-		// 'ngSanitize',
+		'ngSanitize',
 		// 'ngTouch',
 	],
 );
@@ -14,7 +14,7 @@ var app = angular.module(
 
 app.controller(
 	'Home_Controller',
-	function ( $scope, $http, $window, $location, $cookies )
+	function ( $scope )
 	{
 
 
@@ -25,6 +25,24 @@ app.controller(
 		};
 		$scope.Page = Page;
 
+
+		//---------------------------------------------------------------------
+		Page.GetText = function ( String_or_Array )
+		{
+			if ( typeof String_or_Array === 'undefined' ) { return ''; }
+			else if ( typeof String_or_Array === 'string' ) { return String_or_Array; }
+			else if ( Array.isArray( String_or_Array ) ) { return String_or_Array.join( '\n<br>\n' ); }
+			else { return String_or_Array.toString(); }
+		};
+
+
+		console.log( "Using LiquicodeJS (v" + Page.VersionNumber + ")" );
+		console.log( "Loaded " + Page.Schemas.length + " schemas." );
+
+		$( 'table' ).addClass( 'w3-table w3-border w3-bordered w3-centered' );
+		$( 'details' ).addClass( 'w3-container w3-border w3-round-large w3-sand w3-padding' );
+		$( 'summary' ).addClass( 'w3-large w3-round-large' );
+		$( 'blockquote' ).addClass( 'w3-container w3-border w3-round-large w3-light-blue' );
 
 		//---------------------------------------------------------------------
 		// Exit Controller

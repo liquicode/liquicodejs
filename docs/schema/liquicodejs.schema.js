@@ -1,4 +1,4 @@
-{
+exports = {
     "version": "0.0.1",
     "Schemas": [
         {
@@ -7,11 +7,11 @@
             "type": "namespace",
             "summary": "Data value and type handling",
             "description": [
-                "\n\n**The FieldSchema Object**\n\n~~~javascript\nFieldSchema = {\n\ttype: '',\t\t\t\t// Javascript data type (boolean, number, string, object).\n\tformat: '',\t\t\t\t// A data type specific designation.\n\tdefault: undefined,\t\t// A default value used for missing fields.\n\tname: '',\t\t\t\t// Name of the field.\n}\n~~~\n\nLiquicodeJS can classify and identify value types beyond the primitive data types supported by Javascript.\nWhen obtaining FieldSchema objects from \"Schema.ValueSchema()\" or \"Schema.ObjectSchema()\",\n\"FieldSchema.type\" will contain the Javascript data type and \"FieldSchema.format\" will have a more specific type description.\n\nPossible values for \"FieldSchema.type\" and \"FieldSchema.format\" are as follows:\n\n| Type    | Format        | Default Value | Examples                          |\n|---------|---------------|---------------|-----------------------------------|\n| boolean | boolean       | false         | true, or false                    |\n| number  | integer       | 0             | 1, 2, or 3.0                      |\n| number  | float         | 0             | 1.1, 2.071, or 3.14               |\n| string  | string        | \"\"            | Hello', or ''                     |\n| object  | object        | {}            | { foo: 'bar' }                    |\n| object  | array         | []            | [ 1, 'two', 3.14, null ]          |\n| object  | boolean-array | []            | [ true, false, true ]             |\n| object  | number-array  | []            | [ 1, 2, 3.14 ]                    |\n| object  | string-array  | []            | [ 'one', 'two', 'three' ]         |\n| object  | object-array  | []            | [ { foo: 'bar' }, [1,2,3], null ] |\n| object  | array-array   | []            | [ [1,2,3], [], [4,5] ]            |\n",
+                "\n\n**The FieldSchema Object**\n\n~~~javascript\nFieldSchema = {\n\ttype: '',\t\t\t\t// Javascript data type (boolean, number, string, object).\n\tformat: '',\t\t\t\t// A data type specific designation.\n\tdefault: undefined,\t\t// A default value used for missing fields.\n\tname: '',\t\t\t\t// Name of the field.\n}\n~~~\n\nLiquicodeJS can classify and identify value types beyond the primitive data types supported by Javascript.\nWhen obtaining FieldSchema objects from `Schema.ValueSchema()` or `Schema.ObjectSchema()`,\n`FieldSchema.type` will contain the Javascript data type and `FieldSchema.format` will have a more specific type description.\n\nPossible values for \"FieldSchema.type\" and \"FieldSchema.format\" are as follows:\n\n| Type    | Format        | Default Value | Examples                          |\n|---------|---------------|---------------|-----------------------------------|\n| boolean | boolean       | false         | true, or false                    |\n| number  | integer       | 0             | 1, 2, or 3.0                      |\n| number  | float         | 0             | 1.1, 2.071, or 3.14               |\n| string  | string        | \"\"            | Hello', or ''                     |\n| object  | object        | {}            | { foo: 'bar' }                    |\n| object  | array         | []            | [ 1, 'two', 3.14, null ]          |\n| object  | boolean-array | []            | [ true, false, true ]             |\n| object  | number-array  | []            | [ 1, 2, 3.14 ]                    |\n| object  | string-array  | []            | [ 'one', 'two', 'three' ]         |\n| object  | object-array  | []            | [ { foo: 'bar' }, [1,2,3], null ] |\n| object  | array-array   | []            | [ [1,2,3], [], [4,5] ]            |\n",
                 "\n**The ErrorValue Object**\n\n~~~javascript\nErrorValue = {\n\tok: false,\t\t// Always set to \"false\".\n\terror: '',\t\t// Error message.\n\tcontext: '',\t// Context for the error (e.g. a function name).\n}\n~~~\n\nLiquicodeJS introduces an \"ErrorValue\" object that it can use to indicate errors.\nSome functions will optionally return an \"ErrorValue\" object instead of throwing a Javascript Error.\nIn some cases, this can make code more efficient and legible when certain errors are tolerable\nand you want to avoid the expensive cost of a Javascript Error that includes a call stack.\n\nUse the \"Schema.ErrorValue()\" function to create ErrorValue objects and \"Schema.IsErrorValue()\" to test for errors.\nAn ErrorValue will always have \"ErrorValue.ok = false\" and \"ErrorValue.error\" equal to a string.\n",
                 "\n**Value Coercion**\n\nThe functions \"Schema.CoerceValue()\", \"Schema.ValidateValue()\", and \"Schema.ValidateObject()\" can optionally coerce values\nfrom their given type to the types specified in Schema.\n\nThis tables describes how values are converted from one data type to another during coercion:\n\n| From Type | To Boolean     | To Number      | To String        | To Object      |\n|-----------|----------------|----------------|------------------|----------------|\n| undefined | DefaultValue() | DefaultValue() | DefaultValue()   | DefaultValue() |\n| null      | DefaultValue() | DefaultValue() | DefaultValue()   | DefaultValue() |\n| Boolean   | Value          | Number()       | toString()       | ErrorValue     |\n| Number    | Boolean()      | Value          | toString()       | ErrorValue     |\n| String    | Boolean()      | Number()       | Value            | JSON.parse()   |\n| Object    | Boolean()      | Number()       | JSON.stringify() | Value          |\n",
-                "\n**Object Schema and Validation**\n\nAll of this is very interesting, I am sure.\n\nThe functions \"Schema.ObjectSchema()\" and \"Schema.ValidateObject()\" take these concepts to the next level and\nprovides schemas functionality on an object level rather than an individual value level.\n",
-                "\n**Additional References***\n\n- [You Don't Know JS: Types & Grammar - Chapter 4. Coercion](https://www.oreilly.com/library/view/you-dont-know/9781491905159/ch04.html)\n"
+                "\n**Object Schema and Validation**\n\nThe functions \"Schema.ObjectSchema()\" and \"Schema.ValidateObject()\" take these concepts to the next level and\nprovides schemas functionality on an object level rather than an individual value level.\n",
+                "\n**Additional References**\n\n- [You Don't Know JS: Types & Grammar - Chapter 4. Coercion](https://www.oreilly.com/library/view/you-dont-know/9781491905159/ch04.html)\n"
             ],
             "examples": [
                 "Schema = { name: 'PersonName', type: 'string' }",
@@ -606,6 +606,35 @@
             "source_filename": "200-Text\\210-Text.ReplaceCharacters.js"
         },
         {
+            "id": "211",
+            "member_of": "Text",
+            "name": "ReplaceText",
+            "type": "function",
+            "returns": "string",
+            "description": "",
+            "Parameters": {
+                "Text": {
+                    "name": "Text",
+                    "type": "string",
+                    "required": true,
+                    "default": ""
+                },
+                "SearchText": {
+                    "name": "SearchText",
+                    "type": "string",
+                    "required": true,
+                    "default": ""
+                },
+                "ReplacementText": {
+                    "name": "ReplacementText",
+                    "type": "string",
+                    "required": true,
+                    "default": ""
+                }
+            },
+            "source_filename": "200-Text\\211-Text.ReplaceText.js"
+        },
+        {
             "id": "220",
             "member_of": "Text",
             "name": "FirstWord",
@@ -986,6 +1015,36 @@
             "source_filename": "800-File\\814-File.DeleteFolder.js"
         },
         {
+            "id": "820",
+            "member_of": "OS",
+            "name": "AsyncSleep",
+            "type": "function",
+            "description": "",
+            "Parameters": {
+                "Milliseconds": {
+                    "name": "Milliseconds",
+                    "type": "number",
+                    "format": "integer"
+                }
+            },
+            "source_filename": "800-File\\820-OS.AsyncSleep.js"
+        },
+        {
+            "id": "821",
+            "member_of": "OS",
+            "name": "AsyncExecute",
+            "type": "function",
+            "description": "",
+            "Parameters": {
+                "Milliseconds": {
+                    "name": "Milliseconds",
+                    "type": "number",
+                    "format": "integer"
+                }
+            },
+            "source_filename": "800-File\\821-OS.AsyncExecute.js"
+        },
+        {
             "id": "900",
             "name": "Net",
             "type": "namespace",
@@ -1019,4 +1078,4 @@
             "source_filename": "900-Net\\920-Net.AsyncGetRequest.js"
         }
     ]
-}
+};
