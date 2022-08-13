@@ -61,9 +61,9 @@ module.exports = function ( Liquicode )
 	function ReplaceText( Text, SearchText, ReplacementText ) 
 	{
 		// Validate Parameters
-		Text = Liquicode.Schema.CoerceValue( Text, _Schema.Parameters.Text, true );
-		SearchText = Liquicode.Schema.CoerceValue( SearchText, _Schema.Parameters.SearchText, true );
-		ReplacementText = Liquicode.Schema.CoerceValue( ReplacementText, _Schema.Parameters.ReplacementText, true );
+		Text = Liquicode.Types.Coerce( Text ).ToString();
+		SearchText = Liquicode.Types.Coerce( SearchText ).ToString();
+		ReplacementText = Liquicode.Types.Coerce( ReplacementText ).ToString();
 
 		return Text.split( SearchText ).join( ReplacementText );
 	}

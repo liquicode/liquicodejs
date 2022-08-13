@@ -8,13 +8,13 @@ const LQC = require( LIB_PATH.resolve( __dirname, '../liquicode-node.js' ) );
 
 
 //---------------------------------------------------------------------
-describe( `000) Schema Module`, function ()
+describe( `500) Parse Tests`, function ()
 {
 
 	//---------------------------------------------------------------------
-	it( `should load the Schema module`, function ()
+	it( `should load the Parse module`, function ()
 	{
-		LIB_ASSERT.ok( LQC.Schema );
+		LIB_ASSERT.ok( LQC.Parse );
 		return;
 	} );
 

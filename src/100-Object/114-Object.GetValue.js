@@ -42,8 +42,8 @@ module.exports = function ( Liquicode )
 
 	function GetValue( Root, Path )
 	{
-		Root = Liquicode.Schema.CoerceValue( Root, _Schema.Parameters.Root, true );
-		Path = Liquicode.Schema.CoerceValue( Path, _Schema.Parameters.Path, true );
+		Root = Liquicode.Types.Coerce( Root ).ToObject();
+		Path = Liquicode.Types.Coerce( Path ).ToString();
 
 		let result = Liquicode.Object.Traverse( Root,
 			function ( info )

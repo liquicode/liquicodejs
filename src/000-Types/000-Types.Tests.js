@@ -8,13 +8,13 @@ const LQC = require( LIB_PATH.resolve( __dirname, '../liquicode-node.js' ) );
 
 
 //---------------------------------------------------------------------
-describe( `500) Token Tests`, function ()
+describe( `000) Types Module`, function ()
 {
 
 	//---------------------------------------------------------------------
-	it( `should load the Token module`, function ()
+	it( `should load the Types module`, function ()
 	{
-		LIB_ASSERT.ok( LQC.Token );
+		LIB_ASSERT.ok( LQC.Types );
 		return;
 	} );
 

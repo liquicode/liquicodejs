@@ -61,9 +61,9 @@ module.exports = function ( Liquicode )
 
 	function Compare( StringA, StringB, CaseSensitive )
 	{
-		StringA = Liquicode.Schema.ValidateValue( StringA, _Schema.Parameters.StringA , { coerce_values: true, throw_errors: true });
-		StringB = Liquicode.Schema.ValidateValue( StringB, _Schema.Parameters.StringB , { coerce_values: true, throw_errors: true });
-		CaseSensitive = Liquicode.Schema.ValidateValue( CaseSensitive, _Schema.Parameters.CaseSensitive, { coerce_values: true, throw_errors: true } );
+		StringA = Liquicode.Types.Coerce( StringA, _Schema.Parameters.StringA , { coerce_values: true, throw_errors: true });
+		StringB = Liquicode.Types.Coerce( StringB, _Schema.Parameters.StringB , { coerce_values: true, throw_errors: true });
+		CaseSensitive = Liquicode.Types.Coerce( CaseSensitive, _Schema.Parameters.CaseSensitive, { coerce_values: true, throw_errors: true } );
 
 		try
 		{

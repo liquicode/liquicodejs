@@ -4,7 +4,7 @@
 //---------------------------------------------------------------------
 let Schema = {
 	id: '502',
-	member_of: 'Token',
+	member_of: 'Parse',
 	name: 'Tokenize',
 	type: 'function',
 	returns: 'object',
@@ -48,7 +48,7 @@ module.exports = function ( Liquicode )
 	function Tokenize( Text, Options )
 	{
 		// Get the options.
-		let tokenize_options = Liquicode.Token.TokenizeOptions();
+		let tokenize_options = Liquicode.Parse.TokenizeOptions();
 		tokenize_options = Liquicode.Object.Merge( tokenize_options, Options );
 
 		// Tokenize the text.

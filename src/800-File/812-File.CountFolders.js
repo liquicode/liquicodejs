@@ -49,8 +49,8 @@ module.exports = function ( Liquicode )
 
 	function CountFolders( StartFolder, Recurse ) 
 	{
-		StartFolder = Liquicode.Schema.ValidateValue( StartFolder, _Schema.Parameters.StartFolder, { coerce_values: true, throw_errors: true } );
-		Recurse = Liquicode.Schema.ValidateValue( Recurse, _Schema.Parameters.Recurse , { coerce_values: true, throw_errors: true });
+		StartFolder = Liquicode.Types.Coerce( StartFolder ).ToString();
+		Recurse = Liquicode.Types.Coerce( Recurse ).ToBoolean();
 
 		let folder_count = 0;
 		Liquicode.File.Visit( StartFolder, '', Recurse,

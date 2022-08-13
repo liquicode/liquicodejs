@@ -8,14 +8,14 @@ const LQC = require( LIB_PATH.resolve( __dirname, '../liquicode-node.js' ) );
 
 
 //---------------------------------------------------------------------
-describe( `502-Token.Tokenize Tests`, function ()
+describe( `502) Parse.Tokenize Tests`, function ()
 {
 
 	//---------------------------------------------------------------------
 	it( `should tokenize an undefined string`,
 		async function ()
 		{
-			let tokens = LQC.Token.Tokenize();
+			let tokens = LQC.Parse.Tokenize();
 			LIB_ASSERT.ok( tokens );
 			LIB_ASSERT.ok( tokens.length === 0 );
 			return;
@@ -26,7 +26,7 @@ describe( `502-Token.Tokenize Tests`, function ()
 	it( `should tokenize an empty string`,
 		async function ()
 		{
-			let tokens = LQC.Token.Tokenize( '' );
+			let tokens = LQC.Parse.Tokenize( '' );
 			LIB_ASSERT.ok( tokens );
 			LIB_ASSERT.ok( tokens.length === 0 );
 			return;
@@ -37,7 +37,7 @@ describe( `502-Token.Tokenize Tests`, function ()
 	it( `should tokenize a simple string`,
 		async function ()
 		{
-			let tokens = LQC.Token.Tokenize( 'Abracadabra' );
+			let tokens = LQC.Parse.Tokenize( 'Abracadabra' );
 			LIB_ASSERT.ok( tokens );
 			LIB_ASSERT.strictEqual( tokens.length, 1 );
 			LIB_ASSERT.strictEqual( tokens[ 0 ].token, "Abracadabra" );
@@ -51,10 +51,10 @@ describe( `502-Token.Tokenize Tests`, function ()
 	it( `should tokenize a more complex string and detect custom keywords`,
 		async function ()
 		{
-			let options = LQC.Token.TokenizeOptions();
+			let options = LQC.Parse.TokenizeOptions();
 			options.keywords.push( 'let' );
 
-			let tokens = LQC.Token.Tokenize( 'let X = 3.14;', options );
+			let tokens = LQC.Parse.Tokenize( 'let X = 3.14;', options );
 			LIB_ASSERT.ok( tokens );
 
 			let expected_tokens =
@@ -77,7 +77,7 @@ describe( `502-Token.Tokenize Tests`, function ()
 	it( `should tokenize a symbol`,
 		async function ()
 		{
-			let tokens = LQC.Token.Tokenize( '=' );
+			let tokens = LQC.Parse.Tokenize( '=' );
 			LIB_ASSERT.ok( tokens );
 
 			let expected_tokens =
@@ -93,7 +93,7 @@ describe( `502-Token.Tokenize Tests`, function ()
 	it( `should tokenize whitespace`,
 		async function ()
 		{
-			let tokens = LQC.Token.Tokenize( '\t \n' );
+			let tokens = LQC.Parse.Tokenize( '\t \n' );
 			LIB_ASSERT.ok( tokens );
 
 			let expected_tokens =
@@ -109,7 +109,7 @@ describe( `502-Token.Tokenize Tests`, function ()
 	it( `should tokenize a literal`,
 		async function ()
 		{
-			let tokens = LQC.Token.Tokenize( '"What is the answer?"' );
+			let tokens = LQC.Parse.Tokenize( '"What is the answer?"' );
 			LIB_ASSERT.ok( tokens );
 
 			let expected_tokens =
@@ -125,7 +125,7 @@ describe( `502-Token.Tokenize Tests`, function ()
 	it( `should tokenize a literal with an apostrophe`,
 		async function ()
 		{
-			let tokens = LQC.Token.Tokenize( `"What's the answer?"` );
+			let tokens = LQC.Parse.Tokenize( `"What's the answer?"` );
 			LIB_ASSERT.ok( tokens );
 
 			let expected_tokens =
@@ -141,7 +141,7 @@ describe( `502-Token.Tokenize Tests`, function ()
 	it( `should tokenize a literal with an escape character`,
 		async function ()
 		{
-			let tokens = LQC.Token.Tokenize( `'What\\'s the answer?'` );
+			let tokens = LQC.Parse.Tokenize( `'What\\'s the answer?'` );
 			LIB_ASSERT.ok( tokens );
 
 			let expected_tokens =
@@ -157,10 +157,10 @@ describe( `502-Token.Tokenize Tests`, function ()
 	it( `should tokenize a literal with an alternate escape character`,
 		async function ()
 		{
-			let options = LQC.Token.TokenizeOptions();
+			let options = LQC.Parse.TokenizeOptions();
 			options.literal_escape_chars += '~';
 
-			let tokens = LQC.Token.Tokenize( `'What~'s the answer?'`, options );
+			let tokens = LQC.Parse.Tokenize( `'What~'s the answer?'`, options );
 			LIB_ASSERT.ok( tokens );
 
 			let expected_tokens =
@@ -176,10 +176,10 @@ describe( `502-Token.Tokenize Tests`, function ()
 	it( `should tokenize a literal with a self escaping duplicate character`,
 		async function ()
 		{
-			let options = LQC.Token.TokenizeOptions();
+			let options = LQC.Parse.TokenizeOptions();
 			options.self_escape_literal_delimiters = true;
 
-			let tokens = LQC.Token.Tokenize( `"What's ""the"" answer?"`, options );
+			let tokens = LQC.Parse.Tokenize( `"What's ""the"" answer?"`, options );
 			LIB_ASSERT.ok( tokens );
 
 			let expected_tokens =
@@ -195,11 +195,11 @@ describe( `502-Token.Tokenize Tests`, function ()
 	it( `should discard whitespace`,
 		async function ()
 		{
-			let options = LQC.Token.TokenizeOptions();
+			let options = LQC.Parse.TokenizeOptions();
 			options.keywords.push( 'let' );
 			options.discard_whitespace = true;
 
-			let tokens = LQC.Token.Tokenize( `let X = 3.14;`, options );
+			let tokens = LQC.Parse.Tokenize( `let X = 3.14;`, options );
 			LIB_ASSERT.ok( tokens );
 
 			let expected_tokens =
@@ -219,12 +219,12 @@ describe( `502-Token.Tokenize Tests`, function ()
 	it( `should detect keywords, case sensitive`,
 		async function ()
 		{
-			let options = LQC.Token.TokenizeOptions();
+			let options = LQC.Parse.TokenizeOptions();
 			options.discard_whitespace = true;
 			options.keywords_are_case_sensitive = true;
 			options.keywords.push( 'Let' );
 
-			let tokens = LQC.Token.Tokenize( `let X = 3.14;`, options );
+			let tokens = LQC.Parse.Tokenize( `let X = 3.14;`, options );
 			LIB_ASSERT.ok( tokens );
 
 			let expected_tokens =
@@ -244,11 +244,11 @@ describe( `502-Token.Tokenize Tests`, function ()
 	it( `should detect keywords, case insensitive`,
 		async function ()
 		{
-			let options = LQC.Token.TokenizeOptions();
+			let options = LQC.Parse.TokenizeOptions();
 			options.discard_whitespace = true;
 			options.keywords.push( 'Let' );
 
-			let tokens = LQC.Token.Tokenize( `let X = 3.14;`, options );
+			let tokens = LQC.Parse.Tokenize( `let X = 3.14;`, options );
 			LIB_ASSERT.ok( tokens );
 
 			let expected_tokens =

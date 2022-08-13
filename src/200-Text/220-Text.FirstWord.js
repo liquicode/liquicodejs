@@ -52,8 +52,8 @@ module.exports = function ( Liquicode )
 
 	function FirstWord( Phrase, Delimiters )
 	{
-		Phrase = Liquicode.Schema.ValidateValue( Phrase, _Schema.Parameters.Phrase , { coerce_values: true, throw_errors: true });
-		Delimiters = Liquicode.Schema.ValidateValue( Delimiters, _Schema.Parameters.Delimiters, { coerce_values: true, throw_errors: true } );
+		Phrase = Liquicode.Types.Coerce( Phrase ).ToString();
+		Delimiters = Liquicode.Types.Coerce( Delimiters ).ToString();
 
 		let word_start = -1;
 		for ( let index = 0; index < Phrase.length; index++ )

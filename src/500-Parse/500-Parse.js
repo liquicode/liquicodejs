@@ -4,7 +4,7 @@
 //---------------------------------------------------------------------
 let Schema = {
 	id: '500',
-	name: 'Token',
+	name: 'Parse',
 	type: 'namespace',
 	summary: 'Functions for tokenizing text strings.',
 };
@@ -24,8 +24,9 @@ module.exports = function ( Liquicode )
 {
 	return {
 		_Schema: Schema,
-		TokenizeOptions: require( './501-Token.TokenizeOptions.js' )( Liquicode ).TokenizeOptions,
-		Tokenize: require( './502-Token.Tokenize.js' )( Liquicode ).Tokenize,
+		TokenizeOptions: require( './501-Parse.TokenizeOptions.js' )( Liquicode ).TokenizeOptions,
+		Tokenize: require( './502-Parse.Tokenize.js' )( Liquicode ).Tokenize,
+		DateParse: require( './510-Parse.DateParse.js' )( Liquicode ).DateParse,
 	};
 };
 

@@ -4,44 +4,77 @@
 //---------------------------------------------------------------------
 let _Schema = {
 	id: '000',
-	name: 'Schema',
+	name: 'Types',
 	type: 'namespace',
-	summary: 'Data value and type handling',
-	description: [`
+	summary: 'Data Type Handling',
+	description: [ `
+
+LiquicodeJS can classify and identify value types beyond the primitive data types supported by Javascript.
+When obtaining FieldSchema objects from \`Schema.ValueSchema()\` or \`Schema.ObjectSchema()\`,
+\`FieldSchema.type\` will contain the Javascript data type and \`FieldSchema.format\` will have a more specific type description.
+
+Javascript (and JSON) offers four data types for your variable values: \`boolean\`, \`number\`, \`string\`,
+and everything else is essentially an \`object\`.
+This suits Javascript well for the types of things that Javascript needs to do like storing values in memory
+and executing program statements with those values.
+This is not always great on an application level though.
+When you need to, for example, make sure that a variable contains an \`array\` of \`string\` or that value represents a floating point number.
+Cases like these require additional progrma statements and type checking which can be consolidated into a set of functions.
+
+The \`Schema\` module defines a few objects and functions to alleviate this burden from the application developer.
 
 **The FieldSchema Object**
 
+This object describes a value (or field) with greater precision then Javascript's \`typeof\` statement.
+The \`FieldSchema.type\` member will always contain a Javascript data type while the \`FieldSchema.format\` field contains a more
+detailed data type.
+
 ~~~javascript
 FieldSchema = {
-	type: '',				// Javascript data type (boolean, number, string, object).
+	type: '',				// Javascript data type (boolean, number, string, or object).
 	format: '',				// A data type specific designation.
 	default: undefined,		// A default value used for missing fields.
 	name: '',				// Name of the field.
 }
 ~~~
 
-LiquicodeJS can classify and identify value types beyond the primitive data types supported by Javascript.
-When obtaining FieldSchema objects from \`Schema.ValueSchema()\` or \`Schema.ObjectSchema()\`,
-\`FieldSchema.type\` will contain the Javascript data type and \`FieldSchema.format\` will have a more specific type description.
+These functions will generate a \`FieldSchema\` from a single value or an object.
+Be aware that only the top level members of an object are scrutinized as this is what we are typically interested in most cases.
+Functions of the \`Schema\` module do not recurse into an object providing the schema for every single field in the object.
+Rather, they inspect the top level of objects only and return an array of schema objects as a result.
+Again, this handles most use cases with a consistent set of functions.
+Any further validation/coercion that may be required can also be perfomed by the same functions on an individual case basis.
 
-Possible values for "FieldSchema.type" and "FieldSchema.format" are as follows:
+- \`Schema.ValueSchema( FromValue )\`
+- \`Schema.ObjectSchema( FromObject )\`
 
-| Type    | Format        | Default Value | Examples                          |
-|---------|---------------|---------------|-----------------------------------|
-| boolean | boolean       | false         | true, or false                    |
-| number  | integer       | 0             | 1, 2, or 3.0                      |
-| number  | float         | 0             | 1.1, 2.071, or 3.14               |
-| string  | string        | ""            | Hello', or ''                     |
-| object  | object        | {}            | { foo: 'bar' }                    |
-| object  | array         | []            | [ 1, 'two', 3.14, null ]          |
-| object  | boolean-array | []            | [ true, false, true ]             |
-| object  | number-array  | []            | [ 1, 2, 3.14 ]                    |
-| object  | string-array  | []            | [ 'one', 'two', 'three' ]         |
-| object  | object-array  | []            | [ { foo: 'bar' }, [1,2,3], null ] |
-| object  | array-array   | []            | [ [1,2,3], [], [4,5] ]            |
+Possible values for \`FieldSchema.type\` and \`FieldSchema.format\` are as follows:
+
+| Type    | Format        | Default Value | Examples                              |
+|---------|---------------|---------------|---------------------------------------|
+| boolean | boolean       | false         | \`true\`, or \`false\`                |
+| number  | integer       | 0             | \`1\`, \`2\`, or \`3.0\`              |
+| number  | float         | 0             | \`1.1\`, \`2.071\`, or \`3.14\`       |
+| string  | string        | ""            | \`"Hello"\`, or \`""\`                |
+| object  | object        | {}            | \`{ foo: 'bar' }\`                    |
+| object  | array         | []            | \`[ 1, 'two', 3.14, null ]\`          |
+| object  | boolean-array | []            | \`[ true, false, true ]\`             |
+| object  | number-array  | []            | \`[ 1, 2, 3.14 ]\`                    |
+| object  | string-array  | []            | \`[ 'one', 'two', 'three' ]\`         |
+| object  | object-array  | []            | \`[ { foo: 'bar' }, [1,2,3], null ]\` |
+| object  | array-array   | []            | \`[ [1,2,3], [], [4,5] ]\`            |
 `,
-`
+		`
+
 **The ErrorValue Object**
+
+LiquicodeJS introduces an \`ErrorValue\` object that is used to indicate and convey errors.
+Some functions will return an \`ErrorValue\` object instead of throwing a Javascript \`Error\`.
+In some cases, this can make code more efficient and legible when certain errors are tolerable
+and you want to avoid the expensive cost of a Javascript \`Error\` that includes a call stack.
+
+Use the \`Schema.ErrorValue()\` function to create an \`ErrorValue\` object and \`Schema.IsErrorValue()\` to test for errors.
+An \`ErrorValue\` will always have \`ErrorValue.ok = false\` and \`ErrorValue.error\` will contain the error message.
 
 ~~~javascript
 ErrorValue = {
@@ -50,20 +83,24 @@ ErrorValue = {
 	context: '',	// Context for the error (e.g. a function name).
 }
 ~~~
-
-LiquicodeJS introduces an "ErrorValue" object that it can use to indicate errors.
-Some functions will optionally return an "ErrorValue" object instead of throwing a Javascript Error.
-In some cases, this can make code more efficient and legible when certain errors are tolerable
-and you want to avoid the expensive cost of a Javascript Error that includes a call stack.
-
-Use the "Schema.ErrorValue()" function to create ErrorValue objects and "Schema.IsErrorValue()" to test for errors.
-An ErrorValue will always have "ErrorValue.ok = false" and "ErrorValue.error" equal to a string.
 `,
-`
+		`
+
 **Value Coercion**
 
-The functions "Schema.CoerceValue()", "Schema.ValidateValue()", and "Schema.ValidateObject()" can optionally coerce values
-from their given type to the types specified in Schema.
+As data gets shuttled around between memory, files, and network transmissions, the representation of the data might
+change to suit to the medium.
+For example, an integer value being stored in a file might be read back out later as a string.
+It's actual value hasn't changed, but the way it is represented has changed.
+Javascript can be pretty forgiving in these cases by allowing a certain amount of type fluidity;
+However, this can also cause some difficult to spot errors like when \`'2' + 2\` equals the string \`'22'\` and not the integer \`4\`.
+
+Use these functions the validate that a value's type is of an expected type and to coerce the value, in a common sense way,
+to that expected type.
+
+- \`Types.Coerce( Value, Schema, ThrowErrors )\`
+- \`Types.Coerce( Value, Schema, ThrowErrors )\`
+- \`Types.Coerces( Values, Schemas, ThrowErrors )\`
 
 This tables describes how values are converted from one data type to another during coercion:
 
@@ -76,14 +113,9 @@ This tables describes how values are converted from one data type to another dur
 | String    | Boolean()      | Number()       | Value            | JSON.parse()   |
 | Object    | Boolean()      | Number()       | JSON.stringify() | Value          |
 `,
-`
-**Object Schema and Validation**
+		`
 
-The functions "Schema.ObjectSchema()" and "Schema.ValidateObject()" take these concepts to the next level and
-provides schemas functionality on an object level rather than an individual value level.
-`,
-`
-**Additional References**
+**Related Reading**
 
 - [You Don't Know JS: Types & Grammar - Chapter 4. Coercion](https://www.oreilly.com/library/view/you-dont-know/9781491905159/ch04.html)
 `,
@@ -163,7 +195,7 @@ An ErrorValue will always have "ErrorValue.ok = false" and "ErrorValue.error" eq
 
 **Value Coercion**
 
-The functions "Schema.CoerceValue()", "Schema.ValidateValue()", and "Schema.ValidateObject()" can optionally coerce values
+The functions "Types.Coerce()", "Types.Coerce()", and "Schema.ValidateObject()" can optionally coerce values
 from their given type to the types specified in Schema.
 
 This tables describes how values are converted from one data type to another during coercion:
@@ -203,13 +235,11 @@ module.exports = function ( Liquicode )
 {
 	return {
 		_Schema: _Schema,
-		ErrorValue: require( './010-Schema.ErrorValue.js' )( Liquicode ).ErrorValue,
-		IsErrorValue: require( './011-Schema.IsErrorValue.js' )( Liquicode ).IsErrorValue,
-		ValueSchema: require( './020-Schema.ValueSchema.js' )( Liquicode ).ValueSchema,
-		DefaultValue: require( './021-Schema.DefaultValue.js' )( Liquicode ).DefaultValue,
-		CoerceValue: require( './022-Schema.CoerceValue.js' )( Liquicode ).CoerceValue,
-		ValidateValue: require( './023-Schema.ValidateValue.js' )( Liquicode ).ValidateValue,
-		ObjectSchema: require( './030-Schema.ObjectSchema.js' )( Liquicode ).ObjectSchema,
-		ValidateValues: require( './031-Schema.ValidateValues.js' )( Liquicode ).ValidateValues,
+
+		Coerce: require( './010-Types.Coerce.js' )( Liquicode ).Coerce,
+
+		Formats: require( './020-Types.Formats.js' )( Liquicode ).Formats,
+		GetFormat: require( './021-Types.GetFormat.js' )( Liquicode ).GetFormat,
+
 	};
 };

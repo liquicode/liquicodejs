@@ -55,9 +55,8 @@ module.exports = function ( Liquicode )
 
 	function DeleteFolder( Folder, Recurse ) 
 	{
-		Folder = Liquicode.Schema.ValidateValue( Folder, _Schema.Parameters.Folder, { coerce_values: true, throw_errors: true } );
-		FilePattern = Liquicode.Schema.ValidateValue( FilePattern, _Schema.Parameters.FilePattern, { coerce_values: true, throw_errors: true } );
-		Recurse = Liquicode.Schema.ValidateValue( Recurse, _Schema.Parameters.Recurse , { coerce_values: true, throw_errors: true });
+		Folder = Liquicode.Types.Coerce( Folder ).ToString();
+		Recurse = Liquicode.Types.Coerce( Recurse ).ToBoolean();
 
 		if ( !LIB_FS.existsSync( Folder ) ) { return 0; }
 		let count = 0;

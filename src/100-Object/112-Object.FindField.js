@@ -42,8 +42,8 @@ module.exports = function ( Liquicode )
 
 	function FindField( Root, Name )
 	{
-		Root = Liquicode.Schema.CoerceValue( Root, _Schema.Parameters.Root, true );
-		Name = Liquicode.Schema.CoerceValue( Name, _Schema.Parameters.Name, true );
+		Root = Liquicode.Types.Coerce( Root ).ToObject();
+		Name = Liquicode.Types.Coerce( Name ).ToString();
 
 		let result = Liquicode.Object.Traverse( Root,
 			function ( info )

@@ -42,7 +42,7 @@ module.exports = function ( Liquicode )
 
 	function AsyncExecute( Command, Environment, StartFolder ) 
 	{
-		Milliseconds = Liquicode.Schema.CoerceValue( Milliseconds, _Schema.Parameters.Milliseconds, true );
+		// Milliseconds = Liquicode.Types.Coerce( Milliseconds, _Schema.Parameters.Milliseconds, true );
 
 
 		//---------------------------------------------------------------------

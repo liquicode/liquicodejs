@@ -4,7 +4,7 @@
 //---------------------------------------------------------------------
 let Schema = {
 	id: '501',
-	member_of: 'Token',
+	member_of: 'Parse',
 	name: 'TokenizeOptions',
 	type: 'function',
 	returns: 'object',

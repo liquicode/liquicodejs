@@ -60,7 +60,7 @@ The parser is a bit more relaxed and allows:
 
 	function FromJson( JsonString )
 	{
-		// JsonString = Liquicode.Schema.CoerceValue( JsonString, _Schema.Parameters.JsonString, true );
+		// JsonString = Liquicode.Types.Coerce( JsonString, _Schema.Parameters.JsonString, true );
 		JsonString = JsonString || '';
 		if ( typeof JsonString !== 'string' ) { JsonString = JsonString.toString(); }
 

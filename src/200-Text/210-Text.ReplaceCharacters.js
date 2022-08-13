@@ -66,10 +66,10 @@ module.exports = function ( Liquicode )
 	function ReplaceCharacters( Text, SearchCharacters, ReplacementText, MaxTimes )
 	{
 		// Validate Parameters
-		Text = Liquicode.Schema.ValidateValue( Text, _Schema.Parameters.Text , { coerce_values: true, throw_errors: true });
-		SearchCharacters = Liquicode.Schema.ValidateValue( SearchCharacters, _Schema.Parameters.SearchCharacters, { coerce_values: true, throw_errors: true } );
-		ReplacementText = Liquicode.Schema.ValidateValue( ReplacementText, _Schema.Parameters.ReplacementText , { coerce_values: true, throw_errors: true });
-		MaxTimes = Liquicode.Schema.ValidateValue( MaxTimes, _Schema.Parameters.MaxTimes , { coerce_values: true, throw_errors: true });
+		Text = Liquicode.Types.Coerce( Text ).ToString();
+		SearchCharacters = Liquicode.Types.Coerce( SearchCharacters ).ToString();
+		ReplacementText = Liquicode.Types.Coerce( ReplacementText ).ToString();
+		MaxTimes = Liquicode.Types.Coerce( MaxTimes ).ToNumber();
 
 		let new_text = '';
 		let count = 0;

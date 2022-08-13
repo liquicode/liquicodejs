@@ -40,7 +40,7 @@ module.exports = function ( Liquicode )
 
 	function ToJsonOptions( PresetName )
 	{
-		PresetName = Liquicode.Schema.CoerceValue( PresetName, _Schema.Parameters.PresetName, true );
+		PresetName = Liquicode.Types.Coerce( PresetName ).ToString();
 
 		let options = {
 			identifier_quote: `"`,

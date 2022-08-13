@@ -42,7 +42,7 @@ module.exports = function ( Liquicode )
 
 	function AsyncSleep( Milliseconds ) 
 	{
-		Milliseconds = Liquicode.Schema.CoerceValue( Milliseconds, _Schema.Parameters.Milliseconds, true );
+		Milliseconds = Liquicode.Types.Coerce( Milliseconds ).ToNumber();
 
 		return new Promise( resolve => setTimeout( resolve, Milliseconds ) );
 	}

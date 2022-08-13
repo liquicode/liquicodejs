@@ -69,11 +69,11 @@ module.exports = function ( Liquicode )
 
 	function CopyFolder( FromFolder, ToFolder, FilePattern, Overwrite, Recurse ) 
 	{
-		FromFolder = Liquicode.Schema.ValidateValue( FromFolder, _Schema.Parameters.FromFolder, { coerce_values: true, throw_errors: true } );
-		ToFolder = Liquicode.Schema.ValidateValue( ToFolder, _Schema.Parameters.ToFolder, { coerce_values: true, throw_errors: true } );
-		FilePattern = Liquicode.Schema.ValidateValue( FilePattern, _Schema.Parameters.FilePattern, { coerce_values: true, throw_errors: true } );
-		Overwrite = Liquicode.Schema.ValidateValue( Overwrite, _Schema.Parameters.Overwrite , { coerce_values: true, throw_errors: true });
-		Recurse = Liquicode.Schema.ValidateValue( Recurse, _Schema.Parameters.Recurse , { coerce_values: true, throw_errors: true });
+		FromFolder = Liquicode.Types.Coerce( FromFolder ).ToString();
+		ToFolder = Liquicode.Types.Coerce( ToFolder ).ToString();
+		FilePattern = Liquicode.Types.Coerce( FilePattern ).ToString();
+		Overwrite = Liquicode.Types.Coerce( Overwrite ).ToBoolean();
+		Recurse = Liquicode.Types.Coerce( Recurse ).ToBoolean();
 
 		if ( !LIB_FS.existsSync( FromFolder ) ) { return 0; }
 		LIB_FS.mkdirSync( ToFolder, { recursive: true } );

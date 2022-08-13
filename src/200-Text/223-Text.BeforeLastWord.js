@@ -52,8 +52,8 @@ module.exports = function ( Liquicode )
 
 	function BeforeLastWord( Phrase, Delimiters )
 	{
-		Phrase = Liquicode.Schema.ValidateValue( Phrase, _Schema.Parameters.Phrase , { coerce_values: true, throw_errors: true });
-		Delimiters = Liquicode.Schema.ValidateValue( Delimiters, _Schema.Parameters.Delimiters , { coerce_values: true, throw_errors: true });
+		Phrase = Liquicode.Types.Coerce( Phrase ).ToString();
+		Delimiters = Liquicode.Types.Coerce( Delimiters ).ToString();
 
 		for ( let index = Phrase.length - 1; index >= 0; index-- )
 		{

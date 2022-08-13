@@ -55,8 +55,8 @@ This functions recurses through sub-objects and traverses the entire object.
 	function Traverse( Root, Visitor )
 	{
 		// Root = Root || {};
-		Root = Liquicode.Schema.CoerceValue( Root, _Schema.Parameters.Root, true );
-		// Visitor = Liquicode.Schema.CoerceValue( Visitor, _Schema.Parameters.Visitor, true );
+		Root = Liquicode.Types.Coerce( Root ).ToObject();
+		// Visitor = Liquicode.Types.Coerce( Visitor, _Schema.Parameters.Visitor, true );
 
 		//---------------------------------------------------------------------
 		function traverse_recurse( Visitor, Parent, Name, Value, Path, Depth )

@@ -44,7 +44,7 @@ Parse an Ini string and return an object value.
 
 	function ToIni( Value )
 	{
-		// IniString = Liquicode.Schema.CoerceValue( IniString, _Schema.Parameters.IniString, true );
+		Value = Liquicode.Types.Coerce( Value ).ToObject();
 
 		//NOTE: This function has the following side effects:
 		//		- ignores all sections that are not of type object

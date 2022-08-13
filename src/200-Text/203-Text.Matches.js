@@ -51,8 +51,8 @@ module.exports = function ( Liquicode )
 	function Matches( Text, Pattern ) 
 	{
 		// Validate Parameters
-		Text = Liquicode.Schema.ValidateValue( Text, _Schema.Parameters.Text , { coerce_values: true, throw_errors: true });
-		Pattern = Liquicode.Schema.ValidateValue( Pattern, _Schema.Parameters.Pattern , { coerce_values: true, throw_errors: true });
+		Text = Liquicode.Types.Coerce( Text ).ToString();
+		Pattern = Liquicode.Types.Coerce( Pattern ).ToString();
 
 		//FROM: https://stackoverflow.com/a/57527468
 		let wildcard_exp = Pattern.replace( /[.+^${}()|[\]\\]/g, '\\$&' ); // regexp escape 

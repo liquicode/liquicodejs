@@ -43,7 +43,7 @@ module.exports = function ( Liquicode )
 
 	function Clone( From )
 	{
-		From = Liquicode.Schema.ValidateValue( From, _Schema.Parameters.From, { coerce_values: true, throw_errors: true } );
+		From = Liquicode.Types.Coerce( From, _Schema.Parameters.From, { coerce_values: true, throw_errors: true } );
 		return JSON.parse( JSON.stringify( From ) );
 	};
 

@@ -42,8 +42,8 @@ module.exports = function ( Liquicode )
 
 	function Merge( Original, Updates )
 	{
-		Original = Liquicode.Schema.ValidateValue( Original, _Schema.Parameters.Original, { coerce_values: true, throw_errors: true } );
-		Updates = Liquicode.Schema.ValidateValue( Updates, _Schema.Parameters.Updates, { coerce_values: true, throw_errors: true } );
+		Original = Liquicode.Types.Coerce( Original, true ).ToObject( {} );
+		Updates = Liquicode.Types.Coerce( Updates, true ).ToObject( {} );
 
 		let new_object = JSON.parse( JSON.stringify( Original ) );
 

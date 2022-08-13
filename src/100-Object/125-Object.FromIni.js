@@ -44,7 +44,7 @@ Parse an Ini string and return an object value.
 
 	function FromIni( IniString )
 	{
-		IniString = Liquicode.Schema.CoerceValue( IniString, _Schema.Parameters.IniString, true );
+		IniString = Liquicode.Types.Coerce( IniString ).ToString();
 
 		//NOTE: This function has the following side effects:
 		//		- ignores all lines before the first section is found

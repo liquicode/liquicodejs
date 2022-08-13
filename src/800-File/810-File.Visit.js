@@ -67,10 +67,10 @@ module.exports = function ( Liquicode )
 
 	function Visit( StartFolder, FilePattern, Recurse, Visitor ) 
 	{
-		StartFolder = Liquicode.Schema.ValidateValue( StartFolder, _Schema.Parameters.StartFolder, { coerce_values: true, throw_errors: true } );
-		FilePattern = Liquicode.Schema.ValidateValue( FilePattern, _Schema.Parameters.FilePattern, { coerce_values: true, throw_errors: true } );
-		Recurse = Liquicode.Schema.ValidateValue( Recurse, _Schema.Parameters.Recurse, { coerce_values: true, throw_errors: true } );
-		// Visitor = Liquicode.Schema.ValidateValue( Visitor, Schema.Parameters.Visitor , { coerce_values: true, throw_errors: true });
+		StartFolder = Liquicode.Types.Coerce( StartFolder ).ToString();
+		FilePattern = Liquicode.Types.Coerce( FilePattern ).ToString();
+		Recurse = Liquicode.Types.Coerce( Recurse ).ToBoolean();
+		// Visitor = Liquicode.Types.Coerce( Visitor, Schema.Parameters.Visitor , { coerce_values: true, throw_errors: true });
 
 		if ( !LIB_FS.existsSync( StartFolder ) ) { return; }
 		let count = 0;

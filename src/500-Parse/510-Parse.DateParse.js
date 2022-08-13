@@ -3,24 +3,24 @@
 
 //---------------------------------------------------------------------
 let _Schema = {
-	id: '401',
-	member_of: 'Date',
-	name: 'Parse',
+	id: '011',
+	member_of: 'Parse',
+	name: 'DateParse',
 	type: 'function',
 	returns: 'object',
-	description: [
-		'Converts a string to a date-time value.',
-		'Returns a `date_time_parts` structure.'
-	],
+	returns_summary: 'Returns a \`DateParts\` object containing Date/Time detail.',
+	description: [ `
+Dates and times are funny little creatures.
+`],
 	Parameters: {
-		Text: {
-			name: 'Text',
+		Value: {
+			name: 'Value',
 			type: 'string',
 			required: true,
 		},
 		TimeZoneOffset: {
 			name: 'TimeZoneOffset',
-			type: 'function',
+			type: 'string',
 			required: false,
 			default: '+0000',
 		},
@@ -41,20 +41,20 @@ module.exports = function ( Liquicode )
 	 * @description
 	 * Converts a string to a date-time value.
 	 * Returns a `date_time_parts` structure.
-	 * @param {string} Text
+	 * @param {string} Value
 	 * @param {function} [TimeZoneOffset="+0000"]
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 
 
 	//---------------------------------------------------------------------
-	function Parse( Text, TimeZoneOffset )
+	function DateParse( Value, TimeZoneOffset = '+0000' )
 	{
-		From = Liquicode.Schema.ValidateValue( From, _Schema.Parameters.From , { coerce_values: true, throw_errors: true });
+		Value = Liquicode.Types.Coerce( Value ).ToString();
 
 		// Prepare and validate the date string.
-		Text = Text.toLowerCase().trim();
-		if ( !Text ) { return get_date_parts( null, TimeZoneOffset ); }
+		Value = Value.toLowerCase().trim();
+		if ( !Value ) { return get_date_parts( null, TimeZoneOffset ); }
 
 		// Validate AssumeTimeZone
 		if ( !TimeZoneOffset ) { TimeZoneOffset = '+0000'; }
@@ -71,9 +71,9 @@ module.exports = function ( Liquicode )
 		let date = null;
 
 		// Try some unusual cases of compressed timestamps.
-		if ( !isNaN( Number( Text ) ) )
+		if ( !isNaN( Number( Value ) ) )
 		{
-			let s = Number( Text ).toString(); // Remove any noise.
+			let s = Number( Value ).toString(); // Remove any noise.
 			if ( s.length == 8 )
 			{
 				// 20180329 => 2018-03-29
@@ -111,42 +111,40 @@ module.exports = function ( Liquicode )
 			}
 
 			// Try the javascript date parsing.
-			try { date = new Date( s ); }
-			catch ( e ) { }
-			if ( date ) { return get_date_parts( date, TimeZoneOffset ); }
+			date = new Date( s );
+			if ( !isNaN( date.getTime() ) ) { return get_date_parts( date, TimeZoneOffset ); }
 		}
 
 		// Test for ISO format: 2005-05-01T15:05:23.000Z
 		if (
-			( Text.length >= 24 )
-			&& ( Text.substr( 4, 1 ) === '-' )
-			&& ( Text.substr( 7, 1 ) === '-' )
-			&& ( Text.substr( 10, 1 ) === 't' )
-			&& ( Text.substr( 13, 1 ) === ':' )
-			&& ( Text.substr( 16, 1 ) === ':' )
-			&& ( Text.substr( 19, 1 ) === '.' )
-			&& ( Text.substr( 23, 1 ) === 'z' )
+			( Value.length >= 24 )
+			&& ( Value.substr( 4, 1 ) === '-' )
+			&& ( Value.substr( 7, 1 ) === '-' )
+			&& ( Value.substr( 10, 1 ) === 't' )
+			&& ( Value.substr( 13, 1 ) === ':' )
+			&& ( Value.substr( 16, 1 ) === ':' )
+			&& ( Value.substr( 19, 1 ) === '.' )
+			&& ( Value.substr( 23, 1 ) === 'z' )
 		)
 		{
-			try { date = new Date( Text ); }
+			try { date = new Date( Value ); }
 			catch ( e ) { }
-			if ( date && !isNaN( date.getTime() ) )
-			{ return get_date_parts( date, TimeZoneOffset ); }
+			if ( date && !isNaN( date.getTime() ) ) { return get_date_parts( date, TimeZoneOffset ); }
 			else { return get_date_parts( null, TimeZoneOffset ); }
 		}
 
 		// Test for ISO format (short): 2005-05-01T15:05:23Z
 		if (
-			( Text.length >= 20 )
-			&& ( Text.substr( 4, 1 ) === '-' )
-			&& ( Text.substr( 7, 1 ) === '-' )
-			&& ( Text.substr( 10, 1 ) === 't' )
-			&& ( Text.substr( 13, 1 ) === ':' )
-			&& ( Text.substr( 16, 1 ) === ':' )
-			&& ( Text.substr( 19, 1 ) === 'z' )
+			( Value.length >= 20 )
+			&& ( Value.substr( 4, 1 ) === '-' )
+			&& ( Value.substr( 7, 1 ) === '-' )
+			&& ( Value.substr( 10, 1 ) === 't' )
+			&& ( Value.substr( 13, 1 ) === ':' )
+			&& ( Value.substr( 16, 1 ) === ':' )
+			&& ( Value.substr( 19, 1 ) === 'z' )
 		)
 		{
-			try { date = new Date( Text ); }
+			try { date = new Date( Value ); }
 			catch ( e ) { }
 			if ( date && !isNaN( date.getTime() ) )
 			{ return get_date_parts( date, TimeZoneOffset ); }
@@ -155,7 +153,7 @@ module.exports = function ( Liquicode )
 
 		// We know its not a javascript supported format.
 		// We have to do it the hard way.
-		let tokens = tokenize_date( Text );
+		let tokens = tokenize_date( Value );
 		let symbols = tokens2symbols( tokens );
 		date = symbols2date( symbols, TimeZoneOffset );
 
@@ -174,16 +172,16 @@ module.exports = function ( Liquicode )
 		months: [ 'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december' ],
 		months_abbrev: [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec' ],
 	};
-	
-	
+
+
 	//---------------------------------------------------------------------
 	function tokenize_date( text )
 	{
 		let tokens = [];
-	
+
 		// Split text into words.
 		let words = text.split( ' ' );
-	
+
 		// Convert words to tokens.
 		words.forEach(
 			( word, word_index ) =>
@@ -191,7 +189,7 @@ module.exports = function ( Liquicode )
 				// Remove punctuation
 				if ( word.endsWith( ',' ) ) { word = word.substr( 0, word.length - 1 ); }
 				if ( word.endsWith( '.' ) ) { word = word.substr( 0, word.length - 1 ); }
-	
+
 				// Split up date formats
 				if ( word.includes( '/' ) )
 				{
@@ -223,12 +221,12 @@ module.exports = function ( Liquicode )
 				}
 			}
 		);
-	
+
 		// Return tokens.
 		return tokens;
 	}
-	
-	
+
+
 	//---------------------------------------------------------------------
 	function tokens2symbols( tokens )
 	{
@@ -236,7 +234,7 @@ module.exports = function ( Liquicode )
 		tokens.forEach(
 			( token, token_index ) =>
 			{
-	
+
 				// Check for time zone.
 				if ( token.startsWith( '+' ) || token.startsWith( 'utc+' ) || token.startsWith( 'gmt+' ) )
 				{
@@ -248,14 +246,14 @@ module.exports = function ( Liquicode )
 					symbols.push( { type: 'zone', value: token } );
 					return;
 				}
-	
+
 				// Check for universal time format.
 				if ( token.includes( ':' ) )
 				{
 					symbols.push( { type: 'time', value: token } );
 					return;
 				}
-	
+
 				// Check for month names.
 				if ( REFS.months.includes( token ) )
 				{
@@ -273,7 +271,7 @@ module.exports = function ( Liquicode )
 					symbols.push( { type: 'month', value: token } );
 					return;
 				}
-	
+
 				// Check for numeric
 				if ( !isNaN( Number( token ) ) )
 				{
@@ -297,15 +295,15 @@ module.exports = function ( Liquicode )
 					symbols.push( { type: 'text', value: token } );
 					return;
 				}
-	
+
 			}
 		);
-	
+
 		// Return the symbols.
 		return symbols;
 	}
-	
-	
+
+
 	//---------------------------------------------------------------------
 	function symbols2date( symbols, AssumeTimeZone )
 	{
@@ -317,7 +315,7 @@ module.exports = function ( Liquicode )
 			time: null,
 			zone: null,
 		};
-	
+
 		// The first picks out the things we are pretty sure of.
 		symbols.forEach(
 			( symbol ) =>
@@ -344,7 +342,7 @@ module.exports = function ( Liquicode )
 				}
 			}
 		);
-	
+
 		// We go again to try to determine month and day.
 		symbols.forEach(
 			( symbol ) =>
@@ -363,19 +361,19 @@ module.exports = function ( Liquicode )
 				}
 			}
 		);
-	
+
 		// Validate our date fields.
 		if ( !fields.year ) { return null; }
 		if ( !fields.month ) { return null; }
 		if ( !fields.day ) { return null; }
 		if ( !fields.time ) { fields.time = '00:00:00'; }
 		if ( !fields.zone ) { fields.zone = AssumeTimeZone; }
-	
+
 		// Try to fix timezone offsets.
 		if ( fields.zone )
 		{
 			let zone = fields.zone;
-	
+
 			// Find the offset and direction.
 			let offset = '';
 			let sign = '';
@@ -417,7 +415,7 @@ module.exports = function ( Liquicode )
 				fields.zone = AssumeTimeZone;
 			}
 		}
-	
+
 		// Convert what we have with javascript date parsing.
 		let text = `${fields.year}-${fields.month}-${fields.day} ${fields.time} ${fields.zone}`;
 		let date = null;
@@ -425,9 +423,9 @@ module.exports = function ( Liquicode )
 		catch ( e ) { }
 		return date;
 	}
-	
-	
-		//---------------------------------------------------------------------
+
+
+	//---------------------------------------------------------------------
 	function get_date_parts( JsDate, TimeZoneOffset = '+0000' )
 	{
 		let datetime_parts =
@@ -470,6 +468,6 @@ module.exports = function ( Liquicode )
 	// Return the module exports.
 	return {
 		_Schema: _Schema,
-		Parse: Parse,
+		DateParse: DateParse,
 	};
 };
