@@ -13,10 +13,10 @@ return /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./src/000-Schema/000-Schema.js":
-/*!**************************************!*\
-  !*** ./src/000-Schema/000-Schema.js ***!
-  \**************************************/
+/***/ "./src/000-Types/000-Types.js":
+/*!************************************!*\
+  !*** ./src/000-Types/000-Types.js ***!
+  \************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 
@@ -25,44 +25,78 @@ return /******/ (() => { // webpackBootstrap
 //---------------------------------------------------------------------
 let _Schema = {
 	id: '000',
-	name: 'Schema',
+	name: 'Types',
 	type: 'namespace',
-	summary: 'Data value and type handling',
-	description: `
+	summary: 'Data Type Handling',
+	description: [ `
+LiquicodeJS can classify and identify value types beyond the primitive data types supported by Javascript.
+
+
+When obtaining FieldSchema objects from \`Schema.ValueSchema()\` or \`Schema.ObjectSchema()\`,
+\`FieldSchema.type\` will contain the Javascript data type and \`FieldSchema.format\` will have a more specific type description.
+
+Javascript (and JSON) offers four data types for your variable values: \`boolean\`, \`number\`, \`string\`,
+and everything else is essentially an \`object\`.
+This suits Javascript well for the types of things that Javascript needs to do like storing values in memory
+and executing program statements with those values.
+This is not always great on an application level though.
+When you need to, for example, make sure that a variable contains an \`array\` of \`string\` or that value represents a floating point number.
+Cases like these require additional progrma statements and type checking which can be consolidated into a set of functions.
+
+The \`Schema\` module defines a few objects and functions to alleviate this burden from the application developer.
 
 **The FieldSchema Object**
 
+This object describes a value (or field) with greater precision then Javascript's \`typeof\` statement.
+The \`FieldSchema.type\` member will always contain a Javascript data type while the \`FieldSchema.format\` field contains a more
+detailed data type.
+
 ~~~javascript
 FieldSchema = {
-	type: '',				// Javascript data type (boolean, number, string, object).
+	type: '',				// Javascript data type (boolean, number, string, or object).
 	format: '',				// A data type specific designation.
 	default: undefined,		// A default value used for missing fields.
 	name: '',				// Name of the field.
 }
 ~~~
 
-LiquicodeJS can classify and identify value types beyond the primitive data types supported by Javascript.
-When obtaining FieldSchema objects from "Schema.ValueSchema()" or "Schema.ObjectSchema()",
-"FieldSchema.type" will contain the Javascript data type and "FieldSchema.format" will have a more specific type description.
+These functions will generate a \`FieldSchema\` from a single value or an object.
+Be aware that only the top level members of an object are scrutinized as this is what we are typically interested in most cases.
+Functions of the \`Schema\` module do not recurse into an object providing the schema for every single field in the object.
+Rather, they inspect the top level of objects only and return an array of schema objects as a result.
+Again, this handles most use cases with a consistent set of functions.
+Any further validation/coercion that may be required can also be perfomed by the same functions on an individual case basis.
 
-Possible values for "FieldSchema.type" and "FieldSchema.format" are as follows:
+- \`Schema.ValueSchema( FromValue )\`
+- \`Schema.ObjectSchema( FromObject )\`
 
-| Type    | Format        | Default Value | Examples                          |
-|---------|---------------|---------------|-----------------------------------|
-| boolean | boolean       | false         | true, or false                    |
-| number  | integer       | 0             | 1, 2, or 3.0                      |
-| number  | float         | 0             | 1.1, 2.071, or 3.14               |
-| string  | string        | ""            | Hello', or ''                     |
-| object  | object        | {}            | { foo: 'bar' }                    |
-| object  | array         | []            | [ 1, 'two', 3.14, null ]          |
-| object  | boolean-array | []            | [ true, false, true ]             |
-| object  | number-array  | []            | [ 1, 2, 3.14 ]                    |
-| object  | string-array  | []            | [ 'one', 'two', 'three' ]         |
-| object  | object-array  | []            | [ { foo: 'bar' }, [1,2,3], null ] |
-| object  | array-array   | []            | [ [1,2,3], [], [4,5] ]            |
+Possible values for \`FieldSchema.type\` and \`FieldSchema.format\` are as follows:
 
+| Type    | Format        | Default Value | Examples                              |
+|---------|---------------|---------------|---------------------------------------|
+| boolean | boolean       | false         | \`true\`, or \`false\`                |
+| number  | integer       | 0             | \`1\`, \`2\`, or \`3.0\`              |
+| number  | float         | 0             | \`1.1\`, \`2.071\`, or \`3.14\`       |
+| string  | string        | ""            | \`"Hello"\`, or \`""\`                |
+| object  | object        | {}            | \`{ foo: 'bar' }\`                    |
+| object  | array         | []            | \`[ 1, 'two', 3.14, null ]\`          |
+| object  | boolean-array | []            | \`[ true, false, true ]\`             |
+| object  | number-array  | []            | \`[ 1, 2, 3.14 ]\`                    |
+| object  | string-array  | []            | \`[ 'one', 'two', 'three' ]\`         |
+| object  | object-array  | []            | \`[ { foo: 'bar' }, [1,2,3], null ]\` |
+| object  | array-array   | []            | \`[ [1,2,3], [], [4,5] ]\`            |
+`,
+		`
 
 **The ErrorValue Object**
+
+LiquicodeJS introduces an \`ErrorValue\` object that is used to indicate and convey errors.
+Some functions will return an \`ErrorValue\` object instead of throwing a Javascript \`Error\`.
+In some cases, this can make code more efficient and legible when certain errors are tolerable
+and you want to avoid the expensive cost of a Javascript \`Error\` that includes a call stack.
+
+Use the \`Schema.ErrorValue()\` function to create an \`ErrorValue\` object and \`Schema.IsErrorValue()\` to test for errors.
+An \`ErrorValue\` will always have \`ErrorValue.ok = false\` and \`ErrorValue.error\` will contain the error message.
 
 ~~~javascript
 ErrorValue = {
@@ -71,20 +105,24 @@ ErrorValue = {
 	context: '',	// Context for the error (e.g. a function name).
 }
 ~~~
-
-LiquicodeJS introduces an "ErrorValue" object that it can use to indicate errors.
-Some functions will optionally return an "ErrorValue" object instead of throwing a Javascript Error.
-In some cases, this can make code more efficient and legible when certain errors are tolerable
-and you want to avoid the expensive cost of a Javascript Error that includes a call stack.
-
-Use the "Schema.ErrorValue()" function to create ErrorValue objects and "Schema.IsErrorValue()" to test for errors.
-An ErrorValue will always have "ErrorValue.ok = false" and "ErrorValue.error" equal to a string.
-
+`,
+		`
 
 **Value Coercion**
 
-The functions "Schema.CoerceValue()", "Schema.ValidateValue()", and "Schema.ValidateObject()" can optionally coerce values
-from their given type to the types specified in Schema.
+As data gets shuttled around between memory, files, and network transmissions, the representation of the data might
+change to suit to the medium.
+For example, an integer value being stored in a file might be read back out later as a string.
+It's actual value hasn't changed, but the way it is represented has changed.
+Javascript can be pretty forgiving in these cases by allowing a certain amount of type fluidity;
+However, this can also cause some difficult to spot errors like when \`'2' + 2\` equals the string \`'22'\` and not the integer \`4\`.
+
+Use these functions the validate that a value's type is of an expected type and to coerce the value, in a common sense way,
+to that expected type.
+
+- \`Types.Coerce( Value, Schema, ThrowErrors )\`
+- \`Types.Coerce( Value, Schema, ThrowErrors )\`
+- \`Types.Coerces( Values, Schemas, ThrowErrors )\`
 
 This tables describes how values are converted from one data type to another during coercion:
 
@@ -96,21 +134,14 @@ This tables describes how values are converted from one data type to another dur
 | Number    | Boolean()      | Value          | toString()       | ErrorValue     |
 | String    | Boolean()      | Number()       | Value            | JSON.parse()   |
 | Object    | Boolean()      | Number()       | JSON.stringify() | Value          |
+`,
+		`
 
-
-**Object Schema and Validation**
-
-All of this is very interesting, I am sure.
-
-The functions "Schema.ObjectSchema()" and "Schema.ValidateObject()" take these concepts to the next level and
-provides schemas functionality on an object level rather than an individual value level.
-
-
-**Additional References***
+**Related Reading**
 
 - [You Don't Know JS: Types & Grammar - Chapter 4. Coercion](https://www.oreilly.com/library/view/you-dont-know/9781491905159/ch04.html)
-
 `,
+	],
 	examples: [
 		`Schema = { name: 'PersonName', type: 'string' }`,
 		`Schema = { name: 'options', type: 'object', default: { hoist: true, swab: 'decks' } }`,
@@ -128,44 +159,78 @@ provides schemas functionality on an object level rather than an individual valu
 //-start-jsdoc---------------------------------------------------------
 /**
  * @public
- * @namespace Schema
- * @summary Data value and type handling
+ * @namespace Types
+ * @summary Data Type Handling
  * @description
  * 
+LiquicodeJS can classify and identify value types beyond the primitive data types supported by Javascript.
+
+
+When obtaining FieldSchema objects from `Schema.ValueSchema()` or `Schema.ObjectSchema()`,
+`FieldSchema.type` will contain the Javascript data type and `FieldSchema.format` will have a more specific type description.
+
+Javascript (and JSON) offers four data types for your variable values: `boolean`, `number`, `string`,
+and everything else is essentially an `object`.
+This suits Javascript well for the types of things that Javascript needs to do like storing values in memory
+and executing program statements with those values.
+This is not always great on an application level though.
+When you need to, for example, make sure that a variable contains an `array` of `string` or that value represents a floating point number.
+Cases like these require additional progrma statements and type checking which can be consolidated into a set of functions.
+
+The `Schema` module defines a few objects and functions to alleviate this burden from the application developer.
 
 **The FieldSchema Object**
 
+This object describes a value (or field) with greater precision then Javascript's `typeof` statement.
+The `FieldSchema.type` member will always contain a Javascript data type while the `FieldSchema.format` field contains a more
+detailed data type.
+
 ~~~javascript
 FieldSchema = {
-	type: '',				// Javascript data type (boolean, number, string, object).
+	type: '',				// Javascript data type (boolean, number, string, or object).
 	format: '',				// A data type specific designation.
 	default: undefined,		// A default value used for missing fields.
 	name: '',				// Name of the field.
 }
 ~~~
 
-LiquicodeJS can classify and identify value types beyond the primitive data types supported by Javascript.
-When obtaining FieldSchema objects from "Schema.ValueSchema()" or "Schema.ObjectSchema()",
-"FieldSchema.type" will contain the Javascript data type and "FieldSchema.format" will have a more specific type description.
+These functions will generate a `FieldSchema` from a single value or an object.
+Be aware that only the top level members of an object are scrutinized as this is what we are typically interested in most cases.
+Functions of the `Schema` module do not recurse into an object providing the schema for every single field in the object.
+Rather, they inspect the top level of objects only and return an array of schema objects as a result.
+Again, this handles most use cases with a consistent set of functions.
+Any further validation/coercion that may be required can also be perfomed by the same functions on an individual case basis.
 
-Possible values for "FieldSchema.type" and "FieldSchema.format" are as follows:
+- `Schema.ValueSchema( FromValue )`
+- `Schema.ObjectSchema( FromObject )`
 
-| Type    | Format        | Default Value | Examples                          |
-|---------|---------------|---------------|-----------------------------------|
-| boolean | boolean       | false         | true, or false                    |
-| number  | integer       | 0             | 1, 2, or 3.0                      |
-| number  | float         | 0             | 1.1, 2.071, or 3.14               |
-| string  | string        | ""            | Hello', or ''                     |
-| object  | object        | {}            | { foo: 'bar' }                    |
-| object  | array         | []            | [ 1, 'two', 3.14, null ]          |
-| object  | boolean-array | []            | [ true, false, true ]             |
-| object  | number-array  | []            | [ 1, 2, 3.14 ]                    |
-| object  | string-array  | []            | [ 'one', 'two', 'three' ]         |
-| object  | object-array  | []            | [ { foo: 'bar' }, [1,2,3], null ] |
-| object  | array-array   | []            | [ [1,2,3], [], [4,5] ]            |
+Possible values for `FieldSchema.type` and `FieldSchema.format` are as follows:
 
+| Type    | Format        | Default Value | Examples                              |
+|---------|---------------|---------------|---------------------------------------|
+| boolean | boolean       | false         | `true`, or `false`                |
+| number  | integer       | 0             | `1`, `2`, or `3.0`              |
+| number  | float         | 0             | `1.1`, `2.071`, or `3.14`       |
+| string  | string        | ""            | `"Hello"`, or `""`                |
+| object  | object        | {}            | `{ foo: 'bar' }`                    |
+| object  | array         | []            | `[ 1, 'two', 3.14, null ]`          |
+| object  | boolean-array | []            | `[ true, false, true ]`             |
+| object  | number-array  | []            | `[ 1, 2, 3.14 ]`                    |
+| object  | string-array  | []            | `[ 'one', 'two', 'three' ]`         |
+| object  | object-array  | []            | `[ { foo: 'bar' }, [1,2,3], null ]` |
+| object  | array-array   | []            | `[ [1,2,3], [], [4,5] ]`            |
+
+ * 
 
 **The ErrorValue Object**
+
+LiquicodeJS introduces an `ErrorValue` object that is used to indicate and convey errors.
+Some functions will return an `ErrorValue` object instead of throwing a Javascript `Error`.
+In some cases, this can make code more efficient and legible when certain errors are tolerable
+and you want to avoid the expensive cost of a Javascript `Error` that includes a call stack.
+
+Use the `Schema.ErrorValue()` function to create an `ErrorValue` object and `Schema.IsErrorValue()` to test for errors.
+An `ErrorValue` will always have `ErrorValue.ok = false` and `ErrorValue.error` will contain the error message.
 
 ~~~javascript
 ErrorValue = {
@@ -175,19 +240,23 @@ ErrorValue = {
 }
 ~~~
 
-LiquicodeJS introduces an "ErrorValue" object that it can use to indicate errors.
-Some functions will optionally return an "ErrorValue" object instead of throwing a Javascript Error.
-In some cases, this can make code more efficient and legible when certain errors are tolerable
-and you want to avoid the expensive cost of a Javascript Error that includes a call stack.
-
-Use the "Schema.ErrorValue()" function to create ErrorValue objects and "Schema.IsErrorValue()" to test for errors.
-An ErrorValue will always have "ErrorValue.ok = false" and "ErrorValue.error" equal to a string.
-
+ * 
 
 **Value Coercion**
 
-The functions "Schema.CoerceValue()", "Schema.ValidateValue()", and "Schema.ValidateObject()" can optionally coerce values
-from their given type to the types specified in Schema.
+As data gets shuttled around between memory, files, and network transmissions, the representation of the data might
+change to suit to the medium.
+For example, an integer value being stored in a file might be read back out later as a string.
+It's actual value hasn't changed, but the way it is represented has changed.
+Javascript can be pretty forgiving in these cases by allowing a certain amount of type fluidity;
+However, this can also cause some difficult to spot errors like when `'2' + 2` equals the string `'22'` and not the integer `4`.
+
+Use these functions the validate that a value's type is of an expected type and to coerce the value, in a common sense way,
+to that expected type.
+
+- `Types.Coerce( Value, Schema, ThrowErrors )`
+- `Types.Coerce( Value, Schema, ThrowErrors )`
+- `Types.Coerces( Values, Schemas, ThrowErrors )`
 
 This tables describes how values are converted from one data type to another during coercion:
 
@@ -200,19 +269,11 @@ This tables describes how values are converted from one data type to another dur
 | String    | Boolean()      | Number()       | Value            | JSON.parse()   |
 | Object    | Boolean()      | Number()       | JSON.stringify() | Value          |
 
+ * 
 
-**Object Schema and Validation**
-
-All of this is very interesting, I am sure.
-
-The functions "Schema.ObjectSchema()" and "Schema.ValidateObject()" take these concepts to the next level and
-provides schemas functionality on an object level rather than an individual value level.
-
-
-**Additional References***
+**Related Reading**
 
 - [You Don't Know JS: Types & Grammar - Chapter 4. Coercion](https://www.oreilly.com/library/view/you-dont-know/9781491905159/ch04.html)
-
 
  * @todo Support extended number formats: positive-integer, negative-integer, positive-float, negative-float
  * @todo Support type: function
@@ -226,24 +287,22 @@ module.exports = function ( Liquicode )
 {
 	return {
 		_Schema: _Schema,
-		ErrorValue: __webpack_require__( /*! ./010-Schema.ErrorValue.js */ "./src/000-Schema/010-Schema.ErrorValue.js" )( Liquicode ).ErrorValue,
-		IsErrorValue: __webpack_require__( /*! ./011-Schema.IsErrorValue.js */ "./src/000-Schema/011-Schema.IsErrorValue.js" )( Liquicode ).IsErrorValue,
-		ValueSchema: __webpack_require__( /*! ./020-Schema.ValueSchema.js */ "./src/000-Schema/020-Schema.ValueSchema.js" )( Liquicode ).ValueSchema,
-		DefaultValue: __webpack_require__( /*! ./021-Schema.DefaultValue.js */ "./src/000-Schema/021-Schema.DefaultValue.js" )( Liquicode ).DefaultValue,
-		CoerceValue: __webpack_require__( /*! ./022-Schema.CoerceValue.js */ "./src/000-Schema/022-Schema.CoerceValue.js" )( Liquicode ).CoerceValue,
-		ValidateValue: __webpack_require__( /*! ./023-Schema.ValidateValue.js */ "./src/000-Schema/023-Schema.ValidateValue.js" )( Liquicode ).ValidateValue,
-		ObjectSchema: __webpack_require__( /*! ./030-Schema.ObjectSchema.js */ "./src/000-Schema/030-Schema.ObjectSchema.js" )( Liquicode ).ObjectSchema,
-		ValidateValues: __webpack_require__( /*! ./031-Schema.ValidateValues.js */ "./src/000-Schema/031-Schema.ValidateValues.js" )( Liquicode ).ValidateValues,
+
+		Coerce: __webpack_require__( /*! ./010-Types.Coerce.js */ "./src/000-Types/010-Types.Coerce.js" )( Liquicode ).Coerce,
+
+		Formats: __webpack_require__( /*! ./020-Types.Formats.js */ "./src/000-Types/020-Types.Formats.js" )( Liquicode ).Formats,
+		GetFormat: __webpack_require__( /*! ./021-Types.GetFormat.js */ "./src/000-Types/021-Types.GetFormat.js" )( Liquicode ).GetFormat,
+
 	};
 };
 
 
 /***/ }),
 
-/***/ "./src/000-Schema/010-Schema.ErrorValue.js":
-/*!*************************************************!*\
-  !*** ./src/000-Schema/010-Schema.ErrorValue.js ***!
-  \*************************************************/
+/***/ "./src/000-Types/010-Types.Coerce.js":
+/*!*******************************************!*\
+  !*** ./src/000-Types/010-Types.Coerce.js ***!
+  \*******************************************/
 /***/ ((module) => {
 
 
@@ -252,103 +311,89 @@ module.exports = function ( Liquicode )
 //---------------------------------------------------------------------
 let _Schema = {
 	id: '010',
-	member_of: 'Schema',
-	name: 'ErrorValue',
+	member_of: 'Types',
+	name: 'Coerce',
 	type: 'function',
 	returns: 'object',
-	returns_description: 'An ErrorValue object.',
-	summary: 'Returns an ErrorValue object containing error information.',
-	description: [
-		``,
-	],
-	Parameters: {
-		Message: {
-			name: 'Message',
-			type: 'string',
-			required: false,
-			default: 'error',
-			description: 'The error message.',
-		},
-		Context: {
-			name: 'Context',
-			type: 'string',
-			required: false,
-			default: undefined,
-			description: 'Context for the error (e.g. a function name).',
-		},
-	},
-	todo: [],
-};
+	returns_description: 'A \`Coercion\` object.',
+	summary: 'Returns a \`Coercion\` object which is used to coerce values to different types.',
+	description: `
+The returned \`Coercion\` object has a single member \`Coercion.value\` and a number of coercion functions:
 
+- \`ToBoolean( Default = false )\` :
+	Returns the boolean value of \`Coercion.value\`.
+	Anything can be coerced to a boolean.
+	If value is a string, then 'false' and '0' will return false while 'true' will return true.
 
-//---------------------------------------------------------------------
-module.exports = function ( Liquicode )
-{
+- \`ToNumber( Default = 0 )\` :
+	Returns the numeric value of \`Coercion.value\`.
+	Booleans, other numbers, and numeric strings can be coerced to a number.
 
+- \`ToString( Default = '' )\` :
+	Returns the string value of \`Coercion.value\`.
+	Anything can be coerced to a string.
+	If value is an object, then it is JSON stringified and returned.
 
-	//-start-jsdoc---------------------------------------------------------
-	/**
-	 * @public
-	 * @function ErrorValue
-	 * @returns {object}
-	 * An ErrorValue object.
-	 * @summary Returns an ErrorValue object containing error information.
-	 * @description
-	 * 
-	 * @param {string} [Message="error"]
-	 * The error message.
-	 * @param {string} [Context]
-	 * Context for the error (e.g. a function name).
-	*/
-	//-end-jsdoc-----------------------------------------------------------
+- \`ToObject( Default = null )\` :
+	Returns the object value of \`Coercion.value\`.
+	Only JSON strings and other objects can be coerced to an object.
+	If value is a JSON string, then it is JSON parsed and returned.
 
+\`Coercion.value\` is set to the Value parameter.
 
-	function ErrorValue( Message, Context )
-	{
-		return {
-			ok: false,
-			error: Message || 'error',
-			context: Context,
-		};
-	};
+**Usage**
 
+There are two ways to use the \`Coercion\` object.
 
-	//---------------------------------------------------------------------
-	// Return the module exports.
-	return {
-		_Schema: _Schema,
-		ErrorValue: ErrorValue,
-	};
-};
+One way is to immediately call one of the coercion functions after obtaining the \`Coercion\` object:
+~~~javascript
+let number_42 = LiquicodeJS.Schema.Coerce( '42' ).ToNumber();
+~~~
 
+Another way is to reuse the \`Coercion\` object and alter the \`Coercion.value\` property yourself:
+~~~javascript
+let coercion = LiquicodeJS.Schema.Coerce();
+coercion.value = '42';
+let number_42 = coercion.ToNumber();
+~~~
 
-/***/ }),
+**Examples**
 
-/***/ "./src/000-Schema/011-Schema.IsErrorValue.js":
-/*!***************************************************!*\
-  !*** ./src/000-Schema/011-Schema.IsErrorValue.js ***!
-  \***************************************************/
-/***/ ((module) => {
+~~~javascript
+// Coercing to boolean
+Schema.Coerce( null ).ToBoolean()           // = false
+Schema.Coerce( 0 ).ToBoolean()              // = false
+Schema.Coerce( 'true' ).ToBoolean()         // = true
 
+// Coercing to number
+Schema.Coerce( null ).ToNumber()            // = 0
+Schema.Coerce( '3.14' ).ToNumber()          // = 3.14
+Schema.Coerce( 'foo' ).ToNumber()           // = 0
 
+// Coercing to string
+Schema.Coerce( null ).ToString()            // = ''
+Schema.Coerce( '3.14' ).ToString()          // = '3.14'
+Schema.Coerce( { foo: 'bar' } ).ToString()  // = '{"foo":"bar"}'
 
+// Coercing to object
+Schema.Coerce( null ).ToObject()            // = null
+Schema.Coerce( 3.14 ).ToObject()            // = null
+Schema.Coerce( '{"foo":"bar"}' ).ToObject() // = { foo: 'bar' }
 
-//---------------------------------------------------------------------
-let _Schema = {
-	id: '011',
-	member_of: 'Schema',
-	name: 'IsErrorValue',
-	type: 'function',
-	returns: 'boolean',
-	returns_description: 'True if Value is an ErrorValue object, otherwise false.',
-	summary: 'Tests if a Value is an ErrorValue object.',
-	description: ``,
+// Coercing with a Default
+Schema.Coerce( 'Hello' ).ToNumber( -1 )     // = -1
+Schema.Coerce( true ).ToObject( {} )        // = {}
+Schema.Coerce( 1024 ).ToObject( {} )        // = {}
+Schema.Coerce( null ).ToObject( { a: 1 } )  // = { a: 1 }
+Schema.Coerce( null ).ToObject( [ 1, 2 ] )  // = [ 1, 2 ]
+~~~
+`,
 	Parameters: {
 		Value: {
 			name: 'Value',
-			type: 'object',
+			type: '*',
 			required: false,
-			description: 'The value to test.',
+			description: 'The value to coerce. This value is set to \`Coercion.value\`.',
 		},
 	},
 	todo: [],
@@ -363,45 +408,221 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function IsErrorValue
-	 * @returns {boolean}
-	 * True if Value is an ErrorValue object, otherwise false.
-	 * @summary Tests if a Value is an ErrorValue object.
-	 * @param {object} [Value]
-	 * The value to test.
+	 * @function Coerce
+	 * @returns {object}
+	 * A `Coercion` object.
+	 * @summary Returns a `Coercion` object which is used to coerce values to different types.
+	 * @description
+	 * 
+The returned `Coercion` object has a single member `Coercion.value` and a number of coercion functions:
+
+- `ToBoolean( Default = false )` :
+	Returns the boolean value of `Coercion.value`.
+	Anything can be coerced to a boolean.
+	If value is a string, then 'false' and '0' will return false while 'true' will return true.
+
+- `ToNumber( Default = 0 )` :
+	Returns the numeric value of `Coercion.value`.
+	Booleans, other numbers, and numeric strings can be coerced to a number.
+
+- `ToString( Default = '' )` :
+	Returns the string value of `Coercion.value`.
+	Anything can be coerced to a string.
+	If value is an object, then it is JSON stringified and returned.
+
+- `ToObject( Default = null )` :
+	Returns the object value of `Coercion.value`.
+	Only JSON strings and other objects can be coerced to an object.
+	If value is a JSON string, then it is JSON parsed and returned.
+
+`Coercion.value` is set to the Value parameter.
+
+**Usage**
+
+There are two ways to use the `Coercion` object.
+
+One way is to immediately call one of the coercion functions after obtaining the `Coercion` object:
+~~~javascript
+let number_42 = LiquicodeJS.Schema.Coerce( '42' ).ToNumber();
+~~~
+
+Another way is to reuse the `Coercion` object and alter the `Coercion.value` property yourself:
+~~~javascript
+let coercion = LiquicodeJS.Schema.Coerce();
+coercion.value = '42';
+let number_42 = coercion.ToNumber();
+~~~
+
+**Examples**
+
+~~~javascript
+// Coercing to boolean
+Schema.Coerce( null ).ToBoolean()           // = false
+Schema.Coerce( 0 ).ToBoolean()              // = false
+Schema.Coerce( 'true' ).ToBoolean()         // = true
+
+// Coercing to number
+Schema.Coerce( null ).ToNumber()            // = 0
+Schema.Coerce( '3.14' ).ToNumber()          // = 3.14
+Schema.Coerce( 'foo' ).ToNumber()           // = 0
+
+// Coercing to string
+Schema.Coerce( null ).ToString()            // = ''
+Schema.Coerce( '3.14' ).ToString()          // = '3.14'
+Schema.Coerce( { foo: 'bar' } ).ToString()  // = '{"foo":"bar"}'
+
+// Coercing to object
+Schema.Coerce( null ).ToObject()            // = null
+Schema.Coerce( 3.14 ).ToObject()            // = null
+Schema.Coerce( '{"foo":"bar"}' ).ToObject() // = { foo: 'bar' }
+
+// Coercing with a Default
+Schema.Coerce( 'Hello' ).ToNumber( -1 )     // = -1
+Schema.Coerce( true ).ToObject( {} )        // = {}
+Schema.Coerce( 1024 ).ToObject( {} )        // = {}
+Schema.Coerce( null ).ToObject( { a: 1 } )  // = { a: 1 }
+Schema.Coerce( null ).ToObject( [ 1, 2 ] )  // = [ 1, 2 ]
+~~~
+
+	 * @param {*} [Value]
+	 * The value to coerce. This value is set to `Coercion.value`.
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 
 
-	function IsErrorValue( Value )
+	function default_or_error( Loud, Default, ErrorMessage )
 	{
-		if ( Value !== undefined )
-		{
-			if ( ( Value.ok == false )
-				&& ( typeof Value.error === 'string' ) )
+		if ( Loud ) { throw new Error( ErrorMessage ); }
+		return Default;
+	}
+
+
+	function Coerce( Value, Loud = false )
+	{
+		return {
+
+			value: Value,
+			loud: Loud,
+
+			//---------------------------------------------------------------------
+			ToBoolean: function ( Default = false )
 			{
-				return true;
-			}
-		}
-		return false;
-	};
+				if ( this.value === undefined ) { return Default; }
+				if ( this.value === null ) { return Default; }
+				// Special cases for strings.
+				if ( typeof this.value === 'string' )
+				{
+					if ( this.value === 'false' ) { return false; }
+					if ( this.value === 'true' ) { return true; }
+					if ( this.value === '0' ) { return false; }
+				}
+				// Coerce to Boolean.
+				let coerced = Boolean( this.value );
+				return coerced;
+			},
+
+			//---------------------------------------------------------------------
+			ToNumber: function ( Default = 0 )
+			{
+				if ( this.value === undefined ) { return Default; }
+				if ( this.value === null ) { return Default; }
+				// Coerce to Number.
+				let coerced = Number( this.value );
+				if ( isNaN( coerced ) ) { return default_or_error( this.loud, Default, 'Unable to coerce value to a number.' ); }
+				// throw new Error( `Value is not numeric.` );
+				return coerced;
+			},
+
+			//---------------------------------------------------------------------
+			ToString: function ( Default = '' )
+			{
+				if ( this.value === undefined ) { return Default; }
+				if ( this.value === null ) { return Default; }
+				// Special case for objects.
+				if ( typeof this.value === 'object' )
+				{
+					return JSON.stringify( this.value );
+				}
+				// Coerce to String.
+				if ( this.value.toString === undefined ) { return default_or_error( this.loud, Default, 'Unable to coerce value to a string.' ); }
+				let coerced = this.value.toString();
+				return coerced;
+			},
+
+			//---------------------------------------------------------------------
+			ToObject: function ( Default = null )
+			{
+				if ( this.value === undefined ) { return Default; }
+				if ( this.value === null ) { return Default; }
+				// Coerce to Object.
+				switch ( typeof this.value )
+				{
+					// case 'boolean': throw new Error( `Unable to ceorce from boolean to object.` );
+					case 'boolean': return default_or_error( this.loud, Default, 'Unable to coerce from boolean to object.' );
+
+					// case 'number': throw new Error( `Unable to ceorce from number to object.` );
+					case 'number': return default_or_error( this.loud, Default, 'Unable to coerce from number to object.' );
+
+					case 'string':
+						let coerced = this.value.trim();
+						if ( coerced.startsWith( '{' ) || coerced.startsWith( '[' ) )
+						{
+							try
+							{
+								coerced = JSON.parse( coerced );
+								return coerced;
+							}
+							catch ( error )
+							{
+								return default_or_error( this.loud, Default, 'Unable to coerce from non-json string to object.' );
+							}
+						}
+
+					case 'object': return this.value;
+
+					// case 'function': throw new Error( `Unable to ceorce from function to object.` );
+					case 'function': return default_or_error( this.loud, Default, 'Unable to coerce from function to object.' );
+
+					// case 'symbol': throw new Error( `Unable to ceorce from symbol to object.` );
+					case 'symbol': return default_or_error( this.loud, Default, 'Unable to coerce from symbol to object.' );
+
+					// default: throw new Error( `Unknown type encountered [${typeof this.value}].` );
+					default: return default_or_error( this.loud, Default, `Unknown type encountered [${typeof this.value}].` );
+				}
+			},
+
+			//---------------------------------------------------------------------
+			ToType: function ( TypeName, Default )
+			{
+				switch ( TypeName )
+				{
+					case 'boolean': return this.ToBoolean( Default );
+					case 'number': return this.ToNumber( Default );
+					case 'string': return this.ToString( Default );
+					case 'object': return this.ToObject( Default );
+					default: throw new Error( `Invalid or unknown type name [${TypeName}].` );
+				}
+			},
+
+		};
+	}
 
 
 	//---------------------------------------------------------------------
 	// Return the module exports.
 	return {
 		_Schema: _Schema,
-		IsErrorValue: IsErrorValue,
+		Coerce: Coerce,
 	};
 };
 
 
 /***/ }),
 
-/***/ "./src/000-Schema/020-Schema.ValueSchema.js":
-/*!**************************************************!*\
-  !*** ./src/000-Schema/020-Schema.ValueSchema.js ***!
-  \**************************************************/
+/***/ "./src/000-Types/020-Types.Formats.js":
+/*!********************************************!*\
+  !*** ./src/000-Types/020-Types.Formats.js ***!
+  \********************************************/
 /***/ ((module) => {
 
 
@@ -410,26 +631,101 @@ module.exports = function ( Liquicode )
 //---------------------------------------------------------------------
 let _Schema = {
 	id: '020',
-	member_of: 'Schema',
-	name: 'ValueSchema',
-	type: 'function',
+	member_of: 'Types',
+	name: 'Formats',
+	source_type: 'function',
 	returns: 'object',
-	returns_description: 'A FieldSchema object.',
-	summary: 'Returns a FieldSchema based upon a specific value.',
-	description: [
-		`
-This function is used to obtain extended type information about a value.
-While it does return an entire FieldSchema object, only the "FieldSchema.type" and "FieldSchema.format" fields are set.
-`,
-	],
-	Parameters: {
-		Value: {
-			name: 'Value',
-			type: '*',
-			required: false,
-			description: 'The value to infer a schema from.',
-		},
+	returns_description: 'An array of \`SchemaFormat\` objects.',
+	summary: 'Returns an array of \`SchemaFormat\` objects used to convert values between different formats.',
+	description: `
+Returns the library's internal array of format objects, \`Types.Formats\`.
+
+Each format has a \`type\` and \`format\` string, and an \`IsFormat( Value )\` function.
+This list of formats is used by the \`Types.GetFormat()\` and \`Types.IsFormat()\` functions.
+
+Applications can ammend this array in order to customize type processing or add new formats.
+The structure of each format in the array is:
+~~~javascript
+{
+	type: '',    // The Javascript data type. e.g. 'boolean', 'number', 'string', 'object'
+	format: '',  // A type specific format. e.g. 'integer', 'date'. 
+	IsFormat: function ( Value )
+	{
+		return true;  // Return true, if Value is of this format.
+	}
+}
+~~~
+
+For example, here is the format object for \`"string:string"\`:
+~~~javascript
+{
+	type: 'string',
+	format: 'string',
+	IsFormat: function ( Value )
+	{
+		if ( typeof Value !== 'string' ) { return false; }
+		return true;
 	},
+},
+~~~
+
+You have the ability to directly modify the \`Types.Formats\` array.
+
+For example, suppose you want to define two new formats to detect objects of 'object:person' and 'object:employee'.
+~~~javascript
+Person = {
+	first_name: '',
+	last_name: '',
+}
+Employee = {
+	first_name: '',
+	last_name: '',
+	title: '',
+}
+~~~
+
+The format objects might look something like this:
+~~~javascript
+object_person = {
+	type: 'object',
+	format: 'person',
+	IsFormat: function( Value )
+	{
+		if ( typeof Value !== 'object' ) { return false; }
+		if ( !Value ) { return false; }
+		if ( !Value.first_name ) { return false; }
+		if ( !Value.last_name ) { return false; }
+		return true;
+	},
+},
+object_employee = {
+	type: 'object',
+	format: 'employee',
+	IsFormat: function( Value )
+	{
+		if ( typeof Value !== 'object' ) { return false; }
+		if ( !Value ) { return false; }
+		if ( !Value.first_name ) { return false; }
+		if ( !Value.last_name ) { return false; }
+		if ( !Value.title ) { return false; }
+		return true;
+	},
+},
+~~~
+
+And tou can add them to the \`Types.Formats\` array:
+~~~javascript
+let formats = LiquicodeJS.Types.Formats();
+formats.push( object_person );
+formats.push( object_employee );
+~~~
+
+The \`Types.GetFormat()\` function reads the formats array in reverse order when matching a value to a format.
+This is done so that more complex types will not get "short-circuited" by less complex types.
+The more complex format in this case is "object:employee" and should appear after "object:person" in the array.
+
+`,
+	Parameters: {},
 	todo: [],
 };
 
@@ -442,117 +738,399 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function ValueSchema
+	 * @name Formats
 	 * @returns {object}
-	 * A FieldSchema object.
-	 * @summary Returns a FieldSchema based upon a specific value.
+	 * An array of `SchemaFormat` objects.
+	 * @summary Returns an array of `SchemaFormat` objects used to convert values between different formats.
 	 * @description
 	 * 
-This function is used to obtain extended type information about a value.
-While it does return an entire FieldSchema object, only the "FieldSchema.type" and "FieldSchema.format" fields are set.
+Returns the library's internal array of format objects, `Types.Formats`.
 
-	 * @param {*} [Value]
-	 * The value to infer a schema from.
+Each format has a `type` and `format` string, and an `IsFormat( Value )` function.
+This list of formats is used by the `Types.GetFormat()` and `Types.IsFormat()` functions.
+
+Applications can ammend this array in order to customize type processing or add new formats.
+The structure of each format in the array is:
+~~~javascript
+{
+	type: '',    // The Javascript data type. e.g. 'boolean', 'number', 'string', 'object'
+	format: '',  // A type specific format. e.g. 'integer', 'date'. 
+	IsFormat: function ( Value )
+	{
+		return true;  // Return true, if Value is of this format.
+	}
+}
+~~~
+
+For example, here is the format object for `"string:string"`:
+~~~javascript
+{
+	type: 'string',
+	format: 'string',
+	IsFormat: function ( Value )
+	{
+		if ( typeof Value !== 'string' ) { return false; }
+		return true;
+	},
+},
+~~~
+
+You have the ability to directly modify the `Types.Formats` array.
+
+For example, suppose you want to define two new formats to detect objects of 'object:person' and 'object:employee'.
+~~~javascript
+Person = {
+	first_name: '',
+	last_name: '',
+}
+Employee = {
+	first_name: '',
+	last_name: '',
+	title: '',
+}
+~~~
+
+The format objects might look something like this:
+~~~javascript
+object_person = {
+	type: 'object',
+	format: 'person',
+	IsFormat: function( Value )
+	{
+		if ( typeof Value !== 'object' ) { return false; }
+		if ( !Value ) { return false; }
+		if ( !Value.first_name ) { return false; }
+		if ( !Value.last_name ) { return false; }
+		return true;
+	},
+},
+object_employee = {
+	type: 'object',
+	format: 'employee',
+	IsFormat: function( Value )
+	{
+		if ( typeof Value !== 'object' ) { return false; }
+		if ( !Value ) { return false; }
+		if ( !Value.first_name ) { return false; }
+		if ( !Value.last_name ) { return false; }
+		if ( !Value.title ) { return false; }
+		return true;
+	},
+},
+~~~
+
+And tou can add them to the `Types.Formats` array:
+~~~javascript
+let formats = LiquicodeJS.Types.Formats();
+formats.push( object_person );
+formats.push( object_employee );
+~~~
+
+The `Types.GetFormat()` function reads the formats array in reverse order when matching a value to a format.
+This is done so that more complex types will not get "short-circuited" by less complex types.
+The more complex format in this case is "object:employee" and should appear after "object:person" in the array.
+
+
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 
 
-	function ValueSchema( Value )
-	{
-		let schema = {
-			type: '',
-			format: '',
-			default: undefined,
-			// name: '',
-			// required: false,
-			// description: '',
-			// examples: '',
-		};
-		if ( Value === undefined )
+	let _Formats = [
+
+		//---------------------------------------------------------------------
+		// boolean : boolean
 		{
-			/* Do Nothing */
-		}
-		else if ( Value === null )
-		{
-			/* Do Nothing */
-		}
-		else 
-		{
-			schema.type = typeof Value;
-			switch ( schema.type )
+			type: 'boolean',
+			format: 'boolean',
+			IsFormat: function ( Value )
 			{
-				case 'boolean':
-					schema.format = 'boolean';
-					break;
+				if ( typeof Value !== 'boolean' ) { return false; }
+				return true;
+			},
+		},
 
-				case 'number':
-					let float_value = Number.parseFloat( Value );
-					let integer_value = Number.parseInt( Value );
-					if ( integer_value === float_value )
-					{
-						schema.format = 'integer';
-					}
-					else
-					{
-						schema.format = 'float';
-					}
-					break;
+		//---------------------------------------------------------------------
+		// number : number
+		{
+			type: 'number',
+			format: 'number',
+			IsFormat: function ( Value )
+			{
+				if ( typeof Value !== 'number' ) { return false; }
+				return true;
+			},
+		},
 
-				case 'string':
-					schema.format = 'string';
-					break;
+		//---------------------------------------------------------------------
+		// number : integer
+		{
+			type: 'number',
+			format: 'integer',
+			IsFormat: function ( Value )
+			{
+				if ( typeof Value !== 'number' ) { return false; }
+				if ( Value !== parseInt( Value.toString() ) ) { return false; }
+				return true;
+			},
+		},
 
-				case 'object':
-					schema.format = 'object';
-					if ( Array.isArray( Value ) )
-					{
-						let has_boolean = false;
-						let has_number = false;
-						let has_string = false;
-						let has_object = false;
-						let has_array = false;
-						for ( let index = 0; index < Value.length; index++ )
-						{
-							let type = typeof Value[ index ];
-							if ( type === 'boolean' ) { has_boolean = true; }
-							if ( type === 'number' ) { has_number = true; }
-							if ( type === 'string' ) { has_string = true; }
-							if ( type === 'object' ) 
-							{
-								if ( Array.isArray( Value[ index ] ) ) { has_array = true; }
-								else { has_object = true; }
-							}
-						}
-						if ( has_boolean && !has_number && !has_string && !has_object && !has_array ) { schema.format = 'boolean-array'; }
-						else if ( !has_boolean && has_number && !has_string && !has_object && !has_array ) { schema.format = 'number-array'; }
-						else if ( !has_boolean && !has_number && has_string && !has_object && !has_array ) { schema.format = 'string-array'; }
-						else if ( !has_boolean && !has_number && !has_string && has_object && !has_array ) { schema.format = 'object-array'; }
-						else if ( !has_boolean && !has_number && !has_string && !has_object && has_array ) { schema.format = 'array-array'; }
-						else { schema.format = 'array'; }
-					}
-					break;
+		//---------------------------------------------------------------------
+		// string : string
+		{
+			type: 'string',
+			format: 'string',
+			IsFormat: function ( Value )
+			{
+				if ( typeof Value !== 'string' ) { return false; }
+				return true;
+			},
+		},
 
-			}
-		}
-		return schema;
-	};
+		//---------------------------------------------------------------------
+		// string : json
+		{
+			type: 'string',
+			format: 'json',
+			IsFormat: function ( Value )
+			{
+				if ( typeof Value !== 'string' ) { return false; }
+				if ( !Value ) { return false; }
+				Value = Value.trimStart();
+				if ( !Value.startsWith( '{' ) && !Value.startsWith( '[' ) ) { return false; }
+				return true;
+			},
+		},
+
+		//---------------------------------------------------------------------
+		// string : datetime
+		// 2005-05-01T00:00:00.000Z
+		{
+			type: 'string',
+			format: 'datetime',
+			IsFormat: function ( Value )
+			{
+				if ( typeof Value !== 'string' ) { return false; }
+				if ( !Value ) { return false; }
+				if ( Value.length !== 24 ) { return false; }
+				if ( isNaN( Number( Value.substring( 0, 4 ) ) ) ) { return false; }
+				if ( Value[ 4 ] !== '-' ) { return false; }
+				if ( isNaN( Number( Value.substring( 5, 7 ) ) ) ) { return false; }
+				if ( Value[ 7 ] !== '-' ) { return false; }
+				if ( isNaN( Number( Value.substring( 8, 10 ) ) ) ) { return false; }
+				if ( Value[ 10 ] !== 'T' ) { return false; }
+				if ( isNaN( Number( Value.substring( 11, 13 ) ) ) ) { return false; }
+				if ( Value[ 13 ] !== ':' ) { return false; }
+				if ( isNaN( Number( Value.substring( 14, 16 ) ) ) ) { return false; }
+				if ( Value[ 16 ] !== ':' ) { return false; }
+				if ( isNaN( Number( Value.substring( 17, 19 ) ) ) ) { return false; }
+				if ( Value[ 19 ] !== '.' ) { return false; }
+				if ( isNaN( Number( Value.substring( 20, 23 ) ) ) ) { return false; }
+				if ( Value[ 23 ] !== 'Z' ) { return false; }
+				return true;
+			},
+		},
+
+		//---------------------------------------------------------------------
+		// string : date
+		{
+			type: 'string',
+			format: 'date',
+			IsFormat: function ( Value )
+			{
+				if ( typeof Value !== 'string' ) { return false; }
+				if ( !Value ) { return false; }
+				if ( Value.length !== 10 ) { return false; }
+				if ( isNaN( Number( Value.substring( 0, 4 ) ) ) ) { return false; }
+				if ( Value[ 4 ] !== '-' ) { return false; }
+				if ( isNaN( Number( Value.substring( 5, 7 ) ) ) ) { return false; }
+				if ( Value[ 7 ] !== '-' ) { return false; }
+				if ( isNaN( Number( Value.substring( 8, 10 ) ) ) ) { return false; }
+				return true;
+			},
+		},
+
+		//---------------------------------------------------------------------
+		// string : time
+		{
+			type: 'string',
+			format: 'time',
+			IsFormat: function ( Value )
+			{
+				if ( typeof Value !== 'string' ) { return false; }
+				if ( !Value ) { return false; }
+				if ( Value.length !== 8 ) { return false; }
+				if ( isNaN( Number( Value.substring( 0, 2 ) ) ) ) { return false; }
+				if ( Value[ 2 ] !== ':' ) { return false; }
+				if ( isNaN( Number( Value.substring( 3, 5 ) ) ) ) { return false; }
+				if ( Value[ 5 ] !== ':' ) { return false; }
+				if ( isNaN( Number( Value.substring( 6, 8 ) ) ) ) { return false; }
+				return true;
+			},
+		},
+
+		//---------------------------------------------------------------------
+		// object : object
+		{
+			type: 'object',
+			format: 'object',
+			IsFormat: function ( Value )
+			{
+				if ( typeof Value !== 'object' ) { return false; }
+				if ( !Value ) { return false; }
+				return true;
+			},
+		},
+
+		//---------------------------------------------------------------------
+		// object : datetime
+		{
+			type: 'object',
+			format: 'datetime',
+			IsFormat: function ( Value )
+			{
+				if ( typeof Value !== 'object' ) { return false; }
+				if ( !Value ) { return false; }
+				if ( !Value.getTime ) { return false; }
+				if ( isNaN( Value.getTime() ) ) { return false; }
+				return true;
+			},
+		},
+
+		//---------------------------------------------------------------------
+		// object : array
+		{
+			type: 'object',
+			format: 'array',
+			IsFormat: function ( Value )
+			{
+				if ( typeof Value !== 'object' ) { return false; }
+				if ( !Value ) { return false; }
+				if ( !Array.isArray( Value ) ) { return false; }
+				return true;
+			},
+		},
+
+		//---------------------------------------------------------------------
+		// object : boolean-array
+		{
+			type: 'object',
+			format: 'boolean-array',
+			IsFormat: function ( Value )
+			{
+				if ( typeof Value !== 'object' ) { return false; }
+				if ( !Value ) { return false; }
+				if ( !Array.isArray( Value ) ) { return false; }
+				if ( !Value.length ) { return false; }
+				for ( let index = 0; index < Value.length; index++ )
+				{
+					if ( typeof Value[ index ] !== 'boolean' ) { return false; }
+				}
+				return true;
+			},
+		},
+
+		//---------------------------------------------------------------------
+		// object : number-array
+		{
+			type: 'object',
+			format: 'number-array',
+			IsFormat: function ( Value )
+			{
+				if ( typeof Value !== 'object' ) { return false; }
+				if ( !Value ) { return false; }
+				if ( !Array.isArray( Value ) ) { return false; }
+				if ( !Value.length ) { return false; }
+				for ( let index = 0; index < Value.length; index++ )
+				{
+					if ( typeof Value[ index ] !== 'number' ) { return false; }
+				}
+				return true;
+			},
+		},
+
+		//---------------------------------------------------------------------
+		// object : string-array
+		{
+			type: 'object',
+			format: 'string-array',
+			IsFormat: function ( Value )
+			{
+				if ( typeof Value !== 'object' ) { return false; }
+				if ( !Value ) { return false; }
+				if ( !Array.isArray( Value ) ) { return false; }
+				if ( !Value.length ) { return false; }
+				for ( let index = 0; index < Value.length; index++ )
+				{
+					if ( typeof Value[ index ] !== 'string' ) { return false; }
+				}
+				return true;
+			},
+		},
+
+		//---------------------------------------------------------------------
+		// object : object-array
+		{
+			type: 'object',
+			format: 'object-array',
+			// target_type: 'object',
+			IsFormat: function ( Value )
+			{
+				if ( typeof Value !== 'object' ) { return false; }
+				if ( !Value ) { return false; }
+				if ( !Array.isArray( Value ) ) { return false; }
+				if ( !Value.length ) { return false; }
+				for ( let index = 0; index < Value.length; index++ )
+				{
+					if ( typeof Value[ index ] !== 'object' ) { return false; }
+				}
+				return true;
+			},
+		},
+
+		//---------------------------------------------------------------------
+		// object : array-array
+		{
+			type: 'object',
+			format: 'array-array',
+			target_type: 'object',
+			IsFormat: function ( Value )
+			{
+				if ( typeof Value !== 'object' ) { return false; }
+				if ( !Value ) { return false; }
+				if ( !Array.isArray( Value ) ) { return false; }
+				if ( !Value.length ) { return false; }
+				for ( let index = 0; index < Value.length; index++ )
+				{
+					if ( typeof Value[ index ] !== 'object' ) { return false; }
+					if ( !Array.isArray( Value[ index ] ) ) { return false; }
+				}
+				return true;
+			},
+		},
+	];
+
+
+	function Formats()
+	{
+		return _Formats;
+	}
 
 
 	//---------------------------------------------------------------------
 	// Return the module exports.
 	return {
 		_Schema: _Schema,
-		ValueSchema: ValueSchema,
+		Formats: Formats,
 	};
 };
 
 
 /***/ }),
 
-/***/ "./src/000-Schema/021-Schema.DefaultValue.js":
-/*!***************************************************!*\
-  !*** ./src/000-Schema/021-Schema.DefaultValue.js ***!
-  \***************************************************/
+/***/ "./src/000-Types/021-Types.GetFormat.js":
+/*!**********************************************!*\
+  !*** ./src/000-Types/021-Types.GetFormat.js ***!
+  \**********************************************/
 /***/ ((module) => {
 
 
@@ -561,44 +1139,34 @@ While it does return an entire FieldSchema object, only the "FieldSchema.type" a
 //---------------------------------------------------------------------
 let _Schema = {
 	id: '021',
-	member_of: 'Schema',
-	name: 'DefaultValue',
+	member_of: 'Types',
+	name: 'GetFormat',
 	type: 'function',
-	returns: '*',
-	returns_description: 'The default value.',
-	summary: 'Returns the default value for the FieldSchema.',
+	returns: 'string',
+	returns_description: 'An extended type description.',
+	summary: 'Determine the type and format of a value.',
 	description: `
-If the FieldSchema specifies a default value, then that value will be returned.
-Otherwise, a default value is calculated based upon the type and format of the FieldSchema.
+Iterates through \`Types.Formats\` in reverse order and calls each \`Format.IsFormat()\` function.
+When one of the formats returns \`true\`, then it's type and format are returned separated by \`:\`.
 
-| Type    | Format        | Default
-|---------|---------------|-----------
-| boolean | -             | false
-| number  | integer       | 0
-| number  | float         | 0
-| string  | -             | ''
-| object  | -             | {}
-| object  | array         | []
-| object  | boolean-array | []
-| object  | number-array  | []
-| object  | string-array  | []
-| object  | object-array  | []
+**Examples**
+
+~~~javascript
+LiquicodeJS.Types.GetFormat( '42' )         // = 'number:integer'
+LiquicodeJS.Types.GetFormat( 'Hello' )      // = 'string:string'
+LiquicodeJS.Types.GetFormat( new Date() )   // = 'object:datetime'
+LiquicodeJS.Types.GetFormat( [ 1, 2, 3 ] )  // = 'object:number-array'
+~~~
 `,
 	Parameters: {
-		Schema: {
-			name: 'Schema',
-			type: 'object',
+		Value: {
+			name: 'Value',
+			type: '*',
 			required: true,
-			description: 'The schema to use when calculating a default value.',
-		},
-		ThrowErrors: {
-			name: 'ThrowErrors',
-			type: 'boolean',
-			required: false,
-			default: false,
-			description: 'Errors are thrown if true, otherwise an ErrorValue object is returned.',
+			description: 'The value to get the format for.',
 		},
 	},
+	todo: [],
 };
 
 
@@ -610,68 +1178,42 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function DefaultValue
-	 * @returns {*}
-	 * The default value.
-	 * @summary Returns the default value for the FieldSchema.
+	 * @function GetFormat
+	 * @returns {string}
+	 * An extended type description.
+	 * @summary Determine the type and format of a value.
 	 * @description
 	 * 
-If the FieldSchema specifies a default value, then that value will be returned.
-Otherwise, a default value is calculated based upon the type and format of the FieldSchema.
+Iterates through `Types.Formats` in reverse order and calls each `Format.IsFormat()` function.
+When one of the formats returns `true`, then it's type and format are returned separated by `:`.
 
-| Type    | Format        | Default
-|---------|---------------|-----------
-| boolean | -             | false
-| number  | integer       | 0
-| number  | float         | 0
-| string  | -             | ''
-| object  | -             | {}
-| object  | array         | []
-| object  | boolean-array | []
-| object  | number-array  | []
-| object  | string-array  | []
-| object  | object-array  | []
+**Examples**
 
-	 * @param {object} Schema
-	 * The schema to use when calculating a default value.
-	 * @param {boolean} [ThrowErrors]
-	 * Errors are thrown if true, otherwise an ErrorValue object is returned.
+~~~javascript
+LiquicodeJS.Types.GetFormat( '42' )         // = 'number:integer'
+LiquicodeJS.Types.GetFormat( 'Hello' )      // = 'string:string'
+LiquicodeJS.Types.GetFormat( new Date() )   // = 'object:datetime'
+LiquicodeJS.Types.GetFormat( [ 1, 2, 3 ] )  // = 'object:number-array'
+~~~
+
+	 * @param {*} Value
+	 * The value to get the format for.
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 
 
-	function DefaultValue( Schema, ThrowErrors )
+	function GetFormat( Value )
 	{
-		function send_error( Message )
+		let formats = Liquicode.Types.Formats();
+		for ( let index = ( formats.length - 1 ); index >= 0; index-- )
 		{
-			if ( ThrowErrors ) { throw new Error( Message ); }
-			return Liquicode.Schema.ErrorValue( Message, 'DefaultValue' );
+			let format = formats[ index ];
+			if ( format.IsFormat( Value ) )
+			{
+				return `${format.type}:${format.format}`;
+			}
 		}
-
-		if ( !Schema ) { return send_error( `The parameter [Schema] is missing.` ); }
-		if ( !Schema.type ) { return send_error( `The parameter [Schema.type] is missing.` ); }
-		let schema_format = Schema.format ? Schema.format : Schema.type;
-
-		// If a default exists, return it.
-		if ( Schema.default !== undefined ) { return Schema.default; }
-
-		// Calculate a default.
-		switch ( Schema.type )
-		{
-			case 'boolean': return false;
-
-			case 'number': return 0;
-
-			case 'string': return '';
-
-			case 'object':
-				if ( [ '', 'object' ].includes( schema_format ) ) { return {}; }
-				else if ( schema_format.endsWith( 'array' ) ) { return []; }
-				return send_error( `[schema_format] has an invalid value [${schema_format}] for type [object].` );
-
-			default:
-				return send_error( `[Schema.type] has an invalid value [${Schema.type}].` );
-		}
+		return null;
 	}
 
 
@@ -679,639 +1221,7 @@ Otherwise, a default value is calculated based upon the type and format of the F
 	// Return the module exports.
 	return {
 		_Schema: _Schema,
-		DefaultValue: DefaultValue,
-	};
-};
-
-
-/***/ }),
-
-/***/ "./src/000-Schema/022-Schema.CoerceValue.js":
-/*!**************************************************!*\
-  !*** ./src/000-Schema/022-Schema.CoerceValue.js ***!
-  \**************************************************/
-/***/ ((module) => {
-
-
-
-
-//---------------------------------------------------------------------
-let _Schema = {
-	id: '022',
-	member_of: 'Schema',
-	name: 'CoerceValue',
-	type: 'function',
-	returns: '*',
-	returns_description: 'The coerced value or an error object.',
-	summary: `Attempt to coerce the Value parameter to match the Schema's type.`,
-	description: `
-
-This function uses the Schema to coerce the Value to a particular data type.
-
-If the "Schema.type" === "*", then no validation or coercion is performed and the Value is returned.
-If the "Schema.type" === "function", then no validation or coercion is performed and the Value is returned.
-
-If Value is "undefined" or "null", then the default value for "FieldSchema.type" will be returned.
-This is done by calling "Schema.DefaultValue()" for the FieldSchema.
-
-"Schema.ValueSchema()" is called the get the schema for Value, which is then compared against the expected Schema.
-
-	`,
-	Parameters: {
-		Value: {
-			name: 'Value',
-			type: '*',
-			required: true,
-			description: [
-				'The value to coerce.',
-			],
-		},
-		Schema: {
-			name: 'Schema',
-			type: 'object',
-			required: true,
-			description: 'The schema to use when coercing Value.',
-		},
-		ThrowErrors: {
-			name: 'ThrowErrors',
-			type: 'boolean',
-			required: false,
-			default: false,
-			description: 'Errors are thrown if true, otherwise an ErrorValue object is returned.',
-		},
-	},
-};
-
-
-//---------------------------------------------------------------------
-module.exports = function ( Liquicode )
-{
-
-
-	//-start-jsdoc---------------------------------------------------------
-	/**
-	 * @public
-	 * @function CoerceValue
-	 * @returns {*}
-	 * The coerced value or an error object.
-	 * @summary Attempt to coerce the Value parameter to match the Schema's type.
-	 * @description
-	 * 
-
-This function uses the Schema to coerce the Value to a particular data type.
-
-If the "Schema.type" === "*", then no validation or coercion is performed and the Value is returned.
-If the "Schema.type" === "function", then no validation or coercion is performed and the Value is returned.
-
-If Value is "undefined" or "null", then the default value for "FieldSchema.type" will be returned.
-This is done by calling "Schema.DefaultValue()" for the FieldSchema.
-
-"Schema.ValueSchema()" is called the get the schema for Value, which is then compared against the expected Schema.
-
-	
-	 * @param {*} Value
-	 * The value to coerce.
-	 * @param {object} Schema
-	 * The schema to use when coercing Value.
-	 * @param {boolean} [ThrowErrors]
-	 * Errors are thrown if true, otherwise an ErrorValue object is returned.
-	*/
-	//-end-jsdoc-----------------------------------------------------------
-
-
-	function CoerceValue( Value, Schema, ThrowErrors )
-	{
-		function send_error( Message )
-		{
-			if ( ThrowErrors ) { throw new Error( Message ); }
-			return Liquicode.Schema.ErrorValue( Message, 'CoerceValue' );
-		}
-
-		if ( !Schema ) { return send_error( `The parameter [Schema] is missing.` ); }
-		if ( !Schema.type ) { return send_error( `The parameter [Schema.type] is missing.` ); }
-		let schema_format = Schema.format ? Schema.format : Schema.type;
-
-		// If the schema allows any type, simply return the Value.
-		if ( Schema.type === '*' ) { return Value; }
-
-		// If the schema type is 'function', simply return the Value.
-		if ( Schema.type === 'function' ) { return Value; }
-
-		// If Value is undefined, return the default.
-		if ( Value === undefined ) { return Liquicode.Schema.DefaultValue( Schema ); }
-
-		// If Value is null, return the default.
-		if ( Value === null ) { return Liquicode.Schema.DefaultValue( Schema ); }
-
-		// Get the value schema.
-		let value_schema = Liquicode.Schema.ValueSchema( Value );
-
-		switch ( Schema.type )
-		{
-			case 'boolean':
-				switch ( value_schema.type )
-				{
-					case 'boolean':			// Convert boolean to number.
-					case 'number':			// Convert number to number.
-					case 'string':			// Convert string to number.
-					case 'object':			// Convert object to number.
-						return Boolean( Value );
-
-					default:				// Error: Unknown value type.
-						return send_error( `Value has an unknown type [${value_schema.type}].` );
-				}
-
-			case 'number':
-				switch ( value_schema.type )
-				{
-					case 'boolean':			// Convert boolean to number.
-					case 'number':			// Convert number to number.
-					case 'string':			// Convert string to number.
-						let number_value = Number( Value );
-						if ( isNaN( number_value ) )
-						{
-							number_value = 0;
-						}
-						else if ( schema_format === 'integer' )
-						{
-							number_value = parseInt( number_value.toString() );
-						}
-						return number_value;
-
-					case 'object':			// Convert object to number.
-						return send_error( `Unable to coerce a value from object to number.` );
-
-					default:				// Error: Unknown value type.
-						return send_error( `Value has an unknown type [${value_schema.type}].` );
-				}
-
-			case 'string':
-				switch ( value_schema.type )
-				{
-					case 'boolean':			// Convert boolean to string.
-					case 'number':			// Convert number to string.
-					case 'string':			// Convert string to string.
-						return Value.toString();
-
-					case 'object':			// Convert object to string.
-						return JSON.stringify( Value );
-
-					default:				// Error: Unknown value type.
-						return send_error( `Value has an unknown type [${value_schema.type}].` );
-				}
-
-			case 'object':
-				switch ( value_schema.type )
-				{
-					case 'boolean':			// Convert boolean to object.
-						return send_error( `Unable to coerce a value from boolean to object.` );
-
-					case 'number':			// Convert number to object.
-						return send_error( `Unable to coerce a value from number to object.` );
-
-					case 'string':			// Convert string to object.
-						let json_value = Value.trim();
-						if ( json_value.startsWith( '{' ) ) { return JSON.parse( json_value ); }
-						if ( json_value.startsWith( '[' ) ) { return JSON.parse( json_value ); }
-						return send_error( `Unable to coerce a (non-json) value from string to object.` );
-
-					case 'object':			// Convert object to object.
-						// return JSON.parse( JSON.stringify( Value ) );
-						return Value;
-
-					default:				// Error: Unknown value type.
-						return send_error( `Value has an unknown type [${value_schema.type}].` );
-				}
-
-			default:
-				return send_error( `[Schema.type] has an invalid value [${Schema.type}].` );
-		}
-	};
-
-
-	//---------------------------------------------------------------------
-	// Return the module exports.
-	return {
-		_Schema: _Schema,
-		CoerceValue: CoerceValue,
-	};
-};
-
-
-/***/ }),
-
-/***/ "./src/000-Schema/023-Schema.ValidateValue.js":
-/*!****************************************************!*\
-  !*** ./src/000-Schema/023-Schema.ValidateValue.js ***!
-  \****************************************************/
-/***/ ((module) => {
-
-
-
-
-//---------------------------------------------------------------------
-let _Schema = {
-	id: '023',
-	member_of: 'Schema',
-	name: 'ValidateValue',
-	type: 'function',
-	returns: '*',
-	returns_description: 'The validated/coerced Value or an ErrorValue object.',
-	summary: 'Validates a field value according to a schema and optionally coerces the value to match.',
-	description: `
-
-This function uses "Schema.type", "Schema.format", "Schema.required', and "Schema.default" to validate the given Value.
-
-If "Options.coerce = true", then an attempt will be made to coerce the given value to match the type and format specified in the FieldSchema.
-(See: "Schema.CoerceValue()")
-
-	`,
-	// [
-	// 	'Validate values according to a given schema.',
-	// 	'Return the value if validation succeeds.',
-	// 	'Otherwise, this function throws an error.',
-	// 	'See the "GetSchema()" function for a more detailed explanation of schemas.',
-	// ],
-	Parameters: {
-		Value: {
-			name: 'Value',
-			type: '*',
-			required: true,
-			description: [
-				'The value to validate.',
-			],
-		},
-		Schema: {
-			name: 'Schema',
-			type: 'object',
-			required: true,
-			description: 'The FieldSchema object to validate against.',
-			examples: [
-				`{ name: 'Name', type: 'string' }`,
-				`{ name: 'options', type: 'object', default: { hoist: true, swab: 'decks' } }`,
-				`{ name: 'max_tries', type: 'number', format: 'integer', required: true, default: 3 }`,
-			]
-		},
-		Options: {
-			name: 'Options',
-			type: 'object',
-			required: false,
-			default: "{ coerce: false, throw_errors: false, context: null }",
-			description: `An options object to control validation:
-~~~javascript
-Options = {
-	coerce_values: false,	// Attempt to coerce the provided value to match the schema's type.
-	throw_errors: false,	// When true, throw an error validation errors are encountered.
-	context: null,			// A context name (function name) to include in any error messages.
-}
-~~~`,
-		},
-	},
-};
-
-
-//---------------------------------------------------------------------
-module.exports = function ( Liquicode )
-{
-
-
-	//-start-jsdoc---------------------------------------------------------
-	/**
-	 * @public
-	 * @function ValidateValue
-	 * @returns {*}
-	 * The validated/coerced Value or an ErrorValue object.
-	 * @summary Validates a field value according to a schema and optionally coerces the value to match.
-	 * @description
-	 * 
-
-This function uses "Schema.type", "Schema.format", "Schema.required', and "Schema.default" to validate the given Value.
-
-If "Options.coerce = true", then an attempt will be made to coerce the given value to match the type and format specified in the FieldSchema.
-(See: "Schema.CoerceValue()")
-
-	
-	 * @param {*} Value
-	 * The value to validate.
-	 * @param {object} Schema
-	 * The FieldSchema object to validate against.
-	 * @param {object} [Options="{ coerce: false, throw_errors: false, context: null }"]
-	 * An options object to control validation:
-~~~javascript
-Options = {
-	coerce_values: false,	// Attempt to coerce the provided value to match the schema's type.
-	throw_errors: false,	// When true, throw an error validation errors are encountered.
-	context: null,			// A context name (function name) to include in any error messages.
-}
-~~~
-	*/
-	//-end-jsdoc-----------------------------------------------------------
-
-
-	function ValidateValue( Value, Schema, Options )
-	{
-		function send_error( Message )
-		{
-			if ( Options.throw_errors ) { throw new Error( Message ); }
-			return Liquicode.Schema.ErrorValue( Message, 'ValidateValue' );
-		}
-
-		// Validate the parameters.
-		if ( Options === undefined ) { Options = {}; }
-		Options.coerce_values = ( Options.coerce_values === true );
-		Options.throw_errors = ( Options.throw_errors === true );
-		Options.context = Options.context || '';
-		if ( !Schema ) { return send_error( `The parameter [Schema] is missing.` ); }
-		if ( !Schema.type ) { return send_error( `The parameter [Schema.type] is missing.` ); }
-		let schema_format = Schema.format ? Schema.format : Schema.type;
-
-		// Get the value schema.
-		let value_schema = Liquicode.Schema.ValueSchema( Value );
-
-		// Compare the schemas.
-		if ( Schema.type === value_schema.type )
-		{
-			if ( schema_format === value_schema.format )
-			{
-				return Value;
-			}
-		}
-		else if ( !Options.coerce_values )
-		{
-			let message = `The value of type [${value_schema.type}|${value_schema.format}]`;
-			message += ` does not match the expected type of [${Schema.type}|${schema_format}].`;
-			return send_error( message );
-		}
-
-		// Coerce the value.
-		let coerced_value = Liquicode.Schema.CoerceValue( Value, Schema, Options.throw_errors );
-		if ( Liquicode.Schema.IsErrorValue( coerced_value ) ) { return coerced_value; }
-
-		return coerced_value;
-	};
-
-
-	//---------------------------------------------------------------------
-	// Return the module exports.
-	return {
-		_Schema: _Schema,
-		ValidateValue: ValidateValue,
-	};
-};
-
-
-/***/ }),
-
-/***/ "./src/000-Schema/030-Schema.ObjectSchema.js":
-/*!***************************************************!*\
-  !*** ./src/000-Schema/030-Schema.ObjectSchema.js ***!
-  \***************************************************/
-/***/ ((module) => {
-
-
-
-
-//---------------------------------------------------------------------
-let _Schema = {
-	id: '030',
-	member_of: 'Schema',
-	name: 'ObjectSchema',
-	type: 'function',
-	returns: 'object',
-	returns_description: 'An array of FieldSchema.',
-	summary: 'Returns an array of FieldSchema describing the top-most members of "FromObject".',
-	description: ``,
-	Parameters: {
-		FromObject: {
-			name: 'FromObject',
-			type: 'object',
-			required: true,
-			description: 'An object to retrieve the schema for.',
-		},
-	},
-	todo: [],
-};
-
-
-//---------------------------------------------------------------------
-module.exports = function ( Liquicode )
-{
-
-
-	//-start-jsdoc---------------------------------------------------------
-	/**
-	 * @public
-	 * @function ObjectSchema
-	 * @returns {object}
-	 * An array of FieldSchema.
-	 * @summary Returns an array of FieldSchema describing the top-most members of "FromObject".
-	 * @param {object} FromObject
-	 * An object to retrieve the schema for.
-	*/
-	//-end-jsdoc-----------------------------------------------------------
-
-
-	function ObjectSchema( FromObject )
-	{
-		FromObject = Liquicode.Schema.ValidateValue( FromObject, _Schema.Parameters.FromObject, { coerce_values: true, throw_errors: true } );
-
-		let schema_array = [];
-		let object_keys = Object.keys( FromObject );
-		for ( let key_index = 0; key_index < object_keys.length; key_index++ )
-		{
-			let object_key = object_keys[ key_index ];
-			let schema = Liquicode.Schema.ValueSchema( FromObject[ object_key ] );
-			schema.name = object_key;
-			schema_array.push( schema );
-		}
-		return schema_array;
-	};
-
-
-	//---------------------------------------------------------------------
-	// Return the module exports.
-	return {
-		_Schema: _Schema,
-		ObjectSchema: ObjectSchema,
-	};
-};
-
-
-/***/ }),
-
-/***/ "./src/000-Schema/031-Schema.ValidateValues.js":
-/*!*****************************************************!*\
-  !*** ./src/000-Schema/031-Schema.ValidateValues.js ***!
-  \*****************************************************/
-/***/ ((module) => {
-
-
-
-
-//---------------------------------------------------------------------
-let _Schema = {
-	id: '031',
-	member_of: 'Schema',
-	name: 'ValidateValues',
-	type: 'function',
-	returns: 'object',
-	returns_description: 'An object containing the validation result.',
-	summary: 'Validate a set of values against an array of FieldSchema.',
-	description: `
-
-Takes an array of Values and an array of FieldSchema to validate a number of fields at once.
-This function does not throw validation errors.
-Instead, all validation errors are returned to the caller in the return value.
-Additionally, the number of fields processed and a set of coerced values is also returned.
-
-**The Return Value**
-
-~~~javascript
-ReturnValue = {
-	field_count: 0,				// The number of fields processed.
-	validation_errors: [],		// All validation errors encountered.
-	coerced_values: [],			// An array of coerced values.
-}
-~~~
-`,
-	Parameters: {
-		Values: {
-			name: 'Values',
-			type: 'object',
-			required: true,
-			description: 'The values to validate. This can be an array of values, or an object described by Schemas.',
-		},
-		Schemas: {
-			name: 'Schemas',
-			type: 'object',
-			required: true,
-			description: 'An array of FieldSchemas to validate the Values with. Can also be an object whose top-most fields are instances of FieldSchema.',
-		},
-	},
-	todo: [],
-};
-
-
-//---------------------------------------------------------------------
-module.exports = function ( Liquicode )
-{
-
-
-	//-start-jsdoc---------------------------------------------------------
-	/**
-	 * @public
-	 * @function ValidateValues
-	 * @returns {object}
-	 * An object containing the validation result.
-	 * @summary Validate a set of values against an array of FieldSchema.
-	 * @description
-	 * 
-
-Takes an array of Values and an array of FieldSchema to validate a number of fields at once.
-This function does not throw validation errors.
-Instead, all validation errors are returned to the caller in the return value.
-Additionally, the number of fields processed and a set of coerced values is also returned.
-
-**The Return Value**
-
-~~~javascript
-ReturnValue = {
-	field_count: 0,				// The number of fields processed.
-	validation_errors: [],		// All validation errors encountered.
-	coerced_values: [],			// An array of coerced values.
-}
-~~~
-
-	 * @param {object} Values
-	 * The values to validate. This can be an array of values, or an object described by Schemas.
-	 * @param {object} Schemas
-	 * An array of FieldSchemas to validate the Values with. Can also be an object whose top-most fields are instances of FieldSchema.
-	*/
-	//-end-jsdoc-----------------------------------------------------------
-
-
-	function ValidateValues( Values, Schemas )
-	{
-		let validation_result = {
-			field_count: 0,				// The number of fields processed.
-			validation_errors: [],		// All validation errors encountered.
-			coerced_values: [],			// An array of coerced values.
-		};
-
-		let value_array = null;
-		let schema_array = null;
-
-		// Validate the Values.
-		if ( !Values ) { throw new Error( `The parameter [Values] is missing. Must be an object or array of values.` ); }
-		if ( typeof Values !== 'object' ) { throw new Error( `The parameter [Values] is not an object. Must be an object or array of values.` ); }
-		if ( Array.isArray( Values ) )
-		{
-			value_array = Values;
-		}
-		else
-		{
-			value_array = [];
-			let keys = Object.keys( Values );
-			for ( let index = 0; index < keys.length; index++ )
-			{
-				value_array.push( Values[ keys[ index ] ] );
-			}
-		}
-
-		// Validate the Schemas.
-		if ( !Schemas ) { throw new Error( `The parameter [Schemas] is missing. Must be an object or array of FieldSchema.` ); }
-		if ( typeof Schemas !== 'object' ) { throw new Error( `The parameter [Schemas] is not an object. Must be an object or array of values.` ); }
-		if ( Array.isArray( Schemas ) )
-		{
-			schema_array = Schemas;
-		}
-		else
-		{
-			schema_array = [];
-			let keys = Object.keys( Schemas );
-			for ( let index = 0; index < keys.length; index++ )
-			{
-				schema_array.push( Schemas[ keys[ index ] ] );
-			}
-		}
-
-		// Validate the fields
-		for ( let index = 0; index < schema_array.length; index++ )
-		{
-			if ( index < value_array.length )
-			{
-				let result = Liquicode.Schema.ValidateValue( value_array[ index ], schema_array[ index ], { coerce_values: true, throw_errors: false } );
-				if ( Liquicode.Schema.IsErrorValue( result ) )
-				{
-					validation_result.field_count++;
-					validation_result.coerced_values.push( undefined );
-					validation_result.validation_errors.push( result.error );
-				}
-				else
-				{
-					validation_result.field_count++;
-					validation_result.coerced_values.push( result );
-				}
-			}
-			else
-			{
-				let field_name = schema_array[ index ].name;
-				if ( !field_name ) { field_name = '#' + ( index + 1 ); }
-				validation_result.field_count++;
-				validation_result.coerced_values.push( undefined );
-				validation_result.validation_errors.push( `Field [${field_name}] is missing.` );
-			}
-		}
-
-		return validation_result;
-	};
-
-
-	//---------------------------------------------------------------------
-	// Return the module exports.
-	return {
-		_Schema: _Schema,
-		ValidateValues: ValidateValues,
+		GetFormat: GetFormat,
 	};
 };
 
@@ -1425,7 +1335,7 @@ module.exports = function ( Liquicode )
 
 	function Clone( From )
 	{
-		From = Liquicode.Schema.ValidateValue( From, _Schema.Parameters.From, { coerce_values: true, throw_errors: true } );
+		From = Liquicode.Types.Coerce( From, _Schema.Parameters.From, { coerce_values: true, throw_errors: true } );
 		return JSON.parse( JSON.stringify( From ) );
 	};
 
@@ -1491,8 +1401,8 @@ module.exports = function ( Liquicode )
 
 	function Merge( Original, Updates )
 	{
-		Original = Liquicode.Schema.ValidateValue( Original, _Schema.Parameters.Original, { coerce_values: true, throw_errors: true } );
-		Updates = Liquicode.Schema.ValidateValue( Updates, _Schema.Parameters.Updates, { coerce_values: true, throw_errors: true } );
+		Original = Liquicode.Types.Coerce( Original, true ).ToObject( {} );
+		Updates = Liquicode.Types.Coerce( Updates, true ).ToObject( {} );
 
 		let new_object = JSON.parse( JSON.stringify( Original ) );
 
@@ -1617,8 +1527,8 @@ This functions recurses through sub-objects and traverses the entire object.
 	function Traverse( Root, Visitor )
 	{
 		// Root = Root || {};
-		Root = Liquicode.Schema.CoerceValue( Root, _Schema.Parameters.Root, true );
-		// Visitor = Liquicode.Schema.CoerceValue( Visitor, _Schema.Parameters.Visitor, true );
+		Root = Liquicode.Types.Coerce( Root ).ToObject();
+		// Visitor = Liquicode.Types.Coerce( Visitor, _Schema.Parameters.Visitor, true );
 
 		//---------------------------------------------------------------------
 		function traverse_recurse( Visitor, Parent, Name, Value, Path, Depth )
@@ -1726,8 +1636,8 @@ module.exports = function ( Liquicode )
 
 	function HasPath( Root, Path )
 	{
-		Root = Liquicode.Schema.CoerceValue( Root, _Schema.Parameters.Root, true );
-		Path = Liquicode.Schema.CoerceValue( Path, _Schema.Parameters.Path, true );
+		Root = Liquicode.Types.Coerce( Root ).ToObject();
+		Path = Liquicode.Types.Coerce( Path ).ToString();
 
 		let result = Liquicode.Object.Traverse( Root,
 			function ( info )
@@ -1800,8 +1710,8 @@ module.exports = function ( Liquicode )
 
 	function FindField( Root, Name )
 	{
-		Root = Liquicode.Schema.CoerceValue( Root, _Schema.Parameters.Root, true );
-		Name = Liquicode.Schema.CoerceValue( Name, _Schema.Parameters.Name, true );
+		Root = Liquicode.Types.Coerce( Root ).ToObject();
+		Name = Liquicode.Types.Coerce( Name ).ToString();
 
 		let result = Liquicode.Object.Traverse( Root,
 			function ( info )
@@ -1878,8 +1788,8 @@ module.exports = function ( Liquicode )
 
 	function FindValue( Root, Value )
 	{
-		Root = Liquicode.Schema.CoerceValue( Root, _Schema.Parameters.Root, true );
-		Value = Liquicode.Schema.CoerceValue( Value, _Schema.Parameters.Value, true );
+		Root = Liquicode.Types.Coerce( Root ).ToObject();
+		// Value = Liquicode.Types.Coerce( Value ).ToString();
 
 		let result = Liquicode.Object.Traverse( Root,
 			function ( info )
@@ -1952,8 +1862,8 @@ module.exports = function ( Liquicode )
 
 	function GetValue( Root, Path )
 	{
-		Root = Liquicode.Schema.CoerceValue( Root, _Schema.Parameters.Root, true );
-		Path = Liquicode.Schema.CoerceValue( Path, _Schema.Parameters.Path, true );
+		Root = Liquicode.Types.Coerce( Root ).ToObject();
+		Path = Liquicode.Types.Coerce( Path ).ToString();
 
 		let result = Liquicode.Object.Traverse( Root,
 			function ( info )
@@ -2032,10 +1942,9 @@ module.exports = function ( Liquicode )
 
 	function SetValue( Root, Path, Value )
 	{
-		// Root = Root || {};
-		Root = Liquicode.Schema.CoerceValue( Root, _Schema.Parameters.Root, true );
-		Path = Liquicode.Schema.CoerceValue( Path, _Schema.Parameters.Path, true );
-		// Value = Liquicode.Schema.CoerceValue( Value, _Schema.Parameters.Value, true );
+		Root = Liquicode.Types.Coerce( Root ).ToObject();
+		Path = Liquicode.Types.Coerce( Path ).ToString();
+		// Value = Liquicode.Types.Coerce( Value, _Schema.Parameters.Value, true );
 
 		let result = Liquicode.Object.Traverse( Root,
 			function ( info )
@@ -2130,7 +2039,9 @@ The parser is a bit more relaxed and allows:
 
 	function FromJson( JsonString )
 	{
-		JsonString = Liquicode.Schema.CoerceValue( JsonString, _Schema.Parameters.JsonString, true );
+		// JsonString = Liquicode.Types.Coerce( JsonString, _Schema.Parameters.JsonString, true );
+		JsonString = JsonString || '';
+		if ( typeof JsonString !== 'string' ) { JsonString = JsonString.toString(); }
 
 		let tokens = Tokenize( JsonString );
 		return BuildObject( tokens );
@@ -2372,7 +2283,7 @@ module.exports = function ( Liquicode )
 
 	function ToJsonOptions( PresetName )
 	{
-		PresetName = Liquicode.Schema.CoerceValue( PresetName, _Schema.Parameters.PresetName, true );
+		PresetName = Liquicode.Types.Coerce( PresetName ).ToString();
 
 		let options = {
 			identifier_quote: `"`,
@@ -2672,7 +2583,7 @@ Parse an Ini string and return an object value.
 
 	function FromIni( IniString )
 	{
-		IniString = Liquicode.Schema.CoerceValue( IniString, _Schema.Parameters.IniString, true );
+		IniString = Liquicode.Types.Coerce( IniString ).ToString();
 
 		//NOTE: This function has the following side effects:
 		//		- ignores all lines before the first section is found
@@ -2774,7 +2685,7 @@ Parse an Ini string and return an object value.
 
 	function ToIni( Value )
 	{
-		// IniString = Liquicode.Schema.CoerceValue( IniString, _Schema.Parameters.IniString, true );
+		Value = Liquicode.Types.Coerce( Value ).ToObject();
 
 		//NOTE: This function has the following side effects:
 		//		- ignores all sections that are not of type object
@@ -2855,6 +2766,7 @@ module.exports = function ( Liquicode )
 		Compare: __webpack_require__( /*! ./202-Text.Compare.js */ "./src/200-Text/202-Text.Compare.js" )( Liquicode ).Compare,
 		Matches: __webpack_require__( /*! ./203-Text.Matches.js */ "./src/200-Text/203-Text.Matches.js" )( Liquicode ).Matches,
 		ReplaceCharacters: __webpack_require__( /*! ./210-Text.ReplaceCharacters.js */ "./src/200-Text/210-Text.ReplaceCharacters.js" )( Liquicode ).ReplaceCharacters,
+		ReplaceText: __webpack_require__( /*! ./211-Text.ReplaceText.js */ "./src/200-Text/211-Text.ReplaceText.js" )( Liquicode ).ReplaceText,
 		FirstWord: __webpack_require__( /*! ./220-Text.FirstWord.js */ "./src/200-Text/220-Text.FirstWord.js" )( Liquicode ).FirstWord,
 		AfterFirstWord: __webpack_require__( /*! ./221-Text.AfterFirstWord.js */ "./src/200-Text/221-Text.AfterFirstWord.js" )( Liquicode ).AfterFirstWord,
 		LastWord: __webpack_require__( /*! ./222-Text.LastWord.js */ "./src/200-Text/222-Text.LastWord.js" )( Liquicode ).LastWord,
@@ -2935,9 +2847,9 @@ module.exports = function ( Liquicode )
 
 	function Compare( StringA, StringB, CaseSensitive )
 	{
-		StringA = Liquicode.Schema.ValidateValue( StringA, _Schema.Parameters.StringA , { coerce_values: true, throw_errors: true });
-		StringB = Liquicode.Schema.ValidateValue( StringB, _Schema.Parameters.StringB , { coerce_values: true, throw_errors: true });
-		CaseSensitive = Liquicode.Schema.ValidateValue( CaseSensitive, _Schema.Parameters.CaseSensitive, { coerce_values: true, throw_errors: true } );
+		StringA = Liquicode.Types.Coerce( StringA, _Schema.Parameters.StringA , { coerce_values: true, throw_errors: true });
+		StringB = Liquicode.Types.Coerce( StringB, _Schema.Parameters.StringB , { coerce_values: true, throw_errors: true });
+		CaseSensitive = Liquicode.Types.Coerce( CaseSensitive, _Schema.Parameters.CaseSensitive, { coerce_values: true, throw_errors: true } );
 
 		try
 		{
@@ -3028,8 +2940,8 @@ module.exports = function ( Liquicode )
 	function Matches( Text, Pattern ) 
 	{
 		// Validate Parameters
-		Text = Liquicode.Schema.ValidateValue( Text, _Schema.Parameters.Text , { coerce_values: true, throw_errors: true });
-		Pattern = Liquicode.Schema.ValidateValue( Pattern, _Schema.Parameters.Pattern , { coerce_values: true, throw_errors: true });
+		Text = Liquicode.Types.Coerce( Text ).ToString();
+		Pattern = Liquicode.Types.Coerce( Pattern ).ToString();
 
 		//FROM: https://stackoverflow.com/a/57527468
 		let wildcard_exp = Pattern.replace( /[.+^${}()|[\]\\]/g, '\\$&' ); // regexp escape 
@@ -3122,10 +3034,10 @@ module.exports = function ( Liquicode )
 	function ReplaceCharacters( Text, SearchCharacters, ReplacementText, MaxTimes )
 	{
 		// Validate Parameters
-		Text = Liquicode.Schema.ValidateValue( Text, _Schema.Parameters.Text , { coerce_values: true, throw_errors: true });
-		SearchCharacters = Liquicode.Schema.ValidateValue( SearchCharacters, _Schema.Parameters.SearchCharacters, { coerce_values: true, throw_errors: true } );
-		ReplacementText = Liquicode.Schema.ValidateValue( ReplacementText, _Schema.Parameters.ReplacementText , { coerce_values: true, throw_errors: true });
-		MaxTimes = Liquicode.Schema.ValidateValue( MaxTimes, _Schema.Parameters.MaxTimes , { coerce_values: true, throw_errors: true });
+		Text = Liquicode.Types.Coerce( Text ).ToString();
+		SearchCharacters = Liquicode.Types.Coerce( SearchCharacters ).ToString();
+		ReplacementText = Liquicode.Types.Coerce( ReplacementText ).ToString();
+		MaxTimes = Liquicode.Types.Coerce( MaxTimes ).ToNumber();
 
 		let new_text = '';
 		let count = 0;
@@ -3153,6 +3065,91 @@ module.exports = function ( Liquicode )
 	return {
 		_Schema: _Schema,
 		ReplaceCharacters: ReplaceCharacters,
+	};
+};
+
+
+/***/ }),
+
+/***/ "./src/200-Text/211-Text.ReplaceText.js":
+/*!**********************************************!*\
+  !*** ./src/200-Text/211-Text.ReplaceText.js ***!
+  \**********************************************/
+/***/ ((module) => {
+
+
+
+
+//---------------------------------------------------------------------
+let _Schema = {
+	id: '211',
+	member_of: 'Text',
+	name: 'ReplaceText',
+	type: 'function',
+	returns: 'string',
+	description: ``,
+	Parameters: {
+		Text: {
+			name: 'Text',
+			type: 'string',
+			required: true,
+			default: '',
+		},
+		SearchText: {
+			name: 'SearchText',
+			type: 'string',
+			required: true,
+			default: '',
+		},
+		ReplacementText: {
+			name: 'ReplacementText',
+			type: 'string',
+			required: true,
+			default: '',
+		},
+		// MaxTimes: {
+		// 	name: 'MaxTimes',
+		// 	type: 'number',
+		// 	// format: 'positive-integer',
+		// 	required: false,
+		// 	default: 1,
+		// },
+	},
+};
+
+
+//---------------------------------------------------------------------
+module.exports = function ( Liquicode )
+{
+
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function ReplaceText
+	 * @returns {string}
+	 * @param {string} Text
+	 * @param {string} SearchText
+	 * @param {string} ReplacementText
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
+	function ReplaceText( Text, SearchText, ReplacementText ) 
+	{
+		// Validate Parameters
+		Text = Liquicode.Types.Coerce( Text ).ToString();
+		SearchText = Liquicode.Types.Coerce( SearchText ).ToString();
+		ReplacementText = Liquicode.Types.Coerce( ReplacementText ).ToString();
+
+		return Text.split( SearchText ).join( ReplacementText );
+	}
+
+	//---------------------------------------------------------------------
+	// Return the module exports.
+	return {
+		_Schema: _Schema,
+		ReplaceText: ReplaceText,
 	};
 };
 
@@ -3219,8 +3216,8 @@ module.exports = function ( Liquicode )
 
 	function FirstWord( Phrase, Delimiters )
 	{
-		Phrase = Liquicode.Schema.ValidateValue( Phrase, _Schema.Parameters.Phrase , { coerce_values: true, throw_errors: true });
-		Delimiters = Liquicode.Schema.ValidateValue( Delimiters, _Schema.Parameters.Delimiters, { coerce_values: true, throw_errors: true } );
+		Phrase = Liquicode.Types.Coerce( Phrase ).ToString();
+		Delimiters = Liquicode.Types.Coerce( Delimiters ).ToString();
 
 		let word_start = -1;
 		for ( let index = 0; index < Phrase.length; index++ )
@@ -3317,8 +3314,8 @@ module.exports = function ( Liquicode )
 
 	function AfterFirstWord( Phrase, Delimiters )
 	{
-		Phrase = Liquicode.Schema.ValidateValue( Phrase, _Schema.Parameters.Phrase , { coerce_values: true, throw_errors: true });
-		Delimiters = Liquicode.Schema.ValidateValue( Delimiters, _Schema.Parameters.Delimiters , { coerce_values: true, throw_errors: true });
+		Phrase = Liquicode.Types.Coerce( Phrase ).ToString();
+		Delimiters = Liquicode.Types.Coerce( Delimiters ).ToString();
 
 		for ( let index = 0; index < Phrase.length; index++ )
 		{
@@ -3409,8 +3406,8 @@ module.exports = function ( Liquicode )
 
 	function LastWord( Phrase, Delimiters )
 	{
-		Phrase = Liquicode.Schema.ValidateValue( Phrase, _Schema.Parameters.Phrase , { coerce_values: true, throw_errors: true });
-		Delimiters = Liquicode.Schema.ValidateValue( Delimiters, _Schema.Parameters.Delimiters, { coerce_values: true, throw_errors: true } );
+		Phrase = Liquicode.Types.Coerce( Phrase ).ToString();
+		Delimiters = Liquicode.Types.Coerce( Delimiters ).ToString();
 
 		let word_end = -1;
 		for ( let index = Phrase.length - 1; index >= 0; index-- )
@@ -3507,8 +3504,8 @@ module.exports = function ( Liquicode )
 
 	function BeforeLastWord( Phrase, Delimiters )
 	{
-		Phrase = Liquicode.Schema.ValidateValue( Phrase, _Schema.Parameters.Phrase , { coerce_values: true, throw_errors: true });
-		Delimiters = Liquicode.Schema.ValidateValue( Delimiters, _Schema.Parameters.Delimiters , { coerce_values: true, throw_errors: true });
+		Phrase = Liquicode.Types.Coerce( Phrase ).ToString();
+		Delimiters = Liquicode.Types.Coerce( Delimiters ).ToString();
 
 		for ( let index = Phrase.length - 1; index >= 0; index-- )
 		{
@@ -3533,590 +3530,9 @@ module.exports = function ( Liquicode )
 
 /***/ }),
 
-/***/ "./src/400-Date/400-Date.js":
-/*!**********************************!*\
-  !*** ./src/400-Date/400-Date.js ***!
-  \**********************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-
-
-
-//---------------------------------------------------------------------
-let Schema = {
-	id: '400',
-	name: 'Date',
-	type: 'namespace',
-	summary: 'Functions for manipulating dates.',
-};
-
-
-//-start-jsdoc---------------------------------------------------------
-/**
- * @public
- * @namespace Date
- * @summary Functions for manipulating dates.
-*/
-//-end-jsdoc-----------------------------------------------------------
-
-
-//---------------------------------------------------------------------
-module.exports = function ( Liquicode )
-{
-	return {
-		_Schema: Schema,
-		Parse: __webpack_require__( /*! ./401-Date.Parse.js */ "./src/400-Date/401-Date.Parse.js" )( Liquicode ).Parse,
-		ZuluTimestamp: __webpack_require__( /*! ./410-Date.ZuluTimestamp.js */ "./src/400-Date/410-Date.ZuluTimestamp.js" )( Liquicode ).ZuluTimestamp,
-	};
-};
-
-
-/***/ }),
-
-/***/ "./src/400-Date/401-Date.Parse.js":
-/*!****************************************!*\
-  !*** ./src/400-Date/401-Date.Parse.js ***!
-  \****************************************/
-/***/ ((module) => {
-
-
-
-
-//---------------------------------------------------------------------
-let _Schema = {
-	id: '401',
-	member_of: 'Date',
-	name: 'Parse',
-	type: 'function',
-	returns: 'object',
-	description: [
-		'Converts a string to a date-time value.',
-		'Returns a `date_time_parts` structure.'
-	],
-	Parameters: {
-		Text: {
-			name: 'Text',
-			type: 'string',
-			required: true,
-		},
-		TimeZoneOffset: {
-			name: 'TimeZoneOffset',
-			type: 'function',
-			required: false,
-			default: '+0000',
-		},
-	},
-};
-
-
-//---------------------------------------------------------------------
-module.exports = function ( Liquicode )
-{
-
-
-	//-start-jsdoc---------------------------------------------------------
-	/**
-	 * @public
-	 * @function Parse
-	 * @returns {object}
-	 * @description
-	 * Converts a string to a date-time value.
-	 * Returns a `date_time_parts` structure.
-	 * @param {string} Text
-	 * @param {function} [TimeZoneOffset="+0000"]
-	*/
-	//-end-jsdoc-----------------------------------------------------------
-
-
-	//---------------------------------------------------------------------
-	function Parse( Text, TimeZoneOffset )
-	{
-		From = Liquicode.Schema.ValidateValue( From, _Schema.Parameters.From , { coerce_values: true, throw_errors: true });
-
-		// Prepare and validate the date string.
-		Text = Text.toLowerCase().trim();
-		if ( !Text ) { return get_date_parts( null, TimeZoneOffset ); }
-
-		// Validate AssumeTimeZone
-		if ( !TimeZoneOffset ) { TimeZoneOffset = '+0000'; }
-		if ( !TimeZoneOffset.startsWith( '+' ) && !TimeZoneOffset.startsWith( '-' ) )
-		{
-			throw new Error( `AssumeTimeZone must begin with a plus or minus sign.` );
-		}
-		let offset = TimeZoneOffset.substr( 1 );
-		if ( ( offset.length !== 4 ) || isNaN( offset ) )
-		{
-			throw new Error( `AssumeTimeZone must have a four digit offset component.` );
-		}
-
-		let date = null;
-
-		// Try some unusual cases of compressed timestamps.
-		if ( !isNaN( Number( Text ) ) )
-		{
-			let s = Number( Text ).toString(); // Remove any noise.
-			if ( s.length == 8 )
-			{
-				// 20180329 => 2018-03-29
-				s = (
-					s.substr( 0, 4 ) + '-' +
-					s.substr( 4, 2 ) + '-' +
-					s.substr( 6, 2 ) +
-					' 00:00:00 ' + TimeZoneOffset
-				);
-			}
-			else if ( s.length == 10 )
-			{
-				// 1465241631 => 1465241631000 => Date(1465241631000)
-				s += '000'; // milliseconds
-				s = Number( s );
-			}
-			else if ( s.length == 13 )
-			{
-				// 1465241631000 => Date(1465241631000)
-				s = s; // milliseconds
-				s = Number( s );
-			}
-			else if ( s.length == 14 )
-			{
-				// 20180329074753 => 2018-03-29 07:47:53
-				s = (
-					s.substr( 0, 4 ) + '-' +
-					s.substr( 4, 2 ) + '-' +
-					s.substr( 6, 2 ) + ' ' +
-					s.substr( 8, 2 ) + ':' +
-					s.substr( 10, 2 ) + ':' +
-					s.substr( 12, 2 ) +
-					' ' + TimeZoneOffset
-				);
-			}
-
-			// Try the javascript date parsing.
-			try { date = new Date( s ); }
-			catch ( e ) { }
-			if ( date ) { return get_date_parts( date, TimeZoneOffset ); }
-		}
-
-		// Test for ISO format: 2005-05-01T15:05:23.000Z
-		if (
-			( Text.length >= 24 )
-			&& ( Text.substr( 4, 1 ) === '-' )
-			&& ( Text.substr( 7, 1 ) === '-' )
-			&& ( Text.substr( 10, 1 ) === 't' )
-			&& ( Text.substr( 13, 1 ) === ':' )
-			&& ( Text.substr( 16, 1 ) === ':' )
-			&& ( Text.substr( 19, 1 ) === '.' )
-			&& ( Text.substr( 23, 1 ) === 'z' )
-		)
-		{
-			try { date = new Date( Text ); }
-			catch ( e ) { }
-			if ( date && !isNaN( date.getTime() ) )
-			{ return get_date_parts( date, TimeZoneOffset ); }
-			else { return get_date_parts( null, TimeZoneOffset ); }
-		}
-
-		// Test for ISO format (short): 2005-05-01T15:05:23Z
-		if (
-			( Text.length >= 20 )
-			&& ( Text.substr( 4, 1 ) === '-' )
-			&& ( Text.substr( 7, 1 ) === '-' )
-			&& ( Text.substr( 10, 1 ) === 't' )
-			&& ( Text.substr( 13, 1 ) === ':' )
-			&& ( Text.substr( 16, 1 ) === ':' )
-			&& ( Text.substr( 19, 1 ) === 'z' )
-		)
-		{
-			try { date = new Date( Text ); }
-			catch ( e ) { }
-			if ( date && !isNaN( date.getTime() ) )
-			{ return get_date_parts( date, TimeZoneOffset ); }
-			else { return get_date_parts( null, TimeZoneOffset ); }
-		}
-
-		// We know its not a javascript supported format.
-		// We have to do it the hard way.
-		let tokens = tokenize_date( Text );
-		let symbols = tokens2symbols( tokens );
-		date = symbols2date( symbols, TimeZoneOffset );
-
-		// Return the date.
-		if ( date && !isNaN( date.getTime() ) )
-		{ return get_date_parts( date, TimeZoneOffset ); }
-		else { return get_date_parts( null, TimeZoneOffset ); }
-	};
-
-
-	//---------------------------------------------------------------------
-	const REFS =
-	{
-		day_of_week: [ 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday' ],
-		day_of_week_abbrev: [ 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun' ],
-		months: [ 'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december' ],
-		months_abbrev: [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec' ],
-	};
-	
-	
-	//---------------------------------------------------------------------
-	function tokenize_date( text )
-	{
-		let tokens = [];
-	
-		// Split text into words.
-		let words = text.split( ' ' );
-	
-		// Convert words to tokens.
-		words.forEach(
-			( word, word_index ) =>
-			{
-				// Remove punctuation
-				if ( word.endsWith( ',' ) ) { word = word.substr( 0, word.length - 1 ); }
-				if ( word.endsWith( '.' ) ) { word = word.substr( 0, word.length - 1 ); }
-	
-				// Split up date formats
-				if ( word.includes( '/' ) )
-				{
-					let parts = word.split( '/' );
-					parts.forEach( part => tokens.push( part ) );
-				}
-				else if ( word.includes( '-' ) )
-				{
-					if ( word.startsWith( '-' ) || word.startsWith( 'utc-' ) || word.startsWith( 'gmt-' ) )
-					{
-						// Treat as a time zone offset
-						tokens.push( word );
-					}
-					else
-					{
-						// Treat as a date
-						let parts = word.split( '-' );
-						parts.forEach( part => tokens.push( part ) );
-					}
-				}
-				else if ( word.includes( ',' ) )
-				{
-					let parts = word.split( ',' );
-					parts.forEach( part => tokens.push( part ) );
-				}
-				else
-				{
-					tokens.push( word );
-				}
-			}
-		);
-	
-		// Return tokens.
-		return tokens;
-	}
-	
-	
-	//---------------------------------------------------------------------
-	function tokens2symbols( tokens )
-	{
-		let symbols = [];
-		tokens.forEach(
-			( token, token_index ) =>
-			{
-	
-				// Check for time zone.
-				if ( token.startsWith( '+' ) || token.startsWith( 'utc+' ) || token.startsWith( 'gmt+' ) )
-				{
-					symbols.push( { type: 'zone', value: token } );
-					return;
-				}
-				if ( token.startsWith( '-' ) || token.startsWith( 'utc-' ) || token.startsWith( 'gmt-' ) )
-				{
-					symbols.push( { type: 'zone', value: token } );
-					return;
-				}
-	
-				// Check for universal time format.
-				if ( token.includes( ':' ) )
-				{
-					symbols.push( { type: 'time', value: token } );
-					return;
-				}
-	
-				// Check for month names.
-				if ( REFS.months.includes( token ) )
-				{
-					let index = REFS.months.indexOf( token ) + 1;
-					token = '' + index;
-					if ( index < 10 ) { token = '0' + token; }
-					symbols.push( { type: 'month', value: token } );
-					return;
-				}
-				if ( REFS.months_abbrev.includes( token ) )
-				{
-					let index = REFS.months_abbrev.indexOf( token ) + 1;
-					token = '' + index;
-					if ( index < 10 ) { token = '0' + token; }
-					symbols.push( { type: 'month', value: token } );
-					return;
-				}
-	
-				// Check for numeric
-				if ( !isNaN( Number( token ) ) )
-				{
-					if ( token.length <= 2 )
-					{
-						if ( token.length === 1 ) { token = '0' + token; }
-						symbols.push( { type: 'day-or-month', value: token } );
-					}
-					else if ( token.length === 4 )
-					{
-						symbols.push( { type: 'year', value: token } );
-					}
-					else
-					{
-						symbols.push( { type: 'number', value: token } );
-					}
-					return;
-				}
-				else
-				{
-					symbols.push( { type: 'text', value: token } );
-					return;
-				}
-	
-			}
-		);
-	
-		// Return the symbols.
-		return symbols;
-	}
-	
-	
-	//---------------------------------------------------------------------
-	function symbols2date( symbols, AssumeTimeZone )
-	{
-		let fields =
-		{
-			year: null,
-			month: null,
-			day: null,
-			time: null,
-			zone: null,
-		};
-	
-		// The first picks out the things we are pretty sure of.
-		symbols.forEach(
-			( symbol ) =>
-			{
-				if ( symbol.type === 'year' )
-				{
-					if ( fields.year ) { return; }
-					fields.year = symbol.value;
-				}
-				else if ( symbol.type === 'month' )
-				{
-					if ( fields.month ) { return; }
-					fields.month = symbol.value;
-				}
-				else if ( symbol.type === 'time' )
-				{
-					if ( fields.time ) { return; }
-					fields.time = symbol.value;
-				}
-				else if ( symbol.type === 'zone' )
-				{
-					if ( fields.zone ) { return; }
-					fields.zone = symbol.value;
-				}
-			}
-		);
-	
-		// We go again to try to determine month and day.
-		symbols.forEach(
-			( symbol ) =>
-			{
-				if ( symbol.type === 'day-or-month' )
-				{
-					if ( fields.day && fields.month ) { return; }
-					if ( fields.month )
-					{
-						fields.day = symbol.value;
-					}
-					else
-					{
-						fields.month = symbol.value;
-					}
-				}
-			}
-		);
-	
-		// Validate our date fields.
-		if ( !fields.year ) { return null; }
-		if ( !fields.month ) { return null; }
-		if ( !fields.day ) { return null; }
-		if ( !fields.time ) { fields.time = '00:00:00'; }
-		if ( !fields.zone ) { fields.zone = AssumeTimeZone; }
-	
-		// Try to fix timezone offsets.
-		if ( fields.zone )
-		{
-			let zone = fields.zone;
-	
-			// Find the offset and direction.
-			let offset = '';
-			let sign = '';
-			let sign_index = -1;
-			// - sign
-			if ( zone.includes( '-' ) )
-			{
-				sign = '-';
-				sign_index = zone.indexOf( '-' );
-				offset = zone.substr( sign_index + 1 );
-			}
-			else if ( zone.includes( '+' ) )
-			{
-				sign = '+';
-				sign_index = zone.indexOf( '+' );
-				offset = zone.substr( sign_index + 1 );
-			}
-			else
-			{
-				sign = '+';
-				offset = zone;
-			}
-			// - offset
-			if ( offset.includes( ':' ) )
-			{
-				offset = offset.replace( ':', '' );
-			}
-			if ( offset.length > 4 ) { offset = offset.substr( 0, 4 ); } // e.g. +0500!@#
-			if ( offset.length === 1 ) { offset = `0${offset}00`; } // e.g. -5
-			else if ( offset.length === 2 ) { offset = `${offset}00`; } // e.g. -12
-			else if ( offset.length === 3 ) { offset = `0${offset}`; } // e.g. -5:30
-			// Reconstruct the zone.
-			if ( offset.length === 4 )
-			{
-				fields.zone = `${sign}${offset}`;
-			}
-			else
-			{
-				fields.zone = AssumeTimeZone;
-			}
-		}
-	
-		// Convert what we have with javascript date parsing.
-		let text = `${fields.year}-${fields.month}-${fields.day} ${fields.time} ${fields.zone}`;
-		let date = null;
-		try { date = new Date( text ); }
-		catch ( e ) { }
-		return date;
-	}
-	
-	
-		//---------------------------------------------------------------------
-	function get_date_parts( JsDate, TimeZoneOffset = '+0000' )
-	{
-		let datetime_parts =
-		{
-			date: null,
-			year: 0,
-			month_num: 0,
-			month_name: '',
-			day_of_month: 0,
-			day_of_week: 0,
-			day_name: '',
-			hours: 0,
-			minutes: 0,
-			seconds: 0,
-			milliseconds: 0,
-			timezone_offset: ''
-		};
-		if ( !JsDate ) { return datetime_parts; }
-		if ( isNaN( JsDate.getTime() ) ) { return datetime_parts; }
-
-		datetime_parts.date = new Date( JsDate.getTime() );
-		datetime_parts.year = datetime_parts.date.getFullYear();
-		datetime_parts.month_num = datetime_parts.date.getMonth();
-		datetime_parts.month_name = REFS.months[ datetime_parts.month_num ];
-		datetime_parts.day_of_month = datetime_parts.date.getDate();
-		datetime_parts.day_of_week = datetime_parts.date.getDay();
-		if ( datetime_parts.day_of_week === 0 ) { datetime_parts.day_of_week = 7; }
-		datetime_parts.day_name = REFS.day_of_week[ datetime_parts.day_of_week - 1 ];
-		datetime_parts.hours = datetime_parts.date.getHours();
-		datetime_parts.minutes = datetime_parts.date.getMinutes();
-		datetime_parts.seconds = datetime_parts.date.getSeconds();
-		datetime_parts.milliseconds = datetime_parts.date.getMilliseconds();
-		datetime_parts.timezone_offset = TimeZoneOffset;
-
-		return datetime_parts;
-	}
-
-
-	//---------------------------------------------------------------------
-	// Return the module exports.
-	return {
-		_Schema: _Schema,
-		Parse: Parse,
-	};
-};
-
-
-/***/ }),
-
-/***/ "./src/400-Date/410-Date.ZuluTimestamp.js":
-/*!************************************************!*\
-  !*** ./src/400-Date/410-Date.ZuluTimestamp.js ***!
-  \************************************************/
-/***/ ((module) => {
-
-
-
-
-//---------------------------------------------------------------------
-let Schema = {
-	id: '410',
-	member_of: 'Date',
-	name: 'ZuluTimestamp',
-	type: 'function',
-	returns: 'string',
-	description: [
-		'Returns the current date and time as a string.',
-	],
-	Parameters: {},
-};
-
-
-//---------------------------------------------------------------------
-module.exports = function ( Liquicode )
-{
-
-
-	//-start-jsdoc---------------------------------------------------------
-	/**
-	 * @public
-	 * @function ZuluTimestamp
-	 * @returns {string}
-	 * @description
-	 * Returns the current date and time as a string.
-	*/
-	//-end-jsdoc-----------------------------------------------------------
-
-
-	function ZuluTimestamp()
-	{
-		return ( new Date() ).toISOString();
-	};
-
-
-	//---------------------------------------------------------------------
-	// Return the module exports.
-	return {
-		_Schema: Schema,
-		ZuluTimestamp: ZuluTimestamp,
-	};
-};
-
-
-/***/ }),
-
-/***/ "./src/500-Token/500-Token.js":
+/***/ "./src/500-Parse/500-Parse.js":
 /*!************************************!*\
-  !*** ./src/500-Token/500-Token.js ***!
+  !*** ./src/500-Parse/500-Parse.js ***!
   \************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
@@ -4126,7 +3542,7 @@ module.exports = function ( Liquicode )
 //---------------------------------------------------------------------
 let Schema = {
 	id: '500',
-	name: 'Token',
+	name: 'Parse',
 	type: 'namespace',
 	summary: 'Functions for tokenizing text strings.',
 };
@@ -4135,7 +3551,7 @@ let Schema = {
 //-start-jsdoc---------------------------------------------------------
 /**
  * @public
- * @namespace Token
+ * @namespace Parse
  * @summary Functions for tokenizing text strings.
 */
 //-end-jsdoc-----------------------------------------------------------
@@ -4146,8 +3562,9 @@ module.exports = function ( Liquicode )
 {
 	return {
 		_Schema: Schema,
-		TokenizeOptions: __webpack_require__( /*! ./501-Token.TokenizeOptions.js */ "./src/500-Token/501-Token.TokenizeOptions.js" )( Liquicode ).TokenizeOptions,
-		Tokenize: __webpack_require__( /*! ./502-Token.Tokenize.js */ "./src/500-Token/502-Token.Tokenize.js" )( Liquicode ).Tokenize,
+		TokenizeOptions: __webpack_require__( /*! ./501-Parse.TokenizeOptions.js */ "./src/500-Parse/501-Parse.TokenizeOptions.js" )( Liquicode ).TokenizeOptions,
+		Tokenize: __webpack_require__( /*! ./502-Parse.Tokenize.js */ "./src/500-Parse/502-Parse.Tokenize.js" )( Liquicode ).Tokenize,
+		DateParse: __webpack_require__( /*! ./510-Parse.DateParse.js */ "./src/500-Parse/510-Parse.DateParse.js" )( Liquicode ).DateParse,
 	};
 };
 
@@ -4155,9 +3572,9 @@ module.exports = function ( Liquicode )
 
 /***/ }),
 
-/***/ "./src/500-Token/501-Token.TokenizeOptions.js":
+/***/ "./src/500-Parse/501-Parse.TokenizeOptions.js":
 /*!****************************************************!*\
-  !*** ./src/500-Token/501-Token.TokenizeOptions.js ***!
+  !*** ./src/500-Parse/501-Parse.TokenizeOptions.js ***!
   \****************************************************/
 /***/ ((module) => {
 
@@ -4167,7 +3584,7 @@ module.exports = function ( Liquicode )
 //---------------------------------------------------------------------
 let Schema = {
 	id: '501',
-	member_of: 'Token',
+	member_of: 'Parse',
 	name: 'TokenizeOptions',
 	type: 'function',
 	returns: 'object',
@@ -4266,9 +3683,9 @@ module.exports = function ( Liquicode )
 
 /***/ }),
 
-/***/ "./src/500-Token/502-Token.Tokenize.js":
+/***/ "./src/500-Parse/502-Parse.Tokenize.js":
 /*!*********************************************!*\
-  !*** ./src/500-Token/502-Token.Tokenize.js ***!
+  !*** ./src/500-Parse/502-Parse.Tokenize.js ***!
   \*********************************************/
 /***/ ((module) => {
 
@@ -4278,7 +3695,7 @@ module.exports = function ( Liquicode )
 //---------------------------------------------------------------------
 let Schema = {
 	id: '502',
-	member_of: 'Token',
+	member_of: 'Parse',
 	name: 'Tokenize',
 	type: 'function',
 	returns: 'object',
@@ -4322,7 +3739,7 @@ module.exports = function ( Liquicode )
 	function Tokenize( Text, Options )
 	{
 		// Get the options.
-		let tokenize_options = Liquicode.Token.TokenizeOptions();
+		let tokenize_options = Liquicode.Parse.TokenizeOptions();
 		tokenize_options = Liquicode.Object.Merge( tokenize_options, Options );
 
 		// Tokenize the text.
@@ -4576,10 +3993,494 @@ module.exports = function ( Liquicode )
 
 /***/ }),
 
-/***/ "./src/800-File/800-File.js":
-/*!**********************************!*\
-  !*** ./src/800-File/800-File.js ***!
-  \**********************************/
+/***/ "./src/500-Parse/510-Parse.DateParse.js":
+/*!**********************************************!*\
+  !*** ./src/500-Parse/510-Parse.DateParse.js ***!
+  \**********************************************/
+/***/ ((module) => {
+
+
+
+
+//---------------------------------------------------------------------
+let _Schema = {
+	id: '011',
+	member_of: 'Parse',
+	name: 'DateParse',
+	type: 'function',
+	returns: 'object',
+	returns_summary: 'Returns a \`DateParts\` object containing Date/Time detail.',
+	description: [ `
+Dates and times are funny little creatures.
+`],
+	Parameters: {
+		Value: {
+			name: 'Value',
+			type: 'string',
+			required: true,
+		},
+		TimeZoneOffset: {
+			name: 'TimeZoneOffset',
+			type: 'string',
+			required: false,
+			default: '+0000',
+		},
+	},
+};
+
+
+//---------------------------------------------------------------------
+module.exports = function ( Liquicode )
+{
+
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function DateParse
+	 * @returns {object}
+	 * @description
+	 * 
+Dates and times are funny little creatures.
+
+	 * @param {string} Value
+	 * @param {string} [TimeZoneOffset="+0000"]
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
+	//---------------------------------------------------------------------
+	function DateParse( Value, TimeZoneOffset = '+0000' )
+	{
+		Value = Liquicode.Types.Coerce( Value ).ToString();
+
+		// Prepare and validate the date string.
+		Value = Value.toLowerCase().trim();
+		if ( !Value ) { return get_date_parts( null, TimeZoneOffset ); }
+
+		// Validate AssumeTimeZone
+		if ( !TimeZoneOffset ) { TimeZoneOffset = '+0000'; }
+		if ( !TimeZoneOffset.startsWith( '+' ) && !TimeZoneOffset.startsWith( '-' ) )
+		{
+			throw new Error( `AssumeTimeZone must begin with a plus or minus sign.` );
+		}
+		let offset = TimeZoneOffset.substr( 1 );
+		if ( ( offset.length !== 4 ) || isNaN( offset ) )
+		{
+			throw new Error( `AssumeTimeZone must have a four digit offset component.` );
+		}
+
+		let date = null;
+
+		// Try some unusual cases of compressed timestamps.
+		if ( !isNaN( Number( Value ) ) )
+		{
+			let s = Number( Value ).toString(); // Remove any noise.
+			if ( s.length == 8 )
+			{
+				// 20180329 => 2018-03-29
+				s = (
+					s.substr( 0, 4 ) + '-' +
+					s.substr( 4, 2 ) + '-' +
+					s.substr( 6, 2 ) +
+					' 00:00:00 ' + TimeZoneOffset
+				);
+			}
+			else if ( s.length == 10 )
+			{
+				// 1465241631 => 1465241631000 => Date(1465241631000)
+				s += '000'; // milliseconds
+				s = Number( s );
+			}
+			else if ( s.length == 13 )
+			{
+				// 1465241631000 => Date(1465241631000)
+				s = s; // milliseconds
+				s = Number( s );
+			}
+			else if ( s.length == 14 )
+			{
+				// 20180329074753 => 2018-03-29 07:47:53
+				s = (
+					s.substr( 0, 4 ) + '-' +
+					s.substr( 4, 2 ) + '-' +
+					s.substr( 6, 2 ) + ' ' +
+					s.substr( 8, 2 ) + ':' +
+					s.substr( 10, 2 ) + ':' +
+					s.substr( 12, 2 ) +
+					' ' + TimeZoneOffset
+				);
+			}
+
+			// Try the javascript date parsing.
+			date = new Date( s );
+			if ( !isNaN( date.getTime() ) ) { return get_date_parts( date, TimeZoneOffset ); }
+		}
+
+		// Test for ISO format: 2005-05-01T15:05:23.000Z
+		if (
+			( Value.length >= 24 )
+			&& ( Value.substr( 4, 1 ) === '-' )
+			&& ( Value.substr( 7, 1 ) === '-' )
+			&& ( Value.substr( 10, 1 ) === 't' )
+			&& ( Value.substr( 13, 1 ) === ':' )
+			&& ( Value.substr( 16, 1 ) === ':' )
+			&& ( Value.substr( 19, 1 ) === '.' )
+			&& ( Value.substr( 23, 1 ) === 'z' )
+		)
+		{
+			try { date = new Date( Value ); }
+			catch ( e ) { }
+			if ( date && !isNaN( date.getTime() ) ) { return get_date_parts( date, TimeZoneOffset ); }
+			else { return get_date_parts( null, TimeZoneOffset ); }
+		}
+
+		// Test for ISO format (short): 2005-05-01T15:05:23Z
+		if (
+			( Value.length >= 20 )
+			&& ( Value.substr( 4, 1 ) === '-' )
+			&& ( Value.substr( 7, 1 ) === '-' )
+			&& ( Value.substr( 10, 1 ) === 't' )
+			&& ( Value.substr( 13, 1 ) === ':' )
+			&& ( Value.substr( 16, 1 ) === ':' )
+			&& ( Value.substr( 19, 1 ) === 'z' )
+		)
+		{
+			try { date = new Date( Value ); }
+			catch ( e ) { }
+			if ( date && !isNaN( date.getTime() ) )
+			{ return get_date_parts( date, TimeZoneOffset ); }
+			else { return get_date_parts( null, TimeZoneOffset ); }
+		}
+
+		// We know its not a javascript supported format.
+		// We have to do it the hard way.
+		let tokens = tokenize_date( Value );
+		let symbols = tokens2symbols( tokens );
+		date = symbols2date( symbols, TimeZoneOffset );
+
+		// Return the date.
+		if ( date && !isNaN( date.getTime() ) )
+		{ return get_date_parts( date, TimeZoneOffset ); }
+		else { return get_date_parts( null, TimeZoneOffset ); }
+	};
+
+
+	//---------------------------------------------------------------------
+	const REFS =
+	{
+		day_of_week: [ 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday' ],
+		day_of_week_abbrev: [ 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun' ],
+		months: [ 'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december' ],
+		months_abbrev: [ 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec' ],
+	};
+
+
+	//---------------------------------------------------------------------
+	function tokenize_date( text )
+	{
+		let tokens = [];
+
+		// Split text into words.
+		let words = text.split( ' ' );
+
+		// Convert words to tokens.
+		words.forEach(
+			( word, word_index ) =>
+			{
+				// Remove punctuation
+				if ( word.endsWith( ',' ) ) { word = word.substr( 0, word.length - 1 ); }
+				if ( word.endsWith( '.' ) ) { word = word.substr( 0, word.length - 1 ); }
+
+				// Split up date formats
+				if ( word.includes( '/' ) )
+				{
+					let parts = word.split( '/' );
+					parts.forEach( part => tokens.push( part ) );
+				}
+				else if ( word.includes( '-' ) )
+				{
+					if ( word.startsWith( '-' ) || word.startsWith( 'utc-' ) || word.startsWith( 'gmt-' ) )
+					{
+						// Treat as a time zone offset
+						tokens.push( word );
+					}
+					else
+					{
+						// Treat as a date
+						let parts = word.split( '-' );
+						parts.forEach( part => tokens.push( part ) );
+					}
+				}
+				else if ( word.includes( ',' ) )
+				{
+					let parts = word.split( ',' );
+					parts.forEach( part => tokens.push( part ) );
+				}
+				else
+				{
+					tokens.push( word );
+				}
+			}
+		);
+
+		// Return tokens.
+		return tokens;
+	}
+
+
+	//---------------------------------------------------------------------
+	function tokens2symbols( tokens )
+	{
+		let symbols = [];
+		tokens.forEach(
+			( token, token_index ) =>
+			{
+
+				// Check for time zone.
+				if ( token.startsWith( '+' ) || token.startsWith( 'utc+' ) || token.startsWith( 'gmt+' ) )
+				{
+					symbols.push( { type: 'zone', value: token } );
+					return;
+				}
+				if ( token.startsWith( '-' ) || token.startsWith( 'utc-' ) || token.startsWith( 'gmt-' ) )
+				{
+					symbols.push( { type: 'zone', value: token } );
+					return;
+				}
+
+				// Check for universal time format.
+				if ( token.includes( ':' ) )
+				{
+					symbols.push( { type: 'time', value: token } );
+					return;
+				}
+
+				// Check for month names.
+				if ( REFS.months.includes( token ) )
+				{
+					let index = REFS.months.indexOf( token ) + 1;
+					token = '' + index;
+					if ( index < 10 ) { token = '0' + token; }
+					symbols.push( { type: 'month', value: token } );
+					return;
+				}
+				if ( REFS.months_abbrev.includes( token ) )
+				{
+					let index = REFS.months_abbrev.indexOf( token ) + 1;
+					token = '' + index;
+					if ( index < 10 ) { token = '0' + token; }
+					symbols.push( { type: 'month', value: token } );
+					return;
+				}
+
+				// Check for numeric
+				if ( !isNaN( Number( token ) ) )
+				{
+					if ( token.length <= 2 )
+					{
+						if ( token.length === 1 ) { token = '0' + token; }
+						symbols.push( { type: 'day-or-month', value: token } );
+					}
+					else if ( token.length === 4 )
+					{
+						symbols.push( { type: 'year', value: token } );
+					}
+					else
+					{
+						symbols.push( { type: 'number', value: token } );
+					}
+					return;
+				}
+				else
+				{
+					symbols.push( { type: 'text', value: token } );
+					return;
+				}
+
+			}
+		);
+
+		// Return the symbols.
+		return symbols;
+	}
+
+
+	//---------------------------------------------------------------------
+	function symbols2date( symbols, AssumeTimeZone )
+	{
+		let fields =
+		{
+			year: null,
+			month: null,
+			day: null,
+			time: null,
+			zone: null,
+		};
+
+		// The first picks out the things we are pretty sure of.
+		symbols.forEach(
+			( symbol ) =>
+			{
+				if ( symbol.type === 'year' )
+				{
+					if ( fields.year ) { return; }
+					fields.year = symbol.value;
+				}
+				else if ( symbol.type === 'month' )
+				{
+					if ( fields.month ) { return; }
+					fields.month = symbol.value;
+				}
+				else if ( symbol.type === 'time' )
+				{
+					if ( fields.time ) { return; }
+					fields.time = symbol.value;
+				}
+				else if ( symbol.type === 'zone' )
+				{
+					if ( fields.zone ) { return; }
+					fields.zone = symbol.value;
+				}
+			}
+		);
+
+		// We go again to try to determine month and day.
+		symbols.forEach(
+			( symbol ) =>
+			{
+				if ( symbol.type === 'day-or-month' )
+				{
+					if ( fields.day && fields.month ) { return; }
+					if ( fields.month )
+					{
+						fields.day = symbol.value;
+					}
+					else
+					{
+						fields.month = symbol.value;
+					}
+				}
+			}
+		);
+
+		// Validate our date fields.
+		if ( !fields.year ) { return null; }
+		if ( !fields.month ) { return null; }
+		if ( !fields.day ) { return null; }
+		if ( !fields.time ) { fields.time = '00:00:00'; }
+		if ( !fields.zone ) { fields.zone = AssumeTimeZone; }
+
+		// Try to fix timezone offsets.
+		if ( fields.zone )
+		{
+			let zone = fields.zone;
+
+			// Find the offset and direction.
+			let offset = '';
+			let sign = '';
+			let sign_index = -1;
+			// - sign
+			if ( zone.includes( '-' ) )
+			{
+				sign = '-';
+				sign_index = zone.indexOf( '-' );
+				offset = zone.substr( sign_index + 1 );
+			}
+			else if ( zone.includes( '+' ) )
+			{
+				sign = '+';
+				sign_index = zone.indexOf( '+' );
+				offset = zone.substr( sign_index + 1 );
+			}
+			else
+			{
+				sign = '+';
+				offset = zone;
+			}
+			// - offset
+			if ( offset.includes( ':' ) )
+			{
+				offset = offset.replace( ':', '' );
+			}
+			if ( offset.length > 4 ) { offset = offset.substr( 0, 4 ); } // e.g. +0500!@#
+			if ( offset.length === 1 ) { offset = `0${offset}00`; } // e.g. -5
+			else if ( offset.length === 2 ) { offset = `${offset}00`; } // e.g. -12
+			else if ( offset.length === 3 ) { offset = `0${offset}`; } // e.g. -5:30
+			// Reconstruct the zone.
+			if ( offset.length === 4 )
+			{
+				fields.zone = `${sign}${offset}`;
+			}
+			else
+			{
+				fields.zone = AssumeTimeZone;
+			}
+		}
+
+		// Convert what we have with javascript date parsing.
+		let text = `${fields.year}-${fields.month}-${fields.day} ${fields.time} ${fields.zone}`;
+		let date = null;
+		try { date = new Date( text ); }
+		catch ( e ) { }
+		return date;
+	}
+
+
+	//---------------------------------------------------------------------
+	function get_date_parts( JsDate, TimeZoneOffset = '+0000' )
+	{
+		let datetime_parts =
+		{
+			date: null,
+			year: 0,
+			month_num: 0,
+			month_name: '',
+			day_of_month: 0,
+			day_of_week: 0,
+			day_name: '',
+			hours: 0,
+			minutes: 0,
+			seconds: 0,
+			milliseconds: 0,
+			timezone_offset: ''
+		};
+		if ( !JsDate ) { return datetime_parts; }
+		if ( isNaN( JsDate.getTime() ) ) { return datetime_parts; }
+
+		datetime_parts.date = new Date( JsDate.getTime() );
+		datetime_parts.year = datetime_parts.date.getFullYear();
+		datetime_parts.month_num = datetime_parts.date.getMonth();
+		datetime_parts.month_name = REFS.months[ datetime_parts.month_num ];
+		datetime_parts.day_of_month = datetime_parts.date.getDate();
+		datetime_parts.day_of_week = datetime_parts.date.getDay();
+		if ( datetime_parts.day_of_week === 0 ) { datetime_parts.day_of_week = 7; }
+		datetime_parts.day_name = REFS.day_of_week[ datetime_parts.day_of_week - 1 ];
+		datetime_parts.hours = datetime_parts.date.getHours();
+		datetime_parts.minutes = datetime_parts.date.getMinutes();
+		datetime_parts.seconds = datetime_parts.date.getSeconds();
+		datetime_parts.milliseconds = datetime_parts.date.getMilliseconds();
+		datetime_parts.timezone_offset = TimeZoneOffset;
+
+		return datetime_parts;
+	}
+
+
+	//---------------------------------------------------------------------
+	// Return the module exports.
+	return {
+		_Schema: _Schema,
+		DateParse: DateParse,
+	};
+};
+
+
+/***/ }),
+
+/***/ "./src/800-System/800-System.js":
+/*!**************************************!*\
+  !*** ./src/800-System/800-System.js ***!
+  \**************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 
@@ -4588,17 +4489,17 @@ module.exports = function ( Liquicode )
 //---------------------------------------------------------------------
 let Schema = {
 	id: '800',
-	name: 'File',
+	name: 'System',
 	type: 'namespace',
-	summary: 'Functions for manipulating files. (nodejs only)',
+	summary: 'File system and process functions. (nodejs only)',
 };
 
 
 //-start-jsdoc---------------------------------------------------------
 /**
  * @public
- * @namespace File
- * @summary Functions for manipulating files. (nodejs only)
+ * @namespace System
+ * @summary File system and process functions. (nodejs only)
 */
 //-end-jsdoc-----------------------------------------------------------
 
@@ -4608,21 +4509,28 @@ module.exports = function ( Liquicode )
 {
 	return {
 		_Schema: Schema,
-		Visit: __webpack_require__( /*! ./810-File.Visit.js */ "./src/800-File/810-File.Visit.js" )( Liquicode ).Visit,
-		CountFiles: __webpack_require__( /*! ./811-File.CountFiles.js */ "./src/800-File/811-File.CountFiles.js" )( Liquicode ).CountFiles,
-		CountFolders: __webpack_require__( /*! ./812-File.CountFolders.js */ "./src/800-File/812-File.CountFolders.js" )( Liquicode ).CountFolders,
-		CopyFolder: __webpack_require__( /*! ./813-File.CopyFolder.js */ "./src/800-File/813-File.CopyFolder.js" )( Liquicode ).CopyFolder,
-		DeleteFolder: __webpack_require__( /*! ./814-File.DeleteFolder.js */ "./src/800-File/814-File.DeleteFolder.js" )( Liquicode ).DeleteFolder,
+
+		// File System
+		VisitFiles: __webpack_require__( /*! ./810-System.VisitFiles.js */ "./src/800-System/810-System.VisitFiles.js" )( Liquicode ).VisitFiles,
+		CountFiles: __webpack_require__( /*! ./811-System.CountFiles.js */ "./src/800-System/811-System.CountFiles.js" )( Liquicode ).CountFiles,
+		CountFolders: __webpack_require__( /*! ./812-System.CountFolders.js */ "./src/800-System/812-System.CountFolders.js" )( Liquicode ).CountFolders,
+		CopyFolder: __webpack_require__( /*! ./813-System.CopyFolder.js */ "./src/800-System/813-System.CopyFolder.js" )( Liquicode ).CopyFolder,
+		DeleteFolder: __webpack_require__( /*! ./814-System.DeleteFolder.js */ "./src/800-System/814-System.DeleteFolder.js" )( Liquicode ).DeleteFolder,
+
+		// Process
+		AsyncSleep: __webpack_require__( /*! ./820-System.AsyncSleep.js */ "./src/800-System/820-System.AsyncSleep.js" )( Liquicode ).AsyncSleep,
+		AsyncExecute: __webpack_require__( /*! ./821-System.AsyncExecute.js */ "./src/800-System/821-System.AsyncExecute.js" )( Liquicode ).AsyncExecute,
+
 	};
 };
 
 
 /***/ }),
 
-/***/ "./src/800-File/810-File.Visit.js":
-/*!****************************************!*\
-  !*** ./src/800-File/810-File.Visit.js ***!
-  \****************************************/
+/***/ "./src/800-System/810-System.VisitFiles.js":
+/*!*************************************************!*\
+  !*** ./src/800-System/810-System.VisitFiles.js ***!
+  \*************************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 
@@ -4631,8 +4539,8 @@ module.exports = function ( Liquicode )
 //---------------------------------------------------------------------
 let _Schema = {
 	id: '810',
-	member_of: 'File',
-	name: 'Visit',
+	member_of: 'System',
+	name: 'VisitFiles',
 	type: 'function',
 	returns: 'number',
 	description: [
@@ -4675,7 +4583,7 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function Visit
+	 * @function VisitFiles
 	 * @returns {number}
 	 * @description
 	 * Scans a folder and calls the Visitor callback function for each folder/file encountered.
@@ -4692,12 +4600,12 @@ module.exports = function ( Liquicode )
 	const LIB_PATH = __webpack_require__( /*! path */ "path" );
 
 
-	function Visit( StartFolder, FilePattern, Recurse, Visitor ) 
+	function VisitFiles( StartFolder, FilePattern, Recurse, Visitor ) 
 	{
-		StartFolder = Liquicode.Schema.ValidateValue( StartFolder, _Schema.Parameters.StartFolder, { coerce_values: true, throw_errors: true } );
-		FilePattern = Liquicode.Schema.ValidateValue( FilePattern, _Schema.Parameters.FilePattern, { coerce_values: true, throw_errors: true } );
-		Recurse = Liquicode.Schema.ValidateValue( Recurse, _Schema.Parameters.Recurse, { coerce_values: true, throw_errors: true } );
-		// Visitor = Liquicode.Schema.ValidateValue( Visitor, Schema.Parameters.Visitor , { coerce_values: true, throw_errors: true });
+		StartFolder = Liquicode.Types.Coerce( StartFolder ).ToString();
+		FilePattern = Liquicode.Types.Coerce( FilePattern ).ToString();
+		Recurse = Liquicode.Types.Coerce( Recurse ).ToBoolean();
+		// Visitor = Liquicode.Types.Coerce( Visitor, Schema.Parameters.Visitor , { coerce_values: true, throw_errors: true });
 
 		if ( !LIB_FS.existsSync( StartFolder ) ) { return; }
 		let count = 0;
@@ -4731,7 +4639,7 @@ module.exports = function ( Liquicode )
 				}
 				if ( Recurse )
 				{
-					count += Visit( from_path, FilePattern, Recurse, Visitor );
+					count += VisitFiles( from_path, FilePattern, Recurse, Visitor );
 				}
 			}
 		}
@@ -4743,17 +4651,17 @@ module.exports = function ( Liquicode )
 	// Return the module exports.
 	return {
 		_Schema: _Schema,
-		Visit: Visit,
+		VisitFiles: VisitFiles,
 	};
 };
 
 
 /***/ }),
 
-/***/ "./src/800-File/811-File.CountFiles.js":
-/*!*********************************************!*\
-  !*** ./src/800-File/811-File.CountFiles.js ***!
-  \*********************************************/
+/***/ "./src/800-System/811-System.CountFiles.js":
+/*!*************************************************!*\
+  !*** ./src/800-System/811-System.CountFiles.js ***!
+  \*************************************************/
 /***/ ((module) => {
 
 
@@ -4762,7 +4670,7 @@ module.exports = function ( Liquicode )
 //---------------------------------------------------------------------
 let _Schema = {
 	id: '811',
-	member_of: 'File',
+	member_of: 'System',
 	name: 'CountFiles',
 	type: 'function',
 	returns: 'number',
@@ -4814,11 +4722,11 @@ module.exports = function ( Liquicode )
 
 	function CountFiles( StartFolder, FilePattern, Recurse ) 
 	{
-		StartFolder = Liquicode.Schema.ValidateValue( StartFolder, _Schema.Parameters.StartFolder , { coerce_values: true, throw_errors: true });
-		FilePattern = Liquicode.Schema.ValidateValue( FilePattern, _Schema.Parameters.FilePattern, { coerce_values: true, throw_errors: true } );
-		Recurse = Liquicode.Schema.ValidateValue( Recurse, _Schema.Parameters.Recurse , { coerce_values: true, throw_errors: true });
+		StartFolder = Liquicode.Types.Coerce( StartFolder ).ToString();
+		FilePattern = Liquicode.Types.Coerce( FilePattern ).ToString();
+		Recurse = Liquicode.Types.Coerce( Recurse ).ToBoolean();
 
-		let count = Liquicode.File.Visit( StartFolder, FilePattern, Recurse );
+		let count = Liquicode.System.VisitFiles( StartFolder, FilePattern, Recurse );
 		return count;
 	}
 
@@ -4834,10 +4742,10 @@ module.exports = function ( Liquicode )
 
 /***/ }),
 
-/***/ "./src/800-File/812-File.CountFolders.js":
-/*!***********************************************!*\
-  !*** ./src/800-File/812-File.CountFolders.js ***!
-  \***********************************************/
+/***/ "./src/800-System/812-System.CountFolders.js":
+/*!***************************************************!*\
+  !*** ./src/800-System/812-System.CountFolders.js ***!
+  \***************************************************/
 /***/ ((module) => {
 
 
@@ -4846,7 +4754,7 @@ module.exports = function ( Liquicode )
 //---------------------------------------------------------------------
 let _Schema = {
 	id: '812',
-	member_of: 'File',
+	member_of: 'System',
 	name: 'CountFolders',
 	type: 'function',
 	returns: 'number',
@@ -4891,11 +4799,11 @@ module.exports = function ( Liquicode )
 
 	function CountFolders( StartFolder, Recurse ) 
 	{
-		StartFolder = Liquicode.Schema.ValidateValue( StartFolder, _Schema.Parameters.StartFolder, { coerce_values: true, throw_errors: true } );
-		Recurse = Liquicode.Schema.ValidateValue( Recurse, _Schema.Parameters.Recurse , { coerce_values: true, throw_errors: true });
+		StartFolder = Liquicode.Types.Coerce( StartFolder ).ToString();
+		Recurse = Liquicode.Types.Coerce( Recurse ).ToBoolean();
 
 		let folder_count = 0;
-		Liquicode.File.Visit( StartFolder, '', Recurse,
+		Liquicode.System.VisitFiles( StartFolder, '', Recurse,
 			function ( Folder, Filename )
 			{
 				if ( Folder && !Filename )
@@ -4918,10 +4826,10 @@ module.exports = function ( Liquicode )
 
 /***/ }),
 
-/***/ "./src/800-File/813-File.CopyFolder.js":
-/*!*********************************************!*\
-  !*** ./src/800-File/813-File.CopyFolder.js ***!
-  \*********************************************/
+/***/ "./src/800-System/813-System.CopyFolder.js":
+/*!*************************************************!*\
+  !*** ./src/800-System/813-System.CopyFolder.js ***!
+  \*************************************************/
 /***/ ((module) => {
 
 
@@ -4930,7 +4838,7 @@ module.exports = function ( Liquicode )
 //---------------------------------------------------------------------
 let _Schema = {
 	id: '813',
-	member_of: 'File',
+	member_of: 'System',
 	name: 'CopyFolder',
 	type: 'function',
 	returns: 'number',
@@ -4995,11 +4903,11 @@ module.exports = function ( Liquicode )
 
 	function CopyFolder( FromFolder, ToFolder, FilePattern, Overwrite, Recurse ) 
 	{
-		FromFolder = Liquicode.Schema.ValidateValue( FromFolder, _Schema.Parameters.FromFolder, { coerce_values: true, throw_errors: true } );
-		ToFolder = Liquicode.Schema.ValidateValue( ToFolder, _Schema.Parameters.ToFolder, { coerce_values: true, throw_errors: true } );
-		FilePattern = Liquicode.Schema.ValidateValue( FilePattern, _Schema.Parameters.FilePattern, { coerce_values: true, throw_errors: true } );
-		Overwrite = Liquicode.Schema.ValidateValue( Overwrite, _Schema.Parameters.Overwrite , { coerce_values: true, throw_errors: true });
-		Recurse = Liquicode.Schema.ValidateValue( Recurse, _Schema.Parameters.Recurse , { coerce_values: true, throw_errors: true });
+		FromFolder = Liquicode.Types.Coerce( FromFolder ).ToString();
+		ToFolder = Liquicode.Types.Coerce( ToFolder ).ToString();
+		FilePattern = Liquicode.Types.Coerce( FilePattern ).ToString();
+		Overwrite = Liquicode.Types.Coerce( Overwrite ).ToBoolean();
+		Recurse = Liquicode.Types.Coerce( Recurse ).ToBoolean();
 
 		if ( !LIB_FS.existsSync( FromFolder ) ) { return 0; }
 		LIB_FS.mkdirSync( ToFolder, { recursive: true } );
@@ -5038,10 +4946,10 @@ module.exports = function ( Liquicode )
 
 /***/ }),
 
-/***/ "./src/800-File/814-File.DeleteFolder.js":
-/*!***********************************************!*\
-  !*** ./src/800-File/814-File.DeleteFolder.js ***!
-  \***********************************************/
+/***/ "./src/800-System/814-System.DeleteFolder.js":
+/*!***************************************************!*\
+  !*** ./src/800-System/814-System.DeleteFolder.js ***!
+  \***************************************************/
 /***/ ((module) => {
 
 
@@ -5050,7 +4958,7 @@ module.exports = function ( Liquicode )
 //---------------------------------------------------------------------
 let _Schema = {
 	id: '814',
-	member_of: 'File',
+	member_of: 'System',
 	name: 'DeleteFolder',
 	type: 'function',
 	returns: 'number',
@@ -5101,9 +5009,8 @@ module.exports = function ( Liquicode )
 
 	function DeleteFolder( Folder, Recurse ) 
 	{
-		Folder = Liquicode.Schema.ValidateValue( Folder, _Schema.Parameters.Folder, { coerce_values: true, throw_errors: true } );
-		FilePattern = Liquicode.Schema.ValidateValue( FilePattern, _Schema.Parameters.FilePattern, { coerce_values: true, throw_errors: true } );
-		Recurse = Liquicode.Schema.ValidateValue( Recurse, _Schema.Parameters.Recurse , { coerce_values: true, throw_errors: true });
+		Folder = Liquicode.Types.Coerce( Folder ).ToString();
+		Recurse = Liquicode.Types.Coerce( Recurse ).ToBoolean();
 
 		if ( !LIB_FS.existsSync( Folder ) ) { return 0; }
 		let count = 0;
@@ -5143,10 +5050,157 @@ module.exports = function ( Liquicode )
 
 /***/ }),
 
-/***/ "./src/900-Net/900-Net.js":
-/*!********************************!*\
-  !*** ./src/900-Net/900-Net.js ***!
-  \********************************/
+/***/ "./src/800-System/820-System.AsyncSleep.js":
+/*!*************************************************!*\
+  !*** ./src/800-System/820-System.AsyncSleep.js ***!
+  \*************************************************/
+/***/ ((module) => {
+
+
+
+
+//---------------------------------------------------------------------
+let _Schema = {
+	id: '820',
+	member_of: 'System',
+	name: 'AsyncSleep',
+	type: 'function',
+	// returns: 'number',
+	description: ``,
+	Parameters: {
+		Milliseconds: {
+			name: 'Milliseconds',
+			type: 'number',
+			format: 'integer',
+			// required: true,
+		},
+	},
+};
+
+
+//---------------------------------------------------------------------
+module.exports = function ( Liquicode )
+{
+
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function AsyncSleep
+	 * @param {number} [Milliseconds]
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
+	function AsyncSleep( Milliseconds ) 
+	{
+		Milliseconds = Liquicode.Types.Coerce( Milliseconds ).ToNumber();
+
+		return new Promise( resolve => setTimeout( resolve, Milliseconds ) );
+	}
+
+
+	//---------------------------------------------------------------------
+	// Return the module exports.
+	return {
+		_Schema: _Schema,
+		AsyncSleep: AsyncSleep,
+	};
+};
+
+
+/***/ }),
+
+/***/ "./src/800-System/821-System.AsyncExecute.js":
+/*!***************************************************!*\
+  !*** ./src/800-System/821-System.AsyncExecute.js ***!
+  \***************************************************/
+/***/ ((module) => {
+
+
+
+
+//---------------------------------------------------------------------
+let _Schema = {
+	id: '821',
+	member_of: 'System',
+	name: 'AsyncExecute',
+	type: 'function',
+	// returns: 'number',
+	description: ``,
+	Parameters: {
+		Milliseconds: {
+			name: 'Milliseconds',
+			type: 'number',
+			format: 'integer',
+			// required: true,
+		},
+	},
+};
+
+
+//---------------------------------------------------------------------
+module.exports = function ( Liquicode )
+{
+
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function AsyncExecute
+	 * @param {number} [Milliseconds]
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
+	function AsyncExecute( Command, Environment, StartFolder ) 
+	{
+		// Milliseconds = Liquicode.Types.Coerce( Milliseconds, _Schema.Parameters.Milliseconds, true );
+
+
+		//---------------------------------------------------------------------
+		function execute( Command, Environment )
+		{
+			console.log( `Executing: ${Command}` );
+			LIB_CHILD_PROCESS.execSync( Command, {
+				env: Environment,
+			},
+				( error, stdout, stderror ) =>
+				{
+					// if any error while executing
+					if ( error )
+					{
+						console.error( "Error: ", error );
+						return;
+					}
+
+					console.log( stdout ); // output from stdout
+					console.error( stderror ); // std errors
+				}
+			);
+			return;
+		}
+
+
+		// return new Promise( resolve => setTimeout( resolve, Milliseconds ) );
+	}
+
+
+	//---------------------------------------------------------------------
+	// Return the module exports.
+	return {
+		_Schema: _Schema,
+		AsyncExecute: AsyncExecute,
+	};
+};
+
+
+/***/ }),
+
+/***/ "./src/900-Network/900-Network.js":
+/*!****************************************!*\
+  !*** ./src/900-Network/900-Network.js ***!
+  \****************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 
@@ -5157,7 +5211,7 @@ module.exports = function ( Liquicode )
 //---------------------------------------------------------------------
 let _Schema = {
 	id: '900',
-	name: 'Net',
+	name: 'Network',
 	type: 'namespace',
 	summary: 'Functions for working with networks. (nodejs only)',
 };
@@ -5166,7 +5220,7 @@ let _Schema = {
 //-start-jsdoc---------------------------------------------------------
 /**
  * @public
- * @namespace Net
+ * @namespace Network
  * @summary Functions for working with networks. (nodejs only)
 */
 //-end-jsdoc-----------------------------------------------------------
@@ -5177,18 +5231,18 @@ module.exports = function ( Liquicode )
 {
 	return {
 		_Schema: _Schema,
-		AsyncDownloadFile: __webpack_require__( /*! ./910-Net.AsyncDownloadFile.js */ "./src/900-Net/910-Net.AsyncDownloadFile.js" )( Liquicode ).AsyncDownloadFile,
-		AsyncGetRequest: __webpack_require__( /*! ./920-Net.AsyncGetRequest.js */ "./src/900-Net/920-Net.AsyncGetRequest.js" )( Liquicode ).AsyncGetRequest,
+		AsyncDownloadFile: __webpack_require__( /*! ./910-Network.AsyncDownloadFile.js */ "./src/900-Network/910-Network.AsyncDownloadFile.js" )( Liquicode ).AsyncDownloadFile,
+		AsyncGetRequest: __webpack_require__( /*! ./920-Network.AsyncGetRequest.js */ "./src/900-Network/920-Network.AsyncGetRequest.js" )( Liquicode ).AsyncGetRequest,
 	};
 };
 
 
 /***/ }),
 
-/***/ "./src/900-Net/910-Net.AsyncDownloadFile.js":
-/*!**************************************************!*\
-  !*** ./src/900-Net/910-Net.AsyncDownloadFile.js ***!
-  \**************************************************/
+/***/ "./src/900-Network/910-Network.AsyncDownloadFile.js":
+/*!**********************************************************!*\
+  !*** ./src/900-Network/910-Network.AsyncDownloadFile.js ***!
+  \**********************************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 
@@ -5197,7 +5251,7 @@ module.exports = function ( Liquicode )
 //---------------------------------------------------------------------
 let Schema = {
 	id: '910',
-	member_of: 'Net',
+	member_of: 'Network',
 	name: 'AsyncDownloadFile',
 	type: 'function',
 	returns: 'string',
@@ -5272,10 +5326,10 @@ module.exports = function ( Liquicode )
 
 /***/ }),
 
-/***/ "./src/900-Net/920-Net.AsyncGetRequest.js":
-/*!************************************************!*\
-  !*** ./src/900-Net/920-Net.AsyncGetRequest.js ***!
-  \************************************************/
+/***/ "./src/900-Network/920-Network.AsyncGetRequest.js":
+/*!********************************************************!*\
+  !*** ./src/900-Network/920-Network.AsyncGetRequest.js ***!
+  \********************************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 
@@ -5284,7 +5338,7 @@ module.exports = function ( Liquicode )
 //---------------------------------------------------------------------
 let Schema = {
 	id: '920',
-	member_of: 'Net',
+	member_of: 'Network',
 	name: 'AsyncGetRequest',
 	type: 'function',
 	returns: 'string',
@@ -5375,21 +5429,19 @@ var Liquicode = {};
 Liquicode.version = 'v0.0.1';
 Liquicode.environment = 'node';
 
-Liquicode.Schema = __webpack_require__( /*! ./000-Schema/000-Schema.js */ "./src/000-Schema/000-Schema.js" )( Liquicode );
+Liquicode.Types = __webpack_require__( /*! ./000-Types/000-Types.js */ "./src/000-Types/000-Types.js" )( Liquicode );
 Liquicode.Object = __webpack_require__( /*! ./100-Object/100-Object.js */ "./src/100-Object/100-Object.js" )( Liquicode );
 Liquicode.Text = __webpack_require__( /*! ./200-Text/200-Text.js */ "./src/200-Text/200-Text.js" )( Liquicode );
-Liquicode.Date = __webpack_require__( /*! ./400-Date/400-Date.js */ "./src/400-Date/400-Date.js" )( Liquicode );
-Liquicode.Token = __webpack_require__( /*! ./500-Token/500-Token.js */ "./src/500-Token/500-Token.js" )( Liquicode );
-Liquicode.File = __webpack_require__( /*! ./800-File/800-File.js */ "./src/800-File/800-File.js" )( Liquicode );
-Liquicode.Net = __webpack_require__( /*! ./900-Net/900-Net.js */ "./src/900-Net/900-Net.js" )( Liquicode );
+Liquicode.Parse = __webpack_require__( /*! ./500-Parse/500-Parse.js */ "./src/500-Parse/500-Parse.js" )( Liquicode );
+Liquicode.System = __webpack_require__( /*! ./800-System/800-System.js */ "./src/800-System/800-System.js" )( Liquicode );
+Liquicode.Network = __webpack_require__( /*! ./900-Network/900-Network.js */ "./src/900-Network/900-Network.js" )( Liquicode );
 
-delete Liquicode.Schema._Schema;
+delete Liquicode.Types._Schema;
 delete Liquicode.Object._Schema;
 delete Liquicode.Text._Schema;
-delete Liquicode.Date._Schema;
-delete Liquicode.Token._Schema;
-delete Liquicode.File._Schema;
-delete Liquicode.Net._Schema;
+delete Liquicode.Parse._Schema;
+delete Liquicode.System._Schema;
+delete Liquicode.Network._Schema;
 
 
 module.exports = Liquicode;

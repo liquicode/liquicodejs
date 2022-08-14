@@ -47,13 +47,11 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function Matches
+	 * @function ReplaceText
 	 * @returns {string}
-	 * @description
-	 * Matches the text against a wildcard-lik pattern.
-	 * Returns true If the match succeeds, otherwise false.
 	 * @param {string} Text
-	 * @param {string} Pattern
+	 * @param {string} SearchText
+	 * @param {string} ReplacementText
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 

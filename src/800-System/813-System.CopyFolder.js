@@ -4,7 +4,7 @@
 //---------------------------------------------------------------------
 let _Schema = {
 	id: '813',
-	member_of: 'File',
+	member_of: 'System',
 	name: 'CopyFolder',
 	type: 'function',
 	returns: 'number',

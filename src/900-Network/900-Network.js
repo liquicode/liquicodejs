@@ -6,7 +6,7 @@
 //---------------------------------------------------------------------
 let _Schema = {
 	id: '900',
-	name: 'Net',
+	name: 'Network',
 	type: 'namespace',
 	summary: 'Functions for working with networks. (nodejs only)',
 };
@@ -15,7 +15,7 @@ let _Schema = {
 //-start-jsdoc---------------------------------------------------------
 /**
  * @public
- * @namespace Net
+ * @namespace Network
  * @summary Functions for working with networks. (nodejs only)
 */
 //-end-jsdoc-----------------------------------------------------------
@@ -26,7 +26,7 @@ module.exports = function ( Liquicode )
 {
 	return {
 		_Schema: _Schema,
-		AsyncDownloadFile: require( './910-Net.AsyncDownloadFile.js' )( Liquicode ).AsyncDownloadFile,
-		AsyncGetRequest: require( './920-Net.AsyncGetRequest.js' )( Liquicode ).AsyncGetRequest,
+		AsyncDownloadFile: require( './910-Network.AsyncDownloadFile.js' )( Liquicode ).AsyncDownloadFile,
+		AsyncGetRequest: require( './920-Network.AsyncGetRequest.js' )( Liquicode ).AsyncGetRequest,
 	};
 };

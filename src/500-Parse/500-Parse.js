@@ -13,7 +13,7 @@ let Schema = {
 //-start-jsdoc---------------------------------------------------------
 /**
  * @public
- * @namespace Token
+ * @namespace Parse
  * @summary Functions for tokenizing text strings.
 */
 //-end-jsdoc-----------------------------------------------------------

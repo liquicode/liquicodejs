@@ -3,19 +3,13 @@
 
 //---------------------------------------------------------------------
 let Schema = {
-	id: '920',
-	member_of: 'Net',
-	name: 'AsyncGetRequest',
+	id: '910',
+	member_of: 'Network',
+	name: 'AsyncDownloadFile',
 	type: 'function',
 	returns: 'string',
-	description: `Make an http get request for a an url.`,
-	Parameters: {
-		Url: {
-			name: 'Url',
-			type: 'string',
-			required: true,
-		},
-	},
+	description: `Download a file from an url.`,
+	Parameters: {},
 };
 
 
@@ -27,11 +21,10 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function AsyncGetRequest
+	 * @function AsyncDownloadFile
 	 * @returns {string}
 	 * @description
-	 * Make an http get request for a an url.
-	 * @param {string} Url
+	 * Download a file from an url.
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 
@@ -40,12 +33,12 @@ module.exports = function ( Liquicode )
 	const LIB_HTTPS = require( 'https' );
 
 
-	function AsyncGetRequest( Url )
+	function AsyncDownloadFile( Url, Filename )
 	{
 		let http_engine = null;
 		if ( Url.toLowerCase().startsWith( 'http:' ) ) { http_engine = LIB_HTTP; }
 		else if ( Url.toLowerCase().startsWith( 'https:' ) ) { http_engine = LIB_HTTPS; }
-		else { throw new Error( `Unsupported protocol. Must be http or https.` ); }
+		else { throw new Error( `Unsupported protocol. Must be either http or https.` ); }
 
 		return new Promise(
 			( resolve, reject ) =>
@@ -56,10 +49,15 @@ module.exports = function ( Liquicode )
 						Url,
 						function ( response ) 
 						{
-							response.on( 'data', data =>
-							{
-								resolve( data );
-							} );
+							const file_stream = LIB_FS.createWriteStream( Filename );
+							response.pipe( file_stream );
+							file_stream.on(
+								'finish',
+								function ()
+								{
+									file_stream.close();
+									resolve( true );
+								} );
 						} );
 				}
 				catch ( error )
@@ -74,6 +72,6 @@ module.exports = function ( Liquicode )
 	// Return the module exports.
 	return {
 		_Schema: Schema,
-		AsyncGetRequest: AsyncGetRequest,
+		AsyncDownloadFile: AsyncDownloadFile,
 	};
 };

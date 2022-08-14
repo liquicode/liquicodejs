@@ -11,15 +11,94 @@ let _Schema = {
 	returns_description: 'An array of \`SchemaFormat\` objects.',
 	summary: 'Returns an array of \`SchemaFormat\` objects used to convert values between different formats.',
 	description: `
-`,
-	Parameters: {
-		// Value: {
-		// 	name: 'Value',
-		// 	type: '*',
-		// 	required: false,
-		// 	description: 'The value to coerce. This value is set to \`Coercion.value\`.',
-		// },
+Returns the library's internal array of format objects, \`Types.Formats\`.
+
+Each format has a \`type\` and \`format\` string, and an \`IsFormat( Value )\` function.
+This list of formats is used by the \`Types.GetFormat()\` and \`Types.IsFormat()\` functions.
+
+Applications can ammend this array in order to customize type processing or add new formats.
+The structure of each format in the array is:
+~~~javascript
+{
+	type: '',    // The Javascript data type. e.g. 'boolean', 'number', 'string', 'object'
+	format: '',  // A type specific format. e.g. 'integer', 'date'. 
+	IsFormat: function ( Value )
+	{
+		return true;  // Return true, if Value is of this format.
+	}
+}
+~~~
+
+For example, here is the format object for \`"string:string"\`:
+~~~javascript
+{
+	type: 'string',
+	format: 'string',
+	IsFormat: function ( Value )
+	{
+		if ( typeof Value !== 'string' ) { return false; }
+		return true;
 	},
+},
+~~~
+
+You have the ability to directly modify the \`Types.Formats\` array.
+
+For example, suppose you want to define two new formats to detect objects of 'object:person' and 'object:employee'.
+~~~javascript
+Person = {
+	first_name: '',
+	last_name: '',
+}
+Employee = {
+	first_name: '',
+	last_name: '',
+	title: '',
+}
+~~~
+
+The format objects might look something like this:
+~~~javascript
+object_person = {
+	type: 'object',
+	format: 'person',
+	IsFormat: function( Value )
+	{
+		if ( typeof Value !== 'object' ) { return false; }
+		if ( !Value ) { return false; }
+		if ( !Value.first_name ) { return false; }
+		if ( !Value.last_name ) { return false; }
+		return true;
+	},
+},
+object_employee = {
+	type: 'object',
+	format: 'employee',
+	IsFormat: function( Value )
+	{
+		if ( typeof Value !== 'object' ) { return false; }
+		if ( !Value ) { return false; }
+		if ( !Value.first_name ) { return false; }
+		if ( !Value.last_name ) { return false; }
+		if ( !Value.title ) { return false; }
+		return true;
+	},
+},
+~~~
+
+And tou can add them to the \`Types.Formats\` array:
+~~~javascript
+let formats = Liquicode.Types.Formats();
+formats.push( object_person );
+formats.push( object_employee );
+~~~
+
+The \`Types.GetFormat()\` function reads the formats array in reverse order when matching a value to a format.
+This is done so that more complex types will not get "short-circuited" by less complex types.
+The more complex format in this case is "object:employee" and should appear after "object:person" in the array.
+
+`,
+	Parameters: {},
 	todo: [],
 };
 
@@ -30,6 +109,102 @@ module.exports = function ( Liquicode )
 
 
 	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @name Formats
+	 * @returns {object}
+	 * An array of `SchemaFormat` objects.
+	 * @summary Returns an array of `SchemaFormat` objects used to convert values between different formats.
+	 * @description
+	 * 
+Returns the library's internal array of format objects, `Types.Formats`.
+
+Each format has a `type` and `format` string, and an `IsFormat( Value )` function.
+This list of formats is used by the `Types.GetFormat()` and `Types.IsFormat()` functions.
+
+Applications can ammend this array in order to customize type processing or add new formats.
+The structure of each format in the array is:
+~~~javascript
+{
+	type: '',    // The Javascript data type. e.g. 'boolean', 'number', 'string', 'object'
+	format: '',  // A type specific format. e.g. 'integer', 'date'. 
+	IsFormat: function ( Value )
+	{
+		return true;  // Return true, if Value is of this format.
+	}
+}
+~~~
+
+For example, here is the format object for `"string:string"`:
+~~~javascript
+{
+	type: 'string',
+	format: 'string',
+	IsFormat: function ( Value )
+	{
+		if ( typeof Value !== 'string' ) { return false; }
+		return true;
+	},
+},
+~~~
+
+You have the ability to directly modify the `Types.Formats` array.
+
+For example, suppose you want to define two new formats to detect objects of 'object:person' and 'object:employee'.
+~~~javascript
+Person = {
+	first_name: '',
+	last_name: '',
+}
+Employee = {
+	first_name: '',
+	last_name: '',
+	title: '',
+}
+~~~
+
+The format objects might look something like this:
+~~~javascript
+object_person = {
+	type: 'object',
+	format: 'person',
+	IsFormat: function( Value )
+	{
+		if ( typeof Value !== 'object' ) { return false; }
+		if ( !Value ) { return false; }
+		if ( !Value.first_name ) { return false; }
+		if ( !Value.last_name ) { return false; }
+		return true;
+	},
+},
+object_employee = {
+	type: 'object',
+	format: 'employee',
+	IsFormat: function( Value )
+	{
+		if ( typeof Value !== 'object' ) { return false; }
+		if ( !Value ) { return false; }
+		if ( !Value.first_name ) { return false; }
+		if ( !Value.last_name ) { return false; }
+		if ( !Value.title ) { return false; }
+		return true;
+	},
+},
+~~~
+
+And tou can add them to the `Types.Formats` array:
+~~~javascript
+let formats = Liquicode.Types.Formats();
+formats.push( object_person );
+formats.push( object_employee );
+~~~
+
+The `Types.GetFormat()` function reads the formats array in reverse order when matching a value to a format.
+This is done so that more complex types will not get "short-circuited" by less complex types.
+The more complex format in this case is "object:employee" and should appear after "object:person" in the array.
+
+
+	*/
 	//-end-jsdoc-----------------------------------------------------------
 
 

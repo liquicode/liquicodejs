@@ -4,7 +4,7 @@
 //---------------------------------------------------------------------
 let _Schema = {
 	id: '814',
-	member_of: 'File',
+	member_of: 'System',
 	name: 'DeleteFolder',
 	type: 'function',
 	returns: 'number',

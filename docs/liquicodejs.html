@@ -20,7 +20,7 @@
 <body>
   <script>window.Locals = {};
 window.Locals.VersionNumber = "0.0.1";
-window.Locals.Schemas = [{"id":"000","name":"Schema","type":"namespace","summary":"Data value and type handling","description":["\n\n**The FieldSchema Object**\n\n~~~javascript\nFieldSchema = {\n\ttype: '',\t\t\t\t// Javascript data type (boolean, number, string, object).\n\tformat: '',\t\t\t\t// A data type specific designation.\n\tdefault: undefined,\t\t// A default value used for missing fields.\n\tname: '',\t\t\t\t// Name of the field.\n}\n~~~\n\nLiquicodeJS can classify and identify value types beyond the primitive data types supported by Javascript.\nWhen obtaining FieldSchema objects from `Schema.ValueSchema()` or `Schema.ObjectSchema()`,\n`FieldSchema.type` will contain the Javascript data type and `FieldSchema.format` will have a more specific type description.\n\nPossible values for \"FieldSchema.type\" and \"FieldSchema.format\" are as follows:\n\n| Type    | Format        | Default Value | Examples                          |\n|---------|---------------|---------------|-----------------------------------|\n| boolean | boolean       | false         | true, or false                    |\n| number  | integer       | 0             | 1, 2, or 3.0                      |\n| number  | float         | 0             | 1.1, 2.071, or 3.14               |\n| string  | string        | \"\"            | Hello', or ''                     |\n| object  | object        | {}            | { foo: 'bar' }                    |\n| object  | array         | []            | [ 1, 'two', 3.14, null ]          |\n| object  | boolean-array | []            | [ true, false, true ]             |\n| object  | number-array  | []            | [ 1, 2, 3.14 ]                    |\n| object  | string-array  | []            | [ 'one', 'two', 'three' ]         |\n| object  | object-array  | []            | [ { foo: 'bar' }, [1,2,3], null ] |\n| object  | array-array   | []            | [ [1,2,3], [], [4,5] ]            |\n","\n**The ErrorValue Object**\n\n~~~javascript\nErrorValue = {\n\tok: false,\t\t// Always set to \"false\".\n\terror: '',\t\t// Error message.\n\tcontext: '',\t// Context for the error (e.g. a function name).\n}\n~~~\n\nLiquicodeJS introduces an \"ErrorValue\" object that it can use to indicate errors.\nSome functions will optionally return an \"ErrorValue\" object instead of throwing a Javascript Error.\nIn some cases, this can make code more efficient and legible when certain errors are tolerable\nand you want to avoid the expensive cost of a Javascript Error that includes a call stack.\n\nUse the \"Schema.ErrorValue()\" function to create ErrorValue objects and \"Schema.IsErrorValue()\" to test for errors.\nAn ErrorValue will always have \"ErrorValue.ok = false\" and \"ErrorValue.error\" equal to a string.\n","\n**Value Coercion**\n\nThe functions \"Schema.CoerceValue()\", \"Schema.ValidateValue()\", and \"Schema.ValidateObject()\" can optionally coerce values\nfrom their given type to the types specified in Schema.\n\nThis tables describes how values are converted from one data type to another during coercion:\n\n| From Type | To Boolean     | To Number      | To String        | To Object      |\n|-----------|----------------|----------------|------------------|----------------|\n| undefined | DefaultValue() | DefaultValue() | DefaultValue()   | DefaultValue() |\n| null      | DefaultValue() | DefaultValue() | DefaultValue()   | DefaultValue() |\n| Boolean   | Value          | Number()       | toString()       | ErrorValue     |\n| Number    | Boolean()      | Value          | toString()       | ErrorValue     |\n| String    | Boolean()      | Number()       | Value            | JSON.parse()   |\n| Object    | Boolean()      | Number()       | JSON.stringify() | Value          |\n","\n**Object Schema and Validation**\n\nThe functions \"Schema.ObjectSchema()\" and \"Schema.ValidateObject()\" take these concepts to the next level and\nprovides schemas functionality on an object level rather than an individual value level.\n","\n**Additional References**\n\n- [You Don't Know JS: Types & Grammar - Chapter 4. Coercion](https://www.oreilly.com/library/view/you-dont-know/9781491905159/ch04.html)\n"],"examples":["Schema = { name: 'PersonName', type: 'string' }","Schema = { name: 'options', type: 'object', default: { hoist: true, swab: 'decks' } }","Schema = { name: 'max_tries', type: 'number', format: 'integer', required: true, default: 3 }"],"todo":["Support extended number formats: positive-integer, negative-integer, positive-float, negative-float","Support type: function","Support format plugin-ins. Must implement: get_default(), is_type_of(value), can_coerce(type), coerce(value)"],"source_filename":"000-Schema\\000-Schema.js"},{"id":"010","member_of":"Schema","name":"ErrorValue","type":"function","returns":"object","returns_description":"An ErrorValue object.","summary":"Returns an ErrorValue object containing error information.","description":[""],"Parameters":{"Message":{"name":"Message","type":"string","required":false,"default":"error","description":"The error message."},"Context":{"name":"Context","type":"string","required":false,"description":"Context for the error (e.g. a function name)."}},"todo":[],"source_filename":"000-Schema\\010-Schema.ErrorValue.js"},{"id":"011","member_of":"Schema","name":"IsErrorValue","type":"function","returns":"boolean","returns_description":"True if Value is an ErrorValue object, otherwise false.","summary":"Tests if a Value is an ErrorValue object.","description":"","Parameters":{"Value":{"name":"Value","type":"object","required":false,"description":"The value to test."}},"todo":[],"source_filename":"000-Schema\\011-Schema.IsErrorValue.js"},{"id":"020","member_of":"Schema","name":"ValueSchema","type":"function","returns":"object","returns_description":"A FieldSchema object.","summary":"Returns a FieldSchema based upon a specific value.","description":["\nThis function is used to obtain extended type information about a value.\nWhile it does return an entire FieldSchema object, only the \"FieldSchema.type\" and \"FieldSchema.format\" fields are set.\n"],"Parameters":{"Value":{"name":"Value","type":"*","required":false,"description":"The value to infer a schema from."}},"todo":[],"source_filename":"000-Schema\\020-Schema.ValueSchema.js"},{"id":"021","member_of":"Schema","name":"DefaultValue","type":"function","returns":"*","returns_description":"The default value.","summary":"Returns the default value for the FieldSchema.","description":"\nIf the FieldSchema specifies a default value, then that value will be returned.\nOtherwise, a default value is calculated based upon the type and format of the FieldSchema.\n\n| Type    | Format        | Default\n|---------|---------------|-----------\n| boolean | -             | false\n| number  | integer       | 0\n| number  | float         | 0\n| string  | -             | ''\n| object  | -             | {}\n| object  | array         | []\n| object  | boolean-array | []\n| object  | number-array  | []\n| object  | string-array  | []\n| object  | object-array  | []\n","Parameters":{"Schema":{"name":"Schema","type":"object","required":true,"description":"The schema to use when calculating a default value."},"ThrowErrors":{"name":"ThrowErrors","type":"boolean","required":false,"default":false,"description":"Errors are thrown if true, otherwise an ErrorValue object is returned."}},"source_filename":"000-Schema\\021-Schema.DefaultValue.js"},{"id":"022","member_of":"Schema","name":"CoerceValue","type":"function","returns":"*","returns_description":"The coerced value or an error object.","summary":"Attempt to coerce the Value parameter to match the Schema's type.","description":"\n\nThis function uses the Schema to coerce the Value to a particular data type.\n\nIf the \"Schema.type\" === \"*\", then no validation or coercion is performed and the Value is returned.\nIf the \"Schema.type\" === \"function\", then no validation or coercion is performed and the Value is returned.\n\nIf Value is \"undefined\" or \"null\", then the default value for \"FieldSchema.type\" will be returned.\nThis is done by calling \"Schema.DefaultValue()\" for the FieldSchema.\n\n\"Schema.ValueSchema()\" is called the get the schema for Value, which is then compared against the expected Schema.\n\n\t","Parameters":{"Value":{"name":"Value","type":"*","required":true,"description":["The value to coerce."]},"Schema":{"name":"Schema","type":"object","required":true,"description":"The schema to use when coercing Value."},"ThrowErrors":{"name":"ThrowErrors","type":"boolean","required":false,"default":false,"description":"Errors are thrown if true, otherwise an ErrorValue object is returned."}},"source_filename":"000-Schema\\022-Schema.CoerceValue.js"},{"id":"023","member_of":"Schema","name":"ValidateValue","type":"function","returns":"*","returns_description":"The validated/coerced Value or an ErrorValue object.","summary":"Validates a field value according to a schema and optionally coerces the value to match.","description":"\n\nThis function uses \"Schema.type\", \"Schema.format\", \"Schema.required', and \"Schema.default\" to validate the given Value.\n\nIf \"Options.coerce = true\", then an attempt will be made to coerce the given value to match the type and format specified in the FieldSchema.\n(See: \"Schema.CoerceValue()\")\n\n\t","Parameters":{"Value":{"name":"Value","type":"*","required":true,"description":["The value to validate."]},"Schema":{"name":"Schema","type":"object","required":true,"description":"The FieldSchema object to validate against.","examples":["{ name: 'Name', type: 'string' }","{ name: 'options', type: 'object', default: { hoist: true, swab: 'decks' } }","{ name: 'max_tries', type: 'number', format: 'integer', required: true, default: 3 }"]},"Options":{"name":"Options","type":"object","required":false,"default":"{ coerce: false, throw_errors: false, context: null }","description":"An options object to control validation:\n~~~javascript\nOptions = {\n\tcoerce_values: false,\t// Attempt to coerce the provided value to match the schema's type.\n\tthrow_errors: false,\t// When true, throw an error validation errors are encountered.\n\tcontext: null,\t\t\t// A context name (function name) to include in any error messages.\n}\n~~~"}},"source_filename":"000-Schema\\023-Schema.ValidateValue.js"},{"id":"030","member_of":"Schema","name":"ObjectSchema","type":"function","returns":"object","returns_description":"An array of FieldSchema.","summary":"Returns an array of FieldSchema describing the top-most members of \"FromObject\".","description":"","Parameters":{"FromObject":{"name":"FromObject","type":"object","required":true,"description":"An object to retrieve the schema for."}},"todo":[],"source_filename":"000-Schema\\030-Schema.ObjectSchema.js"},{"id":"031","member_of":"Schema","name":"ValidateValues","type":"function","returns":"object","returns_description":"An object containing the validation result.","summary":"Validate a set of values against an array of FieldSchema.","description":"\n\nTakes an array of Values and an array of FieldSchema to validate a number of fields at once.\nThis function does not throw validation errors.\nInstead, all validation errors are returned to the caller in the return value.\nAdditionally, the number of fields processed and a set of coerced values is also returned.\n\n**The Return Value**\n\n~~~javascript\nReturnValue = {\n\tfield_count: 0,\t\t\t\t// The number of fields processed.\n\tvalidation_errors: [],\t\t// All validation errors encountered.\n\tcoerced_values: [],\t\t\t// An array of coerced values.\n}\n~~~\n","Parameters":{"Values":{"name":"Values","type":"object","required":true,"description":"The values to validate. This can be an array of values, or an object described by Schemas."},"Schemas":{"name":"Schemas","type":"object","required":true,"description":"An array of FieldSchemas to validate the Values with. Can also be an object whose top-most fields are instances of FieldSchema."}},"todo":[],"source_filename":"000-Schema\\031-Schema.ValidateValues.js"},{"id":"100","name":"Object","type":"namespace","summary":"Functions for manipulating Javascript objects.","source_filename":"100-Object\\100-Object.js"},{"id":"101","member_of":"Object","name":"Clone","type":"function","returns":"string","description":["Returns a clone of the given object.","This is equivalent to doing A = JSON.parse( JSON.stringify( B ) )."],"Parameters":{"From":{"name":"From","type":"object","default":{}}},"source_filename":"100-Object\\101-Object.Clone.js"},{"id":"103","member_of":"Object","name":"Merge","type":"function","returns":"object","description":"","Parameters":{"Original":{"name":"Original","type":"object","required":true},"Updates":{"name":"Updates","type":"object","required":false}},"source_filename":"100-Object\\103-Object.Merge.js"},{"id":"110","member_of":"Object","name":"Traverse","type":"function","returns":"string","description":"\n\nTraverses and calls a visitor callback function for each field in an object.\nThis functions recurses through sub-objects and traverses the entire object.\n\n","Parameters":{"Root":{"name":"Root","type":"object","required":true},"Visitor":{"name":"Visitor","type":"function","required":true}},"source_filename":"100-Object\\110-Object.Traverse.js"},{"id":"111","member_of":"Object","name":"HasPath","type":"function","returns":"boolean","description":"","Parameters":{"Root":{"name":"Root","type":"object","required":true},"Path":{"name":"Path","type":"string","required":true}},"source_filename":"100-Object\\111-Object.HasPath.js"},{"id":"112","member_of":"Object","name":"FindField","type":"function","returns":"string","description":"","Parameters":{"Root":{"name":"Root","type":"object","required":true},"Name":{"name":"Name","type":"string","required":true}},"source_filename":"100-Object\\112-Object.FindField.js"},{"id":"113","member_of":"Object","name":"FindValue","type":"function","returns":"string","summary":"Locate a value stored within an object.","description":"","Parameters":{"Root":{"name":"Root","type":"object","required":true},"Value":{"name":"Value","type":"*","required":true,"description":"The value to search for. This must be primitive data type (boolean, number, or string)."}},"source_filename":"100-Object\\113-Object.FindValue.js"},{"id":"114","member_of":"Object","name":"GetValue","type":"function","returns":"*","description":"","Parameters":{"Root":{"name":"Root","type":"object","required":true},"Path":{"name":"Path","type":"string","required":true}},"source_filename":"100-Object\\114-Object.GetValue.js"},{"id":"115","member_of":"Object","name":"SetValue","type":"function","returns":"*","description":"","Parameters":{"Root":{"name":"Root","type":"object","required":true},"Path":{"name":"Path","type":"string","required":true},"Value":{"name":"Value","type":"*","required":true}},"source_filename":"100-Object\\115-Object.SetValue.js"},{"id":"120","member_of":"Object","name":"FromJson","type":"function","returns":"object","description":"\nParse a Json string and return an object value.\nThis is identical Javascript's \"JSON.parse()\" function.\n\nThere are some significant differences from Javascript's version.\nThe parser is a bit more relaxed and allows:\n- Identifiers are not required to have quotes.\n- A comma can appear after the last element of an array or object.\n- String literals can use either single or double quotes.\n- Parsing automatically stops when the closing brace or bracket is found in the json string.\n\n","Parameters":{"JsonString":{"name":"JsonString","type":"string"}},"source_filename":"100-Object\\120-Object.FromJson.js"},{"id":"121","member_of":"Object","name":"ToJsonOptions","type":"function","returns":"object","description":"\n","Parameters":{"PresetName":{"name":"PresetName","type":"string"}},"source_filename":"100-Object\\121-Object.ToJsonOptions.js"},{"id":"122","member_of":"Object","name":"ToJson","type":"function","returns":"object","description":"\n","Parameters":{"Value":{"name":"Value","type":"*","description":"The value to convert to a json string."},"JsonOptions":{"name":"JsonOptions","type":"object|string","description":"Can be an options object or the name of an options preset (\"default\", \"pretty\", or \"pretty-2\")"}},"source_filename":"100-Object\\122-Object.ToJson.js"},{"id":"125","member_of":"Object","name":"FromIni","type":"function","returns":"object","description":"\nParse an Ini string and return an object value.\n\n","Parameters":{"IniString":{"name":"IniString","type":"string"}},"source_filename":"100-Object\\125-Object.FromIni.js"},{"id":"126","member_of":"Object","name":"ToIni","type":"function","returns":"object","description":"\nParse an Ini string and return an object value.\n\n","Parameters":{"Value":{"name":"Value","type":"object"}},"source_filename":"100-Object\\126-Object.ToIni.js"},{"id":"200","name":"Text","type":"namespace","summary":"Functions for text parsing and manipulation.","source_filename":"200-Text\\200-Text.js"},{"id":"201","member_of":"Text","name":"Compare","type":"function","returns":"string","description":["Compares two strings.","Returns a `-1` if `StringA` is less than `StringB`.","Returns a `1` if `StringA` is greater than than `StringB`.","Returns a `0` if `StringA` and `StringB` are the same."],"Parameters":{"StringA":{"name":"StringA","type":"string","default":""},"StringB":{"name":"StringB","type":"string","default":""},"CaseSensitive":{"name":"CaseSensitive","type":"boolean","default":true}},"source_filename":"200-Text\\202-Text.Compare.js"},{"id":"203","member_of":"Text","name":"Matches","type":"function","returns":"string","description":["Matches the text against a wildcard-lik pattern.","Returns true If the match succeeds, otherwise false."],"Parameters":{"Text":{"name":"Text","type":"string","required":true,"default":""},"Pattern":{"name":"Pattern","type":"string","required":true,"default":""}},"source_filename":"200-Text\\203-Text.Matches.js"},{"id":"210","member_of":"Text","name":"ReplaceCharacters","type":"function","returns":"string","description":["Replaces characters within a string.","Returns the modified string."],"Parameters":{"Text":{"name":"Text","type":"string","required":true,"default":""},"SearchCharacters":{"name":"SearchCharacters","type":"string","required":true,"default":""},"ReplacementText":{"name":"ReplacementText","type":"string","required":true,"default":""},"MaxTimes":{"name":"MaxTimes","type":"number","format":"integer","required":false,"default":-1}},"source_filename":"200-Text\\210-Text.ReplaceCharacters.js"},{"id":"211","member_of":"Text","name":"ReplaceText","type":"function","returns":"string","description":"","Parameters":{"Text":{"name":"Text","type":"string","required":true,"default":""},"SearchText":{"name":"SearchText","type":"string","required":true,"default":""},"ReplacementText":{"name":"ReplacementText","type":"string","required":true,"default":""}},"source_filename":"200-Text\\211-Text.ReplaceText.js"},{"id":"220","member_of":"Text","name":"FirstWord","type":"function","returns":"string","description":["Returns the first word of a text phrase."],"Parameters":{"Phrase":{"name":"Phrase","type":"string","required":false,"default":"","description":"A text phrase containing words separated by delimiters."},"Delimiters":{"name":"Delimiters","type":"string","required":false,"default":" ","description":"A string of whitespace and punctuation characters that break the phrase into words."}},"source_filename":"200-Text\\220-Text.FirstWord.js"},{"id":"221","member_of":"Text","name":"AfterFirstWord","type":"function","returns":"string","description":["Returns the remainder of a text phrase occurring after the first word."],"Parameters":{"Phrase":{"name":"Phrase","type":"string","required":false,"default":"","description":"A text phrase containing words separated by delimiters."},"Delimiters":{"name":"Delimiters","type":"string","required":false,"default":" ","description":"A string of characters that break the phrase into words."}},"source_filename":"200-Text\\221-Text.AfterFirstWord.js"},{"id":"222","member_of":"Text","name":"LastWord","type":"function","returns":"string","description":["Returns the last word of a text phrase."],"Parameters":{"Phrase":{"name":"Phrase","type":"string","required":false,"default":"","description":"A text phrase containing words separated by delimiters."},"Delimiters":{"name":"Delimiters","type":"string","required":false,"default":" ","description":"A string of characters that break the phrase into words."}},"source_filename":"200-Text\\222-Text.LastWord.js"},{"id":"223","member_of":"Text","name":"BeforeLastWord","type":"function","returns":"string","description":["Returns the remainder of a text phrase occurring befiore the last word."],"Parameters":{"Phrase":{"name":"Phrase","type":"string","required":false,"default":"","description":"A text phrase containing words separated by delimiters."},"Delimiters":{"name":"Delimiters","type":"string","required":false,"default":" ","description":"A string of characters that break the phrase into words."}},"source_filename":"200-Text\\223-Text.BeforeLastWord.js"},{"id":"300","name":"Json","type":"namespace","summary":"Functions for manipulating Json.","source_filename":"300-Json\\300-Json.js"},{"id":"400","name":"Date","type":"namespace","summary":"Functions for manipulating dates.","source_filename":"400-Date\\400-Date.js"},{"id":"401","member_of":"Date","name":"Parse","type":"function","returns":"object","description":["Converts a string to a date-time value.","Returns a `date_time_parts` structure."],"Parameters":{"Text":{"name":"Text","type":"string","required":true},"TimeZoneOffset":{"name":"TimeZoneOffset","type":"function","required":false,"default":"+0000"}},"source_filename":"400-Date\\401-Date.Parse.js"},{"id":"410","member_of":"Date","name":"ZuluTimestamp","type":"function","returns":"string","description":["Returns the current date and time as a string."],"Parameters":{},"source_filename":"400-Date\\410-Date.ZuluTimestamp.js"},{"id":"500","name":"Token","type":"namespace","summary":"Functions for tokenizing text strings.","source_filename":"500-Token\\500-Token.js"},{"id":"501","member_of":"Token","name":"TokenizeOptions","type":"function","returns":"object","description":["Returns a set of options for calling Tokenize().","Throws an error if an invalid value for PresetName is given."],"Parameters":{"Text":{"name":"PresetName","type":"string","required":false,"default":"","description":["To retrieve an options preset, use one of: 'csv', or 'cli'","You can leave this empty or 'default' for the default options."]}},"source_filename":"500-Token\\501-Token.TokenizeOptions.js"},{"id":"502","member_of":"Token","name":"Tokenize","type":"function","returns":"object","description":["Returns the parsed tokens."],"Parameters":{"Text":{"name":"PresetName","type":"string","required":false,"default":"","description":["To retrieve an options preset, use one of: 'csv', or 'cli'","You can leave this empty for the default options."]}},"source_filename":"500-Token\\502-Token.Tokenize.js"},{"id":"800","name":"File","type":"namespace","summary":"Functions for manipulating files. (nodejs only)","source_filename":"800-File\\800-File.js"},{"id":"810","member_of":"File","name":"Visit","type":"function","returns":"number","description":["Scans a folder and calls the Visitor callback function for each folder/file encountered.","Returns the number of folders/files visited."],"Parameters":{"StartFolder":{"name":"StartFolder","type":"string","required":true},"FilePattern":{"name":"FilePattern","type":"string","required":false,"default":""},"Recurse":{"name":"Recurse","type":"boolean","required":false,"default":false},"Visitor":{"name":"Visitor","type":"function","required":false,"default":null}},"source_filename":"800-File\\810-File.Visit.js"},{"id":"811","member_of":"File","name":"CountFiles","type":"function","returns":"number","description":["Scans a folder and calls the Visitor callback function for each folder/file encountered.","Returns the number of folders/files visited."],"Parameters":{"StartFolder":{"name":"StartFolder","type":"string","required":true},"FilePattern":{"name":"FilePattern","type":"string","required":false,"default":"*"},"Recurse":{"name":"Recurse","type":"boolean","required":false,"default":false}},"source_filename":"800-File\\811-File.CountFiles.js"},{"id":"812","member_of":"File","name":"CountFolders","type":"function","returns":"number","description":["Scans a folder and calls the Visitor callback function for each folder/file encountered.","Returns the number of folders/files visited."],"Parameters":{"StartFolder":{"name":"StartFolder","type":"string","required":true},"Recurse":{"name":"Recurse","type":"boolean","required":false,"default":false}},"source_filename":"800-File\\812-File.CountFolders.js"},{"id":"813","member_of":"File","name":"CopyFolder","type":"function","returns":"number","description":["Copies files from one folder to another.","Returns the number of files copied."],"Parameters":{"FromFolder":{"name":"FromFolder","type":"string","required":true},"ToFolder":{"name":"ToFolder","type":"string","required":true},"FilePattern":{"name":"FilePattern","type":"string","required":false,"default":"*"},"Overwrite":{"name":"Overwrite","type":"boolean","required":false,"default":false},"Recurse":{"name":"Recurse","type":"boolean","required":false,"default":false}},"source_filename":"800-File\\813-File.CopyFolder.js"},{"id":"814","member_of":"File","name":"DeleteFolder","type":"function","returns":"number","description":["Deletes a folder and all of its sub-folders and files.","Returns the number of folders and files deleted."],"Parameters":{"Folder":{"name":"Folder","type":"string","required":true},"Recurse":{"name":"Recurse","type":"boolean","required":false,"default":false}},"source_filename":"800-File\\814-File.DeleteFolder.js"},{"id":"820","member_of":"OS","name":"AsyncSleep","type":"function","description":"","Parameters":{"Milliseconds":{"name":"Milliseconds","type":"number","format":"integer"}},"source_filename":"800-File\\820-OS.AsyncSleep.js"},{"id":"821","member_of":"OS","name":"AsyncExecute","type":"function","description":"","Parameters":{"Milliseconds":{"name":"Milliseconds","type":"number","format":"integer"}},"source_filename":"800-File\\821-OS.AsyncExecute.js"},{"id":"900","name":"Net","type":"namespace","summary":"Functions for working with networks. (nodejs only)","source_filename":"900-Net\\900-Net.js"},{"id":"910","member_of":"Net","name":"AsyncDownloadFile","type":"function","returns":"string","description":"Download a file from an url.","Parameters":{},"source_filename":"900-Net\\910-Net.AsyncDownloadFile.js"},{"id":"920","member_of":"Net","name":"AsyncGetRequest","type":"function","returns":"string","description":"Make an http get request for a an url.","Parameters":{"Url":{"name":"Url","type":"string","required":true}},"source_filename":"900-Net\\920-Net.AsyncGetRequest.js"}];
+window.Locals.Schemas = [{"id":"000","name":"Types","type":"namespace","summary":"Data Type Handling","description":["\nLiquicodeJS can classify and identify value types beyond the primitive data types supported by Javascript.\n\n\nWhen obtaining FieldSchema objects from `Schema.ValueSchema()` or `Schema.ObjectSchema()`,\n`FieldSchema.type` will contain the Javascript data type and `FieldSchema.format` will have a more specific type description.\n\nJavascript (and JSON) offers four data types for your variable values: `boolean`, `number`, `string`,\nand everything else is essentially an `object`.\nThis suits Javascript well for the types of things that Javascript needs to do like storing values in memory\nand executing program statements with those values.\nThis is not always great on an application level though.\nWhen you need to, for example, make sure that a variable contains an `array` of `string` or that value represents a floating point number.\nCases like these require additional progrma statements and type checking which can be consolidated into a set of functions.\n\nThe `Schema` module defines a few objects and functions to alleviate this burden from the application developer.\n\n**The FieldSchema Object**\n\nThis object describes a value (or field) with greater precision then Javascript's `typeof` statement.\nThe `FieldSchema.type` member will always contain a Javascript data type while the `FieldSchema.format` field contains a more\ndetailed data type.\n\n~~~javascript\nFieldSchema = {\n\ttype: '',\t\t\t\t// Javascript data type (boolean, number, string, or object).\n\tformat: '',\t\t\t\t// A data type specific designation.\n\tdefault: undefined,\t\t// A default value used for missing fields.\n\tname: '',\t\t\t\t// Name of the field.\n}\n~~~\n\nThese functions will generate a `FieldSchema` from a single value or an object.\nBe aware that only the top level members of an object are scrutinized as this is what we are typically interested in most cases.\nFunctions of the `Schema` module do not recurse into an object providing the schema for every single field in the object.\nRather, they inspect the top level of objects only and return an array of schema objects as a result.\nAgain, this handles most use cases with a consistent set of functions.\nAny further validation/coercion that may be required can also be perfomed by the same functions on an individual case basis.\n\n- `Schema.ValueSchema( FromValue )`\n- `Schema.ObjectSchema( FromObject )`\n\nPossible values for `FieldSchema.type` and `FieldSchema.format` are as follows:\n\n| Type    | Format        | Default Value | Examples                              |\n|---------|---------------|---------------|---------------------------------------|\n| boolean | boolean       | false         | `true`, or `false`                |\n| number  | integer       | 0             | `1`, `2`, or `3.0`              |\n| number  | float         | 0             | `1.1`, `2.071`, or `3.14`       |\n| string  | string        | \"\"            | `\"Hello\"`, or `\"\"`                |\n| object  | object        | {}            | `{ foo: 'bar' }`                    |\n| object  | array         | []            | `[ 1, 'two', 3.14, null ]`          |\n| object  | boolean-array | []            | `[ true, false, true ]`             |\n| object  | number-array  | []            | `[ 1, 2, 3.14 ]`                    |\n| object  | string-array  | []            | `[ 'one', 'two', 'three' ]`         |\n| object  | object-array  | []            | `[ { foo: 'bar' }, [1,2,3], null ]` |\n| object  | array-array   | []            | `[ [1,2,3], [], [4,5] ]`            |\n","\n\n**The ErrorValue Object**\n\nLiquicodeJS introduces an `ErrorValue` object that is used to indicate and convey errors.\nSome functions will return an `ErrorValue` object instead of throwing a Javascript `Error`.\nIn some cases, this can make code more efficient and legible when certain errors are tolerable\nand you want to avoid the expensive cost of a Javascript `Error` that includes a call stack.\n\nUse the `Schema.ErrorValue()` function to create an `ErrorValue` object and `Schema.IsErrorValue()` to test for errors.\nAn `ErrorValue` will always have `ErrorValue.ok = false` and `ErrorValue.error` will contain the error message.\n\n~~~javascript\nErrorValue = {\n\tok: false,\t\t// Always set to \"false\".\n\terror: '',\t\t// Error message.\n\tcontext: '',\t// Context for the error (e.g. a function name).\n}\n~~~\n","\n\n**Value Coercion**\n\nAs data gets shuttled around between memory, files, and network transmissions, the representation of the data might\nchange to suit to the medium.\nFor example, an integer value being stored in a file might be read back out later as a string.\nIt's actual value hasn't changed, but the way it is represented has changed.\nJavascript can be pretty forgiving in these cases by allowing a certain amount of type fluidity;\nHowever, this can also cause some difficult to spot errors like when `'2' + 2` equals the string `'22'` and not the integer `4`.\n\nUse these functions the validate that a value's type is of an expected type and to coerce the value, in a common sense way,\nto that expected type.\n\n- `Types.Coerce( Value, Schema, ThrowErrors )`\n- `Types.Coerce( Value, Schema, ThrowErrors )`\n- `Types.Coerces( Values, Schemas, ThrowErrors )`\n\nThis tables describes how values are converted from one data type to another during coercion:\n\n| From Type | To Boolean     | To Number      | To String        | To Object      |\n|-----------|----------------|----------------|------------------|----------------|\n| undefined | DefaultValue() | DefaultValue() | DefaultValue()   | DefaultValue() |\n| null      | DefaultValue() | DefaultValue() | DefaultValue()   | DefaultValue() |\n| Boolean   | Value          | Number()       | toString()       | ErrorValue     |\n| Number    | Boolean()      | Value          | toString()       | ErrorValue     |\n| String    | Boolean()      | Number()       | Value            | JSON.parse()   |\n| Object    | Boolean()      | Number()       | JSON.stringify() | Value          |\n","\n\n**Related Reading**\n\n- [You Don't Know JS: Types & Grammar - Chapter 4. Coercion](https://www.oreilly.com/library/view/you-dont-know/9781491905159/ch04.html)\n"],"examples":["Schema = { name: 'PersonName', type: 'string' }","Schema = { name: 'options', type: 'object', default: { hoist: true, swab: 'decks' } }","Schema = { name: 'max_tries', type: 'number', format: 'integer', required: true, default: 3 }"],"todo":["Support extended number formats: positive-integer, negative-integer, positive-float, negative-float","Support type: function","Support format plugin-ins. Must implement: get_default(), is_type_of(value), can_coerce(type), coerce(value)"],"source_filename":"000-Types\\000-Types.js"},{"id":"010","member_of":"Types","name":"Coerce","type":"function","returns":"object","returns_description":"A `Coercion` object.","summary":"Returns a `Coercion` object which is used to coerce values to different types.","description":"\nThe returned `Coercion` object has a single member `Coercion.value` and a number of coercion functions:\n\n- `ToBoolean( Default = false )` :\n\tReturns the boolean value of `Coercion.value`.\n\tAnything can be coerced to a boolean.\n\tIf value is a string, then 'false' and '0' will return false while 'true' will return true.\n\n- `ToNumber( Default = 0 )` :\n\tReturns the numeric value of `Coercion.value`.\n\tBooleans, other numbers, and numeric strings can be coerced to a number.\n\n- `ToString( Default = '' )` :\n\tReturns the string value of `Coercion.value`.\n\tAnything can be coerced to a string.\n\tIf value is an object, then it is JSON stringified and returned.\n\n- `ToObject( Default = null )` :\n\tReturns the object value of `Coercion.value`.\n\tOnly JSON strings and other objects can be coerced to an object.\n\tIf value is a JSON string, then it is JSON parsed and returned.\n\n`Coercion.value` is set to the Value parameter.\n\n**Usage**\n\nThere are two ways to use the `Coercion` object.\n\nOne way is to immediately call one of the coercion functions after obtaining the `Coercion` object:\n~~~javascript\nlet number_42 = LiquicodeJS.Schema.Coerce( '42' ).ToNumber();\n~~~\n\nAnother way is to reuse the `Coercion` object and alter the `Coercion.value` property yourself:\n~~~javascript\nlet coercion = LiquicodeJS.Schema.Coerce();\ncoercion.value = '42';\nlet number_42 = coercion.ToNumber();\n~~~\n\n**Examples**\n\n~~~javascript\n// Coercing to boolean\nSchema.Coerce( null ).ToBoolean()           // = false\nSchema.Coerce( 0 ).ToBoolean()              // = false\nSchema.Coerce( 'true' ).ToBoolean()         // = true\n\n// Coercing to number\nSchema.Coerce( null ).ToNumber()            // = 0\nSchema.Coerce( '3.14' ).ToNumber()          // = 3.14\nSchema.Coerce( 'foo' ).ToNumber()           // = 0\n\n// Coercing to string\nSchema.Coerce( null ).ToString()            // = ''\nSchema.Coerce( '3.14' ).ToString()          // = '3.14'\nSchema.Coerce( { foo: 'bar' } ).ToString()  // = '{\"foo\":\"bar\"}'\n\n// Coercing to object\nSchema.Coerce( null ).ToObject()            // = null\nSchema.Coerce( 3.14 ).ToObject()            // = null\nSchema.Coerce( '{\"foo\":\"bar\"}' ).ToObject() // = { foo: 'bar' }\n\n// Coercing with a Default\nSchema.Coerce( 'Hello' ).ToNumber( -1 )     // = -1\nSchema.Coerce( true ).ToObject( {} )        // = {}\nSchema.Coerce( 1024 ).ToObject( {} )        // = {}\nSchema.Coerce( null ).ToObject( { a: 1 } )  // = { a: 1 }\nSchema.Coerce( null ).ToObject( [ 1, 2 ] )  // = [ 1, 2 ]\n~~~\n","Parameters":{"Value":{"name":"Value","type":"*","required":false,"description":"The value to coerce. This value is set to `Coercion.value`."}},"todo":[],"source_filename":"000-Types\\010-Types.Coerce.js"},{"id":"020","member_of":"Types","name":"Formats","source_type":"function","returns":"object","returns_description":"An array of `SchemaFormat` objects.","summary":"Returns an array of `SchemaFormat` objects used to convert values between different formats.","description":"\nReturns the library's internal array of format objects, `Types.Formats`.\n\nEach format has a `type` and `format` string, and an `IsFormat( Value )` function.\nThis list of formats is used by the `Types.GetFormat()` and `Types.IsFormat()` functions.\n\nApplications can ammend this array in order to customize type processing or add new formats.\nThe structure of each format in the array is:\n~~~javascript\n{\n\ttype: '',    // The Javascript data type. e.g. 'boolean', 'number', 'string', 'object'\n\tformat: '',  // A type specific format. e.g. 'integer', 'date'. \n\tIsFormat: function ( Value )\n\t{\n\t\treturn true;  // Return true, if Value is of this format.\n\t}\n}\n~~~\n\nFor example, here is the format object for `\"string:string\"`:\n~~~javascript\n{\n\ttype: 'string',\n\tformat: 'string',\n\tIsFormat: function ( Value )\n\t{\n\t\tif ( typeof Value !== 'string' ) { return false; }\n\t\treturn true;\n\t},\n},\n~~~\n\nYou have the ability to directly modify the `Types.Formats` array.\n\nFor example, suppose you want to define two new formats to detect objects of 'object:person' and 'object:employee'.\n~~~javascript\nPerson = {\n\tfirst_name: '',\n\tlast_name: '',\n}\nEmployee = {\n\tfirst_name: '',\n\tlast_name: '',\n\ttitle: '',\n}\n~~~\n\nThe format objects might look something like this:\n~~~javascript\nobject_person = {\n\ttype: 'object',\n\tformat: 'person',\n\tIsFormat: function( Value )\n\t{\n\t\tif ( typeof Value !== 'object' ) { return false; }\n\t\tif ( !Value ) { return false; }\n\t\tif ( !Value.first_name ) { return false; }\n\t\tif ( !Value.last_name ) { return false; }\n\t\treturn true;\n\t},\n},\nobject_employee = {\n\ttype: 'object',\n\tformat: 'employee',\n\tIsFormat: function( Value )\n\t{\n\t\tif ( typeof Value !== 'object' ) { return false; }\n\t\tif ( !Value ) { return false; }\n\t\tif ( !Value.first_name ) { return false; }\n\t\tif ( !Value.last_name ) { return false; }\n\t\tif ( !Value.title ) { return false; }\n\t\treturn true;\n\t},\n},\n~~~\n\nAnd tou can add them to the `Types.Formats` array:\n~~~javascript\nlet formats = LiquicodeJS.Types.Formats();\nformats.push( object_person );\nformats.push( object_employee );\n~~~\n\nThe `Types.GetFormat()` function reads the formats array in reverse order when matching a value to a format.\nThis is done so that more complex types will not get \"short-circuited\" by less complex types.\nThe more complex format in this case is \"object:employee\" and should appear after \"object:person\" in the array.\n\n","Parameters":{},"todo":[],"source_filename":"000-Types\\020-Types.Formats.js"},{"id":"021","member_of":"Types","name":"GetFormat","type":"function","returns":"string","returns_description":"An extended type description.","summary":"Determine the type and format of a value.","description":"\nIterates through `Types.Formats` in reverse order and calls each `Format.IsFormat()` function.\nWhen one of the formats returns `true`, then it's type and format are returned separated by `:`.\n\n**Examples**\n\n~~~javascript\nLiquicodeJS.Types.GetFormat( '42' )         // = 'number:integer'\nLiquicodeJS.Types.GetFormat( 'Hello' )      // = 'string:string'\nLiquicodeJS.Types.GetFormat( new Date() )   // = 'object:datetime'\nLiquicodeJS.Types.GetFormat( [ 1, 2, 3 ] )  // = 'object:number-array'\n~~~\n","Parameters":{"Value":{"name":"Value","type":"*","required":true,"description":"The value to get the format for."}},"todo":[],"source_filename":"000-Types\\021-Types.GetFormat.js"},{"id":"022","member_of":"Types","name":"IsFormat","type":"function","returns":"boolean","returns_description":"True if the value matches the format.","summary":"Determine if a value is of a particular format.","description":"\nLooks up the specified format in `Types.Formats` and calls the `Format.IsFormat()` function.\n\nThe `Format` parameter must specify both type and format to be tested for.\n\n**Examples**\n\n~~~javascript\nLiquicodeJS.Types.IsFormat( 'Hello', 'string:string' )            // = true\nLiquicodeJS.Types.IsFormat( 'Hello', 'string:json' )              // = false\nLiquicodeJS.Types.IsFormat( [ 1, 2, 3 ], 'object:array' )         // = true\nLiquicodeJS.Types.IsFormat( [ 1, 2, 3 ], 'object:number-array' )  // = true\nLiquicodeJS.Types.IsFormat( [ 1, 2, 3 ], 'object:string-array' )  // = false\n~~~\n","Parameters":{"Value":{"name":"Value","type":"*","required":true,"description":"The value to test."},"Format":{"name":"Format","type":"string","required":true,"description":"The type and format to test for as: `\"type:format\"`.","examples":["string:string","string:json","object:datetime"]}},"todo":[],"source_filename":"000-Types\\022-Types.IsFormat.js"},{"id":"100","name":"Object","type":"namespace","summary":"Functions for manipulating Javascript objects.","source_filename":"100-Object\\100-Object.js"},{"id":"101","member_of":"Object","name":"Clone","type":"function","returns":"string","description":["Returns a clone of the given object.","This is equivalent to doing A = JSON.parse( JSON.stringify( B ) )."],"Parameters":{"From":{"name":"From","type":"object","default":{}}},"source_filename":"100-Object\\101-Object.Clone.js"},{"id":"103","member_of":"Object","name":"Merge","type":"function","returns":"object","description":"","Parameters":{"Original":{"name":"Original","type":"object","required":true},"Updates":{"name":"Updates","type":"object","required":false}},"source_filename":"100-Object\\103-Object.Merge.js"},{"id":"110","member_of":"Object","name":"Traverse","type":"function","returns":"string","description":"\n\nTraverses and calls a visitor callback function for each field in an object.\nThis functions recurses through sub-objects and traverses the entire object.\n\n","Parameters":{"Root":{"name":"Root","type":"object","required":true},"Visitor":{"name":"Visitor","type":"function","required":true}},"source_filename":"100-Object\\110-Object.Traverse.js"},{"id":"111","member_of":"Object","name":"HasPath","type":"function","returns":"boolean","description":"","Parameters":{"Root":{"name":"Root","type":"object","required":true},"Path":{"name":"Path","type":"string","required":true}},"source_filename":"100-Object\\111-Object.HasPath.js"},{"id":"112","member_of":"Object","name":"FindField","type":"function","returns":"string","description":"","Parameters":{"Root":{"name":"Root","type":"object","required":true},"Name":{"name":"Name","type":"string","required":true}},"source_filename":"100-Object\\112-Object.FindField.js"},{"id":"113","member_of":"Object","name":"FindValue","type":"function","returns":"string","summary":"Locate a value stored within an object.","description":"","Parameters":{"Root":{"name":"Root","type":"object","required":true},"Value":{"name":"Value","type":"*","required":true,"description":"The value to search for. This must be primitive data type (boolean, number, or string)."}},"source_filename":"100-Object\\113-Object.FindValue.js"},{"id":"114","member_of":"Object","name":"GetValue","type":"function","returns":"*","description":"","Parameters":{"Root":{"name":"Root","type":"object","required":true},"Path":{"name":"Path","type":"string","required":true}},"source_filename":"100-Object\\114-Object.GetValue.js"},{"id":"115","member_of":"Object","name":"SetValue","type":"function","returns":"*","description":"","Parameters":{"Root":{"name":"Root","type":"object","required":true},"Path":{"name":"Path","type":"string","required":true},"Value":{"name":"Value","type":"*","required":true}},"source_filename":"100-Object\\115-Object.SetValue.js"},{"id":"120","member_of":"Object","name":"FromJson","type":"function","returns":"object","description":"\nParse a Json string and return an object value.\nThis is identical Javascript's \"JSON.parse()\" function.\n\nThere are some significant differences from Javascript's version.\nThe parser is a bit more relaxed and allows:\n- Identifiers are not required to have quotes.\n- A comma can appear after the last element of an array or object.\n- String literals can use either single or double quotes.\n- Parsing automatically stops when the closing brace or bracket is found in the json string.\n\n","Parameters":{"JsonString":{"name":"JsonString","type":"string"}},"source_filename":"100-Object\\120-Object.FromJson.js"},{"id":"121","member_of":"Object","name":"ToJsonOptions","type":"function","returns":"object","description":"\n","Parameters":{"PresetName":{"name":"PresetName","type":"string"}},"source_filename":"100-Object\\121-Object.ToJsonOptions.js"},{"id":"122","member_of":"Object","name":"ToJson","type":"function","returns":"object","description":"\n","Parameters":{"Value":{"name":"Value","type":"*","description":"The value to convert to a json string."},"JsonOptions":{"name":"JsonOptions","type":"object|string","description":"Can be an options object or the name of an options preset (\"default\", \"pretty\", or \"pretty-2\")"}},"source_filename":"100-Object\\122-Object.ToJson.js"},{"id":"125","member_of":"Object","name":"FromIni","type":"function","returns":"object","description":"\nParse an Ini string and return an object value.\n\n","Parameters":{"IniString":{"name":"IniString","type":"string"}},"source_filename":"100-Object\\125-Object.FromIni.js"},{"id":"126","member_of":"Object","name":"ToIni","type":"function","returns":"object","description":"\nParse an Ini string and return an object value.\n\n","Parameters":{"Value":{"name":"Value","type":"object"}},"source_filename":"100-Object\\126-Object.ToIni.js"},{"id":"200","name":"Text","type":"namespace","summary":"Functions for text parsing and manipulation.","source_filename":"200-Text\\200-Text.js"},{"id":"201","member_of":"Text","name":"Compare","type":"function","returns":"string","description":["Compares two strings.","Returns a `-1` if `StringA` is less than `StringB`.","Returns a `1` if `StringA` is greater than than `StringB`.","Returns a `0` if `StringA` and `StringB` are the same."],"Parameters":{"StringA":{"name":"StringA","type":"string","default":""},"StringB":{"name":"StringB","type":"string","default":""},"CaseSensitive":{"name":"CaseSensitive","type":"boolean","default":true}},"source_filename":"200-Text\\202-Text.Compare.js"},{"id":"203","member_of":"Text","name":"Matches","type":"function","returns":"string","description":["Matches the text against a wildcard-lik pattern.","Returns true If the match succeeds, otherwise false."],"Parameters":{"Text":{"name":"Text","type":"string","required":true,"default":""},"Pattern":{"name":"Pattern","type":"string","required":true,"default":""}},"source_filename":"200-Text\\203-Text.Matches.js"},{"id":"210","member_of":"Text","name":"ReplaceCharacters","type":"function","returns":"string","description":["Replaces characters within a string.","Returns the modified string."],"Parameters":{"Text":{"name":"Text","type":"string","required":true,"default":""},"SearchCharacters":{"name":"SearchCharacters","type":"string","required":true,"default":""},"ReplacementText":{"name":"ReplacementText","type":"string","required":true,"default":""},"MaxTimes":{"name":"MaxTimes","type":"number","format":"integer","required":false,"default":-1}},"source_filename":"200-Text\\210-Text.ReplaceCharacters.js"},{"id":"211","member_of":"Text","name":"ReplaceText","type":"function","returns":"string","description":"","Parameters":{"Text":{"name":"Text","type":"string","required":true,"default":""},"SearchText":{"name":"SearchText","type":"string","required":true,"default":""},"ReplacementText":{"name":"ReplacementText","type":"string","required":true,"default":""}},"source_filename":"200-Text\\211-Text.ReplaceText.js"},{"id":"220","member_of":"Text","name":"FirstWord","type":"function","returns":"string","description":["Returns the first word of a text phrase."],"Parameters":{"Phrase":{"name":"Phrase","type":"string","required":false,"default":"","description":"A text phrase containing words separated by delimiters."},"Delimiters":{"name":"Delimiters","type":"string","required":false,"default":" ","description":"A string of whitespace and punctuation characters that break the phrase into words."}},"source_filename":"200-Text\\220-Text.FirstWord.js"},{"id":"221","member_of":"Text","name":"AfterFirstWord","type":"function","returns":"string","description":["Returns the remainder of a text phrase occurring after the first word."],"Parameters":{"Phrase":{"name":"Phrase","type":"string","required":false,"default":"","description":"A text phrase containing words separated by delimiters."},"Delimiters":{"name":"Delimiters","type":"string","required":false,"default":" ","description":"A string of characters that break the phrase into words."}},"source_filename":"200-Text\\221-Text.AfterFirstWord.js"},{"id":"222","member_of":"Text","name":"LastWord","type":"function","returns":"string","description":["Returns the last word of a text phrase."],"Parameters":{"Phrase":{"name":"Phrase","type":"string","required":false,"default":"","description":"A text phrase containing words separated by delimiters."},"Delimiters":{"name":"Delimiters","type":"string","required":false,"default":" ","description":"A string of characters that break the phrase into words."}},"source_filename":"200-Text\\222-Text.LastWord.js"},{"id":"223","member_of":"Text","name":"BeforeLastWord","type":"function","returns":"string","description":["Returns the remainder of a text phrase occurring befiore the last word."],"Parameters":{"Phrase":{"name":"Phrase","type":"string","required":false,"default":"","description":"A text phrase containing words separated by delimiters."},"Delimiters":{"name":"Delimiters","type":"string","required":false,"default":" ","description":"A string of characters that break the phrase into words."}},"source_filename":"200-Text\\223-Text.BeforeLastWord.js"},{"id":"500","name":"Parse","type":"namespace","summary":"Functions for tokenizing text strings.","source_filename":"500-Parse\\500-Parse.js"},{"id":"501","member_of":"Parse","name":"TokenizeOptions","type":"function","returns":"object","description":["Returns a set of options for calling Tokenize().","Throws an error if an invalid value for PresetName is given."],"Parameters":{"Text":{"name":"PresetName","type":"string","required":false,"default":"","description":["To retrieve an options preset, use one of: 'csv', or 'cli'","You can leave this empty or 'default' for the default options."]}},"source_filename":"500-Parse\\501-Parse.TokenizeOptions.js"},{"id":"502","member_of":"Parse","name":"Tokenize","type":"function","returns":"object","description":["Returns the parsed tokens."],"Parameters":{"Text":{"name":"PresetName","type":"string","required":false,"default":"","description":["To retrieve an options preset, use one of: 'csv', or 'cli'","You can leave this empty for the default options."]}},"source_filename":"500-Parse\\502-Parse.Tokenize.js"},{"id":"011","member_of":"Parse","name":"DateParse","type":"function","returns":"object","returns_summary":"Returns a `DateParts` object containing Date/Time detail.","description":["\nDates and times are funny little creatures.\n"],"Parameters":{"Value":{"name":"Value","type":"string","required":true},"TimeZoneOffset":{"name":"TimeZoneOffset","type":"string","required":false,"default":"+0000"}},"source_filename":"500-Parse\\510-Parse.DateParse.js"},{"id":"800","name":"System","type":"namespace","summary":"File system and process functions. (nodejs only)","source_filename":"800-System\\800-System.js"},{"id":"810","member_of":"System","name":"VisitFiles","type":"function","returns":"number","description":["Scans a folder and calls the Visitor callback function for each folder/file encountered.","Returns the number of folders/files visited."],"Parameters":{"StartFolder":{"name":"StartFolder","type":"string","required":true},"FilePattern":{"name":"FilePattern","type":"string","required":false,"default":""},"Recurse":{"name":"Recurse","type":"boolean","required":false,"default":false},"Visitor":{"name":"Visitor","type":"function","required":false,"default":null}},"source_filename":"800-System\\810-System.VisitFiles.js"},{"id":"811","member_of":"System","name":"CountFiles","type":"function","returns":"number","description":["Scans a folder and calls the Visitor callback function for each folder/file encountered.","Returns the number of folders/files visited."],"Parameters":{"StartFolder":{"name":"StartFolder","type":"string","required":true},"FilePattern":{"name":"FilePattern","type":"string","required":false,"default":"*"},"Recurse":{"name":"Recurse","type":"boolean","required":false,"default":false}},"source_filename":"800-System\\811-System.CountFiles.js"},{"id":"812","member_of":"System","name":"CountFolders","type":"function","returns":"number","description":["Scans a folder and calls the Visitor callback function for each folder/file encountered.","Returns the number of folders/files visited."],"Parameters":{"StartFolder":{"name":"StartFolder","type":"string","required":true},"Recurse":{"name":"Recurse","type":"boolean","required":false,"default":false}},"source_filename":"800-System\\812-System.CountFolders.js"},{"id":"813","member_of":"System","name":"CopyFolder","type":"function","returns":"number","description":["Copies files from one folder to another.","Returns the number of files copied."],"Parameters":{"FromFolder":{"name":"FromFolder","type":"string","required":true},"ToFolder":{"name":"ToFolder","type":"string","required":true},"FilePattern":{"name":"FilePattern","type":"string","required":false,"default":"*"},"Overwrite":{"name":"Overwrite","type":"boolean","required":false,"default":false},"Recurse":{"name":"Recurse","type":"boolean","required":false,"default":false}},"source_filename":"800-System\\813-System.CopyFolder.js"},{"id":"814","member_of":"System","name":"DeleteFolder","type":"function","returns":"number","description":["Deletes a folder and all of its sub-folders and files.","Returns the number of folders and files deleted."],"Parameters":{"Folder":{"name":"Folder","type":"string","required":true},"Recurse":{"name":"Recurse","type":"boolean","required":false,"default":false}},"source_filename":"800-System\\814-System.DeleteFolder.js"},{"id":"820","member_of":"System","name":"AsyncSleep","type":"function","description":"","Parameters":{"Milliseconds":{"name":"Milliseconds","type":"number","format":"integer"}},"source_filename":"800-System\\820-System.AsyncSleep.js"},{"id":"821","member_of":"System","name":"AsyncExecute","type":"function","description":"","Parameters":{"Milliseconds":{"name":"Milliseconds","type":"number","format":"integer"}},"source_filename":"800-System\\821-System.AsyncExecute.js"},{"id":"900","name":"Network","type":"namespace","summary":"Functions for working with networks. (nodejs only)","source_filename":"900-Network\\900-Network.js"},{"id":"910","member_of":"Network","name":"AsyncDownloadFile","type":"function","returns":"string","description":"Download a file from an url.","Parameters":{},"source_filename":"900-Network\\910-Network.AsyncDownloadFile.js"},{"id":"920","member_of":"Network","name":"AsyncGetRequest","type":"function","returns":"string","description":"Make an http get request for a an url.","Parameters":{"Url":{"name":"Url","type":"string","required":true}},"source_filename":"900-Network\\920-Network.AsyncGetRequest.js"}];
 
   </script>
   <div ng-app="Application_Module" ng-cloak>
@@ -35,28 +35,48 @@ window.Locals.Schemas = [{"id":"000","name":"Schema","type":"namespace","summary
         </div><br>
 <br>
 
-<h2 id="schema-data-value-and-type-handling"><em><strong>Schema</strong></em>: Data value and type handling</h2>
+<h2 id="types-data-type-handling"><em><strong>Types</strong></em>: Data Type Handling</h2>
 <details>
 <summary>
 <strong>
-Schema Details
+Types Details
 </strong>
 </summary>
 
 
-
+<p>LiquicodeJS can classify and identify value types beyond the primitive data types supported by Javascript.</p>
+<p>When obtaining FieldSchema objects from <code class="language-markdown">Schema.ValueSchema()</code> or <code class="language-markdown">Schema.ObjectSchema()</code>,
+<code class="language-markdown">FieldSchema.type</code> will contain the Javascript data type and <code class="language-markdown">FieldSchema.format</code> will have a more specific type description.</p>
+<p>Javascript (and JSON) offers four data types for your variable values: <code class="language-markdown">boolean</code>, <code class="language-markdown">number</code>, <code class="language-markdown">string</code>,
+and everything else is essentially an <code class="language-markdown">object</code>.
+This suits Javascript well for the types of things that Javascript needs to do like storing values in memory
+and executing program statements with those values.
+This is not always great on an application level though.
+When you need to, for example, make sure that a variable contains an <code class="language-markdown">array</code> of <code class="language-markdown">string</code> or that value represents a floating point number.
+Cases like these require additional progrma statements and type checking which can be consolidated into a set of functions.</p>
+<p>The <code class="language-markdown">Schema</code> module defines a few objects and functions to alleviate this burden from the application developer.</p>
 <p><strong>The FieldSchema Object</strong></p>
+<p>This object describes a value (or field) with greater precision then Javascript&#39;s <code class="language-markdown">typeof</code> statement.
+The <code class="language-markdown">FieldSchema.type</code> member will always contain a Javascript data type while the <code class="language-markdown">FieldSchema.format</code> field contains a more
+detailed data type.</p>
 <pre><code class="language-javascript">FieldSchema = {
-    type: &#39;&#39;,				// Javascript data type (boolean, number, string, object).
+    type: &#39;&#39;,				// Javascript data type (boolean, number, string, or object).
     format: &#39;&#39;,				// A data type specific designation.
     default: undefined,		// A default value used for missing fields.
     name: &#39;&#39;,				// Name of the field.
 }
 </code></pre>
-<p>LiquicodeJS can classify and identify value types beyond the primitive data types supported by Javascript.
-When obtaining FieldSchema objects from <code class="language-markdown">Schema.ValueSchema()</code> or <code class="language-markdown">Schema.ObjectSchema()</code>,
-<code class="language-markdown">FieldSchema.type</code> will contain the Javascript data type and <code class="language-markdown">FieldSchema.format</code> will have a more specific type description.</p>
-<p>Possible values for &quot;FieldSchema.type&quot; and &quot;FieldSchema.format&quot; are as follows:</p>
+<p>These functions will generate a <code class="language-markdown">FieldSchema</code> from a single value or an object.
+Be aware that only the top level members of an object are scrutinized as this is what we are typically interested in most cases.
+Functions of the <code class="language-markdown">Schema</code> module do not recurse into an object providing the schema for every single field in the object.
+Rather, they inspect the top level of objects only and return an array of schema objects as a result.
+Again, this handles most use cases with a consistent set of functions.
+Any further validation/coercion that may be required can also be perfomed by the same functions on an individual case basis.</p>
+<ul>
+<li><code class="language-markdown">Schema.ValueSchema( FromValue )</code></li>
+<li><code class="language-markdown">Schema.ObjectSchema( FromObject )</code></li>
+</ul>
+<p>Possible values for <code class="language-markdown">FieldSchema.type</code> and <code class="language-markdown">FieldSchema.format</code> are as follows:</p>
 <table>
 <thead>
 <tr>
@@ -70,85 +90,96 @@ When obtaining FieldSchema objects from <code class="language-markdown">Schema.V
 <td>boolean</td>
 <td>boolean</td>
 <td>false</td>
-<td>true, or false</td>
+<td><code class="language-markdown">true</code>, or <code class="language-markdown">false</code></td>
 </tr>
 <tr>
 <td>number</td>
 <td>integer</td>
 <td>0</td>
-<td>1, 2, or 3.0</td>
+<td><code class="language-markdown">1</code>, <code class="language-markdown">2</code>, or <code class="language-markdown">3.0</code></td>
 </tr>
 <tr>
 <td>number</td>
 <td>float</td>
 <td>0</td>
-<td>1.1, 2.071, or 3.14</td>
+<td><code class="language-markdown">1.1</code>, <code class="language-markdown">2.071</code>, or <code class="language-markdown">3.14</code></td>
 </tr>
 <tr>
 <td>string</td>
 <td>string</td>
 <td>&quot;&quot;</td>
-<td>Hello&#39;, or &#39;&#39;</td>
+<td><code class="language-markdown">&quot;Hello&quot;</code>, or <code class="language-markdown">&quot;&quot;</code></td>
 </tr>
 <tr>
 <td>object</td>
 <td>object</td>
 <td>{}</td>
-<td>{ foo: &#39;bar&#39; }</td>
+<td><code class="language-markdown">{ foo: &#39;bar&#39; }</code></td>
 </tr>
 <tr>
 <td>object</td>
 <td>array</td>
 <td>[]</td>
-<td>[ 1, &#39;two&#39;, 3.14, null ]</td>
+<td><code class="language-markdown">[ 1, &#39;two&#39;, 3.14, null ]</code></td>
 </tr>
 <tr>
 <td>object</td>
 <td>boolean-array</td>
 <td>[]</td>
-<td>[ true, false, true ]</td>
+<td><code class="language-markdown">[ true, false, true ]</code></td>
 </tr>
 <tr>
 <td>object</td>
 <td>number-array</td>
 <td>[]</td>
-<td>[ 1, 2, 3.14 ]</td>
+<td><code class="language-markdown">[ 1, 2, 3.14 ]</code></td>
 </tr>
 <tr>
 <td>object</td>
 <td>string-array</td>
 <td>[]</td>
-<td>[ &#39;one&#39;, &#39;two&#39;, &#39;three&#39; ]</td>
+<td><code class="language-markdown">[ &#39;one&#39;, &#39;two&#39;, &#39;three&#39; ]</code></td>
 </tr>
 <tr>
 <td>object</td>
 <td>object-array</td>
 <td>[]</td>
-<td>[ { foo: &#39;bar&#39; }, [1,2,3], null ]</td>
+<td><code class="language-markdown">[ { foo: &#39;bar&#39; }, [1,2,3], null ]</code></td>
 </tr>
 <tr>
 <td>object</td>
 <td>array-array</td>
 <td>[]</td>
-<td>[ [1,2,3], [], [4,5] ]</td>
+<td><code class="language-markdown">[ [1,2,3], [], [4,5] ]</code></td>
 </tr>
 </tbody></table>
 <p><strong>The ErrorValue Object</strong></p>
+<p>LiquicodeJS introduces an <code class="language-markdown">ErrorValue</code> object that is used to indicate and convey errors.
+Some functions will return an <code class="language-markdown">ErrorValue</code> object instead of throwing a Javascript <code class="language-markdown">Error</code>.
+In some cases, this can make code more efficient and legible when certain errors are tolerable
+and you want to avoid the expensive cost of a Javascript <code class="language-markdown">Error</code> that includes a call stack.</p>
+<p>Use the <code class="language-markdown">Schema.ErrorValue()</code> function to create an <code class="language-markdown">ErrorValue</code> object and <code class="language-markdown">Schema.IsErrorValue()</code> to test for errors.
+An <code class="language-markdown">ErrorValue</code> will always have <code class="language-markdown">ErrorValue.ok = false</code> and <code class="language-markdown">ErrorValue.error</code> will contain the error message.</p>
 <pre><code class="language-javascript">ErrorValue = {
     ok: false,		// Always set to &quot;false&quot;.
     error: &#39;&#39;,		// Error message.
     context: &#39;&#39;,	// Context for the error (e.g. a function name).
 }
 </code></pre>
-<p>LiquicodeJS introduces an &quot;ErrorValue&quot; object that it can use to indicate errors.
-Some functions will optionally return an &quot;ErrorValue&quot; object instead of throwing a Javascript Error.
-In some cases, this can make code more efficient and legible when certain errors are tolerable
-and you want to avoid the expensive cost of a Javascript Error that includes a call stack.</p>
-<p>Use the &quot;Schema.ErrorValue()&quot; function to create ErrorValue objects and &quot;Schema.IsErrorValue()&quot; to test for errors.
-An ErrorValue will always have &quot;ErrorValue.ok = false&quot; and &quot;ErrorValue.error&quot; equal to a string.</p>
 <p><strong>Value Coercion</strong></p>
-<p>The functions &quot;Schema.CoerceValue()&quot;, &quot;Schema.ValidateValue()&quot;, and &quot;Schema.ValidateObject()&quot; can optionally coerce values
-from their given type to the types specified in Schema.</p>
+<p>As data gets shuttled around between memory, files, and network transmissions, the representation of the data might
+change to suit to the medium.
+For example, an integer value being stored in a file might be read back out later as a string.
+It&#39;s actual value hasn&#39;t changed, but the way it is represented has changed.
+Javascript can be pretty forgiving in these cases by allowing a certain amount of type fluidity;
+However, this can also cause some difficult to spot errors like when <code class="language-markdown">&#39;2&#39; + 2</code> equals the string <code class="language-markdown">&#39;22&#39;</code> and not the integer <code class="language-markdown">4</code>.</p>
+<p>Use these functions the validate that a value&#39;s type is of an expected type and to coerce the value, in a common sense way,
+to that expected type.</p>
+<ul>
+<li><code class="language-markdown">Types.Coerce( Value, Schema, ThrowErrors )</code></li>
+<li><code class="language-markdown">Types.Coerce( Value, Schema, ThrowErrors )</code></li>
+<li><code class="language-markdown">Types.Coerces( Values, Schemas, ThrowErrors )</code></li>
+</ul>
 <p>This tables describes how values are converted from one data type to another during coercion:</p>
 <table>
 <thead>
@@ -203,10 +234,7 @@ from their given type to the types specified in Schema.</p>
 <td>Value</td>
 </tr>
 </tbody></table>
-<p><strong>Object Schema and Validation</strong></p>
-<p>The functions &quot;Schema.ObjectSchema()&quot; and &quot;Schema.ValidateObject()&quot; take these concepts to the next level and
-provides schemas functionality on an object level rather than an individual value level.</p>
-<p><strong>Additional References</strong></p>
+<p><strong>Related Reading</strong></p>
 <ul>
 <li><a href="https://www.oreilly.com/library/view/you-dont-know/9781491905159/ch04.html">You Don&#39;t Know JS: Types &amp; Grammar - Chapter 4. Coercion</a></li>
 </ul>
@@ -214,69 +242,23 @@ provides schemas functionality on an object level rather than an individual valu
 
 <br>
 
-<h3 id="schema-functions"><em><strong>Schema</strong></em> Functions</h3>
+<h3 id="types-functions"><em><strong>Types</strong></em> Functions</h3>
 <br>
 
 <details>
 <summary>
 <strong>
-ErrorValue( Message, Context )
+Coerce( Value )
 </strong>
 <small>
-- Returns an ErrorValue object containing error information.
+- Returns a `Coercion` object which is used to coerce values to different types.
 </small>
 </summary>
 
 <blockquote>
-<h3 id="schemaerrorvalue-message-context-">Schema.<em><strong>ErrorValue</strong></em>( Message, Context )</h3>
-<p>Returns an ErrorValue object containing error information.</p>
-<p><strong>Returns</strong>: <code class="language-markdown">object</code> - An ErrorValue object.</p>
-</blockquote>
-<p><em><strong>Parameters</strong></em></p>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Type</th>
-<th>Required</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Message</td>
-<td><code class="language-markdown">string</code></td>
-<td>-</td>
-<td>&quot;error&quot;</td>
-<td>The error message.</td>
-</tr>
-<tr>
-<td>Context</td>
-<td><code class="language-markdown">string</code></td>
-<td>-</td>
-<td></td>
-<td>Context for the error (e.g. a function name).</td>
-</tr>
-</tbody></table>
-<p><em><strong>Description</strong></em></p>
-<hr>
-</details>
-<br>
-
-<details>
-<summary>
-<strong>
-IsErrorValue( Value )
-</strong>
-<small>
-- Tests if a Value is an ErrorValue object.
-</small>
-</summary>
-
-<blockquote>
-<h3 id="schemaiserrorvalue-value-">Schema.<em><strong>IsErrorValue</strong></em>( Value )</h3>
-<p>Tests if a Value is an ErrorValue object.</p>
-<p><strong>Returns</strong>: <code class="language-markdown">boolean</code> - True if Value is an ErrorValue object, otherwise false.</p>
+<h3 id="typescoerce-value-">Types.<em><strong>Coerce</strong></em>( Value )</h3>
+<p>Returns a <code class="language-markdown">Coercion</code> object which is used to coerce values to different types.</p>
+<p><strong>Returns</strong>: <code class="language-markdown">object</code> - A <code class="language-markdown">Coercion</code> object.</p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -291,375 +273,175 @@ IsErrorValue( Value )
 </thead>
 <tbody><tr>
 <td>Value</td>
-<td><code class="language-markdown">object</code></td>
+<td><code class="language-markdown">*</code></td>
 <td>-</td>
+<td></td>
+<td>The value to coerce. This value is set to <code class="language-markdown">Coercion.value</code>.</td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>The returned <code class="language-markdown">Coercion</code> object has a single member <code class="language-markdown">Coercion.value</code> and a number of coercion functions:</p>
+<ul>
+<li><p><code class="language-markdown">ToBoolean( Default = false )</code> :
+  Returns the boolean value of <code class="language-markdown">Coercion.value</code>.
+  Anything can be coerced to a boolean.
+  If value is a string, then &#39;false&#39; and &#39;0&#39; will return false while &#39;true&#39; will return true.</p>
+</li>
+<li><p><code class="language-markdown">ToNumber( Default = 0 )</code> :
+  Returns the numeric value of <code class="language-markdown">Coercion.value</code>.
+  Booleans, other numbers, and numeric strings can be coerced to a number.</p>
+</li>
+<li><p><code class="language-markdown">ToString( Default = &#39;&#39; )</code> :
+  Returns the string value of <code class="language-markdown">Coercion.value</code>.
+  Anything can be coerced to a string.
+  If value is an object, then it is JSON stringified and returned.</p>
+</li>
+<li><p><code class="language-markdown">ToObject( Default = null )</code> :
+  Returns the object value of <code class="language-markdown">Coercion.value</code>.
+  Only JSON strings and other objects can be coerced to an object.
+  If value is a JSON string, then it is JSON parsed and returned.</p>
+</li>
+</ul>
+<p><code class="language-markdown">Coercion.value</code> is set to the Value parameter.</p>
+<p><strong>Usage</strong></p>
+<p>There are two ways to use the <code class="language-markdown">Coercion</code> object.</p>
+<p>One way is to immediately call one of the coercion functions after obtaining the <code class="language-markdown">Coercion</code> object:</p>
+<pre><code class="language-javascript">let number_42 = LiquicodeJS.Schema.Coerce( &#39;42&#39; ).ToNumber();
+</code></pre>
+<p>Another way is to reuse the <code class="language-markdown">Coercion</code> object and alter the <code class="language-markdown">Coercion.value</code> property yourself:</p>
+<pre><code class="language-javascript">let coercion = LiquicodeJS.Schema.Coerce();
+coercion.value = &#39;42&#39;;
+let number_42 = coercion.ToNumber();
+</code></pre>
+<p><strong>Examples</strong></p>
+<pre><code class="language-javascript">// Coercing to boolean
+Schema.Coerce( null ).ToBoolean()           // = false
+Schema.Coerce( 0 ).ToBoolean()              // = false
+Schema.Coerce( &#39;true&#39; ).ToBoolean()         // = true
+
+// Coercing to number
+Schema.Coerce( null ).ToNumber()            // = 0
+Schema.Coerce( &#39;3.14&#39; ).ToNumber()          // = 3.14
+Schema.Coerce( &#39;foo&#39; ).ToNumber()           // = 0
+
+// Coercing to string
+Schema.Coerce( null ).ToString()            // = &#39;&#39;
+Schema.Coerce( &#39;3.14&#39; ).ToString()          // = &#39;3.14&#39;
+Schema.Coerce( { foo: &#39;bar&#39; } ).ToString()  // = &#39;{&quot;foo&quot;:&quot;bar&quot;}&#39;
+
+// Coercing to object
+Schema.Coerce( null ).ToObject()            // = null
+Schema.Coerce( 3.14 ).ToObject()            // = null
+Schema.Coerce( &#39;{&quot;foo&quot;:&quot;bar&quot;}&#39; ).ToObject() // = { foo: &#39;bar&#39; }
+
+// Coercing with a Default
+Schema.Coerce( &#39;Hello&#39; ).ToNumber( -1 )     // = -1
+Schema.Coerce( true ).ToObject( {} )        // = {}
+Schema.Coerce( 1024 ).ToObject( {} )        // = {}
+Schema.Coerce( null ).ToObject( { a: 1 } )  // = { a: 1 }
+Schema.Coerce( null ).ToObject( [ 1, 2 ] )  // = [ 1, 2 ]
+</code></pre>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+GetFormat( Value )
+</strong>
+<small>
+- Determine the type and format of a value.
+</small>
+</summary>
+
+<blockquote>
+<h3 id="typesgetformat-value-">Types.<em><strong>GetFormat</strong></em>( Value )</h3>
+<p>Determine the type and format of a value.</p>
+<p><strong>Returns</strong>: <code class="language-markdown">string</code> - An extended type description.</p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Value</td>
+<td><code class="language-markdown">*</code></td>
+<td>required</td>
+<td></td>
+<td>The value to get the format for.</td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Iterates through <code class="language-markdown">Types.Formats</code> in reverse order and calls each <code class="language-markdown">Format.IsFormat()</code> function.
+When one of the formats returns <code class="language-markdown">true</code>, then it&#39;s type and format are returned separated by <code class="language-markdown">:</code>.</p>
+<p><strong>Examples</strong></p>
+<pre><code class="language-javascript">LiquicodeJS.Types.GetFormat( &#39;42&#39; )         // = &#39;number:integer&#39;
+LiquicodeJS.Types.GetFormat( &#39;Hello&#39; )      // = &#39;string:string&#39;
+LiquicodeJS.Types.GetFormat( new Date() )   // = &#39;object:datetime&#39;
+LiquicodeJS.Types.GetFormat( [ 1, 2, 3 ] )  // = &#39;object:number-array&#39;
+</code></pre>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+IsFormat( Value, Format )
+</strong>
+<small>
+- Determine if a value is of a particular format.
+</small>
+</summary>
+
+<blockquote>
+<h3 id="typesisformat-value-format-">Types.<em><strong>IsFormat</strong></em>( Value, Format )</h3>
+<p>Determine if a value is of a particular format.</p>
+<p><strong>Returns</strong>: <code class="language-markdown">boolean</code> - True if the value matches the format.</p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Value</td>
+<td><code class="language-markdown">*</code></td>
+<td>required</td>
 <td></td>
 <td>The value to test.</td>
 </tr>
-</tbody></table>
-<hr>
-</details>
-<br>
-
-<details>
-<summary>
-<strong>
-ValueSchema( Value )
-</strong>
-<small>
-- Returns a FieldSchema based upon a specific value.
-</small>
-</summary>
-
-<blockquote>
-<h3 id="schemavalueschema-value-">Schema.<em><strong>ValueSchema</strong></em>( Value )</h3>
-<p>Returns a FieldSchema based upon a specific value.</p>
-<p><strong>Returns</strong>: <code class="language-markdown">object</code> - A FieldSchema object.</p>
-</blockquote>
-<p><em><strong>Parameters</strong></em></p>
-<table>
-<thead>
 <tr>
-<th>Name</th>
-<th>Type</th>
-<th>Required</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Value</td>
-<td><code class="language-markdown">*</code></td>
-<td>-</td>
+<td>Format</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
 <td></td>
-<td>The value to infer a schema from.</td>
+<td>The type and format to test for as: <code class="language-markdown">&quot;type:format&quot;</code>.</td>
 </tr>
 </tbody></table>
 <p><em><strong>Description</strong></em></p>
-<p>This function is used to obtain extended type information about a value.
-While it does return an entire FieldSchema object, only the &quot;FieldSchema.type&quot; and &quot;FieldSchema.format&quot; fields are set.</p>
-<hr>
-</details>
-<br>
-
-<details>
-<summary>
-<strong>
-DefaultValue( Schema, ThrowErrors )
-</strong>
-<small>
-- Returns the default value for the FieldSchema.
-</small>
-</summary>
-
-<blockquote>
-<h3 id="schemadefaultvalue-schema-throwerrors-">Schema.<em><strong>DefaultValue</strong></em>( Schema, ThrowErrors )</h3>
-<p>Returns the default value for the FieldSchema.</p>
-<p><strong>Returns</strong>: <code class="language-markdown">*</code> - The default value.</p>
-</blockquote>
-<p><em><strong>Parameters</strong></em></p>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Type</th>
-<th>Required</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Schema</td>
-<td><code class="language-markdown">object</code></td>
-<td>required</td>
-<td></td>
-<td>The schema to use when calculating a default value.</td>
-</tr>
-<tr>
-<td>ThrowErrors</td>
-<td><code class="language-markdown">boolean</code></td>
-<td>-</td>
-<td></td>
-<td>Errors are thrown if true, otherwise an ErrorValue object is returned.</td>
-</tr>
-</tbody></table>
-<p><em><strong>Description</strong></em></p>
-<p>If the FieldSchema specifies a default value, then that value will be returned.
-Otherwise, a default value is calculated based upon the type and format of the FieldSchema.</p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Format</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>boolean</td>
-<td>-</td>
-<td>false</td>
-</tr>
-<tr>
-<td>number</td>
-<td>integer</td>
-<td>0</td>
-</tr>
-<tr>
-<td>number</td>
-<td>float</td>
-<td>0</td>
-</tr>
-<tr>
-<td>string</td>
-<td>-</td>
-<td>&#39;&#39;</td>
-</tr>
-<tr>
-<td>object</td>
-<td>-</td>
-<td>{}</td>
-</tr>
-<tr>
-<td>object</td>
-<td>array</td>
-<td>[]</td>
-</tr>
-<tr>
-<td>object</td>
-<td>boolean-array</td>
-<td>[]</td>
-</tr>
-<tr>
-<td>object</td>
-<td>number-array</td>
-<td>[]</td>
-</tr>
-<tr>
-<td>object</td>
-<td>string-array</td>
-<td>[]</td>
-</tr>
-<tr>
-<td>object</td>
-<td>object-array</td>
-<td>[]</td>
-</tr>
-</tbody></table>
-<hr>
-</details>
-<br>
-
-<details>
-<summary>
-<strong>
-CoerceValue( Value, Schema, ThrowErrors )
-</strong>
-<small>
-- Attempt to coerce the Value parameter to match the Schema's type.
-</small>
-</summary>
-
-<blockquote>
-<h3 id="schemacoercevalue-value-schema-throwerrors-">Schema.<em><strong>CoerceValue</strong></em>( Value, Schema, ThrowErrors )</h3>
-<p>Attempt to coerce the Value parameter to match the Schema&#39;s type.</p>
-<p><strong>Returns</strong>: <code class="language-markdown">*</code> - The coerced value or an error object.</p>
-</blockquote>
-<p><em><strong>Parameters</strong></em></p>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Type</th>
-<th>Required</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Value</td>
-<td><code class="language-markdown">*</code></td>
-<td>required</td>
-<td></td>
-<td>The value to coerce.</td>
-</tr>
-<tr>
-<td>Schema</td>
-<td><code class="language-markdown">object</code></td>
-<td>required</td>
-<td></td>
-<td>The schema to use when coercing Value.</td>
-</tr>
-<tr>
-<td>ThrowErrors</td>
-<td><code class="language-markdown">boolean</code></td>
-<td>-</td>
-<td></td>
-<td>Errors are thrown if true, otherwise an ErrorValue object is returned.</td>
-</tr>
-</tbody></table>
-<p><em><strong>Description</strong></em></p>
-<p>This function uses the Schema to coerce the Value to a particular data type.</p>
-<p>If the &quot;Schema.type&quot; === &quot;*&quot;, then no validation or coercion is performed and the Value is returned.
-If the &quot;Schema.type&quot; === &quot;function&quot;, then no validation or coercion is performed and the Value is returned.</p>
-<p>If Value is &quot;undefined&quot; or &quot;null&quot;, then the default value for &quot;FieldSchema.type&quot; will be returned.
-This is done by calling &quot;Schema.DefaultValue()&quot; for the FieldSchema.</p>
-<p>&quot;Schema.ValueSchema()&quot; is called the get the schema for Value, which is then compared against the expected Schema.</p>
-<hr>
-</details>
-<br>
-
-<details>
-<summary>
-<strong>
-ValidateValue( Value, Schema, Options )
-</strong>
-<small>
-- Validates a field value according to a schema and optionally coerces the value to match.
-</small>
-</summary>
-
-<blockquote>
-<h3 id="schemavalidatevalue-value-schema-options-">Schema.<em><strong>ValidateValue</strong></em>( Value, Schema, Options )</h3>
-<p>Validates a field value according to a schema and optionally coerces the value to match.</p>
-<p><strong>Returns</strong>: <code class="language-markdown">*</code> - The validated/coerced Value or an ErrorValue object.</p>
-</blockquote>
-<p><em><strong>Parameters</strong></em></p>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Type</th>
-<th>Required</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Value</td>
-<td><code class="language-markdown">*</code></td>
-<td>required</td>
-<td></td>
-<td>The value to validate.</td>
-</tr>
-<tr>
-<td>Schema</td>
-<td><code class="language-markdown">object</code></td>
-<td>required</td>
-<td></td>
-<td>The FieldSchema object to validate against.</td>
-</tr>
-<tr>
-<td>Options</td>
-<td><code class="language-markdown">object</code></td>
-<td>-</td>
-<td>&quot;{ coerce: false, throw_errors: false, context: null }&quot;</td>
-<td>An options object to control validation:</td>
-</tr>
-</tbody></table>
-<pre><code class="language-javascript">Options = {
-    coerce_values: false,	// Attempt to coerce the provided value to match the schema&#39;s type.
-    throw_errors: false,	// When true, throw an error validation errors are encountered.
-    context: null,			// A context name (function name) to include in any error messages.
-}
-</code></pre>
-<p><em><strong>Description</strong></em></p>
-<p>This function uses &quot;Schema.type&quot;, &quot;Schema.format&quot;, &quot;Schema.required&#39;, and &quot;Schema.default&quot; to validate the given Value.</p>
-<p>If &quot;Options.coerce = true&quot;, then an attempt will be made to coerce the given value to match the type and format specified in the FieldSchema.
-(See: &quot;Schema.CoerceValue()&quot;)</p>
-<hr>
-</details>
-<br>
-
-<details>
-<summary>
-<strong>
-ObjectSchema( FromObject )
-</strong>
-<small>
-- Returns an array of FieldSchema describing the top-most members of "FromObject".
-</small>
-</summary>
-
-<blockquote>
-<h3 id="schemaobjectschema-fromobject-">Schema.<em><strong>ObjectSchema</strong></em>( FromObject )</h3>
-<p>Returns an array of FieldSchema describing the top-most members of &quot;FromObject&quot;.</p>
-<p><strong>Returns</strong>: <code class="language-markdown">object</code> - An array of FieldSchema.</p>
-</blockquote>
-<p><em><strong>Parameters</strong></em></p>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Type</th>
-<th>Required</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>FromObject</td>
-<td><code class="language-markdown">object</code></td>
-<td>required</td>
-<td></td>
-<td>An object to retrieve the schema for.</td>
-</tr>
-</tbody></table>
-<hr>
-</details>
-<br>
-
-<details>
-<summary>
-<strong>
-ValidateValues( Values, Schemas )
-</strong>
-<small>
-- Validate a set of values against an array of FieldSchema.
-</small>
-</summary>
-
-<blockquote>
-<h3 id="schemavalidatevalues-values-schemas-">Schema.<em><strong>ValidateValues</strong></em>( Values, Schemas )</h3>
-<p>Validate a set of values against an array of FieldSchema.</p>
-<p><strong>Returns</strong>: <code class="language-markdown">object</code> - An object containing the validation result.</p>
-</blockquote>
-<p><em><strong>Parameters</strong></em></p>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Type</th>
-<th>Required</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Values</td>
-<td><code class="language-markdown">object</code></td>
-<td>required</td>
-<td></td>
-<td>The values to validate. This can be an array of values, or an object described by Schemas.</td>
-</tr>
-<tr>
-<td>Schemas</td>
-<td><code class="language-markdown">object</code></td>
-<td>required</td>
-<td></td>
-<td>An array of FieldSchemas to validate the Values with. Can also be an object whose top-most fields are instances of FieldSchema.</td>
-</tr>
-</tbody></table>
-<p><em><strong>Description</strong></em></p>
-<p>Takes an array of Values and an array of FieldSchema to validate a number of fields at once.
-This function does not throw validation errors.
-Instead, all validation errors are returned to the caller in the return value.
-Additionally, the number of fields processed and a set of coerced values is also returned.</p>
-<p><strong>The Return Value</strong></p>
-<pre><code class="language-javascript">ReturnValue = {
-    field_count: 0,				// The number of fields processed.
-    validation_errors: [],		// All validation errors encountered.
-    coerced_values: [],			// An array of coerced values.
-}
+<p>Looks up the specified format in <code class="language-markdown">Types.Formats</code> and calls the <code class="language-markdown">Format.IsFormat()</code> function.</p>
+<p>The <code class="language-markdown">Format</code> parameter must specify both type and format to be tested for.</p>
+<p><strong>Examples</strong></p>
+<pre><code class="language-javascript">LiquicodeJS.Types.IsFormat( &#39;Hello&#39;, &#39;string:string&#39; )            // = true
+LiquicodeJS.Types.IsFormat( &#39;Hello&#39;, &#39;string:json&#39; )              // = false
+LiquicodeJS.Types.IsFormat( [ 1, 2, 3 ], &#39;object:array&#39; )         // = true
+LiquicodeJS.Types.IsFormat( [ 1, 2, 3 ], &#39;object:number-array&#39; )  // = true
+LiquicodeJS.Types.IsFormat( [ 1, 2, 3 ], &#39;object:string-array&#39; )  // = false
 </code></pre>
 <hr>
 </details>
@@ -1607,87 +1389,10 @@ BeforeLastWord( Phrase, Delimiters )
 <br>
 <br>
 
-<h2 id="json-functions-for-manipulating-json"><em><strong>Json</strong></em>: Functions for manipulating Json.</h2>
+<h2 id="parse-functions-for-tokenizing-text-strings"><em><strong>Parse</strong></em>: Functions for tokenizing text strings.</h2>
 <br>
 
-<h3 id="json-functions"><em><strong>Json</strong></em> Functions</h3>
-<br>
-<br>
-
-<h2 id="date-functions-for-manipulating-dates"><em><strong>Date</strong></em>: Functions for manipulating dates.</h2>
-<br>
-
-<h3 id="date-functions"><em><strong>Date</strong></em> Functions</h3>
-<br>
-
-<details>
-<summary>
-<strong>
-Parse( Text, TimeZoneOffset )
-</strong>
-</summary>
-
-<blockquote>
-<h3 id="dateparse-text-timezoneoffset-">Date.<em><strong>Parse</strong></em>( Text, TimeZoneOffset )</h3>
-<p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">object</code></p>
-</blockquote>
-<p><em><strong>Parameters</strong></em></p>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Type</th>
-<th>Required</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Text</td>
-<td><code class="language-markdown">string</code></td>
-<td>required</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>TimeZoneOffset</td>
-<td><code class="language-markdown">function</code></td>
-<td>-</td>
-<td>&quot;+0000&quot;</td>
-<td></td>
-</tr>
-</tbody></table>
-<p><em><strong>Description</strong></em></p>
-<p>Converts a string to a date-time value.
-Returns a <code class="language-markdown">date_time_parts</code> structure.</p>
-<hr>
-</details>
-<br>
-
-<details>
-<summary>
-<strong>
-ZuluTimestamp(  )
-</strong>
-</summary>
-
-<blockquote>
-<h3 id="datezulutimestamp--">Date.<em><strong>ZuluTimestamp</strong></em>(  )</h3>
-<p>undefined</p>
-<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
-</blockquote>
-<p><em><strong>Description</strong></em></p>
-<p>Returns the current date and time as a string.</p>
-<hr>
-</details>
-<br>
-<br>
-
-<h2 id="token-functions-for-tokenizing-text-strings"><em><strong>Token</strong></em>: Functions for tokenizing text strings.</h2>
-<br>
-
-<h3 id="token-functions"><em><strong>Token</strong></em> Functions</h3>
+<h3 id="parse-functions"><em><strong>Parse</strong></em> Functions</h3>
 <br>
 
 <details>
@@ -1698,7 +1403,7 @@ TokenizeOptions( PresetName )
 </summary>
 
 <blockquote>
-<h3 id="tokentokenizeoptions-presetname-">Token.<em><strong>TokenizeOptions</strong></em>( PresetName )</h3>
+<h3 id="parsetokenizeoptions-presetname-">Parse.<em><strong>TokenizeOptions</strong></em>( PresetName )</h3>
 <p>undefined</p>
 <p><strong>Returns</strong>: <code class="language-markdown">object</code></p>
 </blockquote>
@@ -1736,7 +1441,7 @@ Tokenize( PresetName )
 </summary>
 
 <blockquote>
-<h3 id="tokentokenize-presetname-">Token.<em><strong>Tokenize</strong></em>( PresetName )</h3>
+<h3 id="parsetokenize-presetname-">Parse.<em><strong>Tokenize</strong></em>( PresetName )</h3>
 <p>undefined</p>
 <p><strong>Returns</strong>: <code class="language-markdown">object</code></p>
 </blockquote>
@@ -1764,23 +1469,67 @@ Tokenize( PresetName )
 <hr>
 </details>
 <br>
+
+<details>
+<summary>
+<strong>
+DateParse( Value, TimeZoneOffset )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="parsedateparse-value-timezoneoffset-">Parse.<em><strong>DateParse</strong></em>( Value, TimeZoneOffset )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">object</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Value</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>TimeZoneOffset</td>
+<td><code class="language-markdown">string</code></td>
+<td>-</td>
+<td>&quot;+0000&quot;</td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Dates and times are funny little creatures.</p>
+<hr>
+</details>
+<br>
 <br>
 
-<h2 id="file-functions-for-manipulating-files-nodejs-only"><em><strong>File</strong></em>: Functions for manipulating files. (nodejs only)</h2>
+<h2 id="system-file-system-and-process-functions-nodejs-only"><em><strong>System</strong></em>: File system and process functions. (nodejs only)</h2>
 <br>
 
-<h3 id="file-functions"><em><strong>File</strong></em> Functions</h3>
+<h3 id="system-functions"><em><strong>System</strong></em> Functions</h3>
 <br>
 
 <details>
 <summary>
 <strong>
-Visit( StartFolder, FilePattern, Recurse, Visitor )
+VisitFiles( StartFolder, FilePattern, Recurse, Visitor )
 </strong>
 </summary>
 
 <blockquote>
-<h3 id="filevisit-startfolder-filepattern-recurse-visitor-">File.<em><strong>Visit</strong></em>( StartFolder, FilePattern, Recurse, Visitor )</h3>
+<h3 id="systemvisitfiles-startfolder-filepattern-recurse-visitor-">System.<em><strong>VisitFiles</strong></em>( StartFolder, FilePattern, Recurse, Visitor )</h3>
 <p>undefined</p>
 <p><strong>Returns</strong>: <code class="language-markdown">number</code></p>
 </blockquote>
@@ -1839,7 +1588,7 @@ CountFiles( StartFolder, FilePattern, Recurse )
 </summary>
 
 <blockquote>
-<h3 id="filecountfiles-startfolder-filepattern-recurse-">File.<em><strong>CountFiles</strong></em>( StartFolder, FilePattern, Recurse )</h3>
+<h3 id="systemcountfiles-startfolder-filepattern-recurse-">System.<em><strong>CountFiles</strong></em>( StartFolder, FilePattern, Recurse )</h3>
 <p>undefined</p>
 <p><strong>Returns</strong>: <code class="language-markdown">number</code></p>
 </blockquote>
@@ -1891,7 +1640,7 @@ CountFolders( StartFolder, Recurse )
 </summary>
 
 <blockquote>
-<h3 id="filecountfolders-startfolder-recurse-">File.<em><strong>CountFolders</strong></em>( StartFolder, Recurse )</h3>
+<h3 id="systemcountfolders-startfolder-recurse-">System.<em><strong>CountFolders</strong></em>( StartFolder, Recurse )</h3>
 <p>undefined</p>
 <p><strong>Returns</strong>: <code class="language-markdown">number</code></p>
 </blockquote>
@@ -1936,7 +1685,7 @@ CopyFolder( FromFolder, ToFolder, FilePattern, Overwrite, Recurse )
 </summary>
 
 <blockquote>
-<h3 id="filecopyfolder-fromfolder-tofolder-filepattern-overwrite-recurse-">File.<em><strong>CopyFolder</strong></em>( FromFolder, ToFolder, FilePattern, Overwrite, Recurse )</h3>
+<h3 id="systemcopyfolder-fromfolder-tofolder-filepattern-overwrite-recurse-">System.<em><strong>CopyFolder</strong></em>( FromFolder, ToFolder, FilePattern, Overwrite, Recurse )</h3>
 <p>undefined</p>
 <p><strong>Returns</strong>: <code class="language-markdown">number</code></p>
 </blockquote>
@@ -2002,7 +1751,7 @@ DeleteFolder( Folder, Recurse )
 </summary>
 
 <blockquote>
-<h3 id="filedeletefolder-folder-recurse-">File.<em><strong>DeleteFolder</strong></em>( Folder, Recurse )</h3>
+<h3 id="systemdeletefolder-folder-recurse-">System.<em><strong>DeleteFolder</strong></em>( Folder, Recurse )</h3>
 <p>undefined</p>
 <p><strong>Returns</strong>: <code class="language-markdown">number</code></p>
 </blockquote>
@@ -2047,7 +1796,7 @@ AsyncSleep( Milliseconds )
 </summary>
 
 <blockquote>
-<h3 id="osasyncsleep-milliseconds-">OS.<em><strong>AsyncSleep</strong></em>( Milliseconds )</h3>
+<h3 id="systemasyncsleep-milliseconds-">System.<em><strong>AsyncSleep</strong></em>( Milliseconds )</h3>
 <p>undefined</p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
@@ -2081,7 +1830,7 @@ AsyncExecute( Milliseconds )
 </summary>
 
 <blockquote>
-<h3 id="osasyncexecute-milliseconds-">OS.<em><strong>AsyncExecute</strong></em>( Milliseconds )</h3>
+<h3 id="systemasyncexecute-milliseconds-">System.<em><strong>AsyncExecute</strong></em>( Milliseconds )</h3>
 <p>undefined</p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
@@ -2108,10 +1857,10 @@ AsyncExecute( Milliseconds )
 <br>
 <br>
 
-<h2 id="net-functions-for-working-with-networks-nodejs-only"><em><strong>Net</strong></em>: Functions for working with networks. (nodejs only)</h2>
+<h2 id="network-functions-for-working-with-networks-nodejs-only"><em><strong>Network</strong></em>: Functions for working with networks. (nodejs only)</h2>
 <br>
 
-<h3 id="net-functions"><em><strong>Net</strong></em> Functions</h3>
+<h3 id="network-functions"><em><strong>Network</strong></em> Functions</h3>
 <br>
 
 <details>
@@ -2122,7 +1871,7 @@ AsyncDownloadFile(  )
 </summary>
 
 <blockquote>
-<h3 id="netasyncdownloadfile--">Net.<em><strong>AsyncDownloadFile</strong></em>(  )</h3>
+<h3 id="networkasyncdownloadfile--">Network.<em><strong>AsyncDownloadFile</strong></em>(  )</h3>
 <p>undefined</p>
 <p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
 </blockquote>
@@ -2140,7 +1889,7 @@ AsyncGetRequest( Url )
 </summary>
 
 <blockquote>
-<h3 id="netasyncgetrequest-url-">Net.<em><strong>AsyncGetRequest</strong></em>( Url )</h3>
+<h3 id="networkasyncgetrequest-url-">Network.<em><strong>AsyncGetRequest</strong></em>( Url )</h3>
 <p>undefined</p>
 <p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
 </blockquote>

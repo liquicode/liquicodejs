@@ -216,7 +216,7 @@ let schema_html_content = '';
 let count_total_files = 0;
 let count_files_with_errors = 0;
 let count_files_processed = 0;
-LQC.File.Visit( SOURCE_FOLDER, '*.js', true,
+LQC.System.VisitFiles( SOURCE_FOLDER, '*.js', true,
 	function ( Folder, Filename )
 	{
 		if ( !Filename ) { return; }

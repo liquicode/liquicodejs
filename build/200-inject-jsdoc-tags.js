@@ -7,6 +7,7 @@ const LIB_PATH = require( 'path' );
 
 const BASE_FOLDER = LIB_PATH.resolve( __dirname, '..' );
 const SOURCE_FOLDER = LIB_PATH.join( BASE_FOLDER, 'src' );
+const SCHEMA_FOLDER = LIB_PATH.join( BASE_FOLDER, 'docs', 'schema' );
 
 
 console.log( `Inject JSDoc Tags into source files:` );
@@ -245,10 +246,9 @@ function ProcessSchema( Schema )
 // Load the schema document.
 let SchemaDoc = null;
 {
-	let filename = LIB_PATH.resolve( __dirname, '..', 'docs' );
-	filename = LIB_PATH.join( filename, 'liquicodejs.schema.json' );
-	SchemaDoc = JSON.parse( LIB_FS.readFileSync( filename, 'utf8' ) );
-	console.log( `Loaded [${SchemaDoc.schema.length}] schemas from file [${filename}].` );
+	let filename = LIB_PATH.join( SCHEMA_FOLDER, 'liquicodejs.schema.json' );
+	SchemaDoc = JSON.parse( LIB_FS.readFileSync( filename, 'utf-8' ) );
+	console.log( `Loaded [${SchemaDoc.Schemas.length}] schemas from file [${filename}].` );
 }
 
 

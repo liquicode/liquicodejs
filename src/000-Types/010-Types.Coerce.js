@@ -40,12 +40,12 @@ There are two ways to use the \`Coercion\` object.
 
 One way is to immediately call one of the coercion functions after obtaining the \`Coercion\` object:
 ~~~javascript
-let number_42 = LiquicodeJS.Schema.Coerce( '42' ).ToNumber();
+let number_42 = Liquicode.Types.Coerce( '42' ).ToNumber();
 ~~~
 
 Another way is to reuse the \`Coercion\` object and alter the \`Coercion.value\` property yourself:
 ~~~javascript
-let coercion = LiquicodeJS.Schema.Coerce();
+let coercion = Liquicode.Types.Coerce();
 coercion.value = '42';
 let number_42 = coercion.ToNumber();
 ~~~
@@ -101,32 +101,84 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function ValidateValues
+	 * @function Coerce
 	 * @returns {object}
-	 * An object containing the validation result.
-	 * @summary Validate a set of values against an array of FieldSchema.
+	 * A `Coercion` object.
+	 * @summary Returns a `Coercion` object which is used to coerce values to different types.
 	 * @description
 	 * 
+The returned `Coercion` object has a single member `Coercion.value` and a number of coercion functions:
 
-Takes an array of Values and an array of FieldSchema to validate a number of fields at once.
-This function does not throw validation errors.
-Instead, all validation errors are returned to the caller in the return value.
-Additionally, the number of fields processed and a set of coerced values is also returned.
+- `ToBoolean( Default = false )` :
+	Returns the boolean value of `Coercion.value`.
+	Anything can be coerced to a boolean.
+	If value is a string, then 'false' and '0' will return false while 'true' will return true.
 
-**The Return Value**
+- `ToNumber( Default = 0 )` :
+	Returns the numeric value of `Coercion.value`.
+	Booleans, other numbers, and numeric strings can be coerced to a number.
 
+- `ToString( Default = '' )` :
+	Returns the string value of `Coercion.value`.
+	Anything can be coerced to a string.
+	If value is an object, then it is JSON stringified and returned.
+
+- `ToObject( Default = null )` :
+	Returns the object value of `Coercion.value`.
+	Only JSON strings and other objects can be coerced to an object.
+	If value is a JSON string, then it is JSON parsed and returned.
+
+`Coercion.value` is set to the Value parameter.
+
+**Usage**
+
+There are two ways to use the `Coercion` object.
+
+One way is to immediately call one of the coercion functions after obtaining the `Coercion` object:
 ~~~javascript
-ReturnValue = {
-	field_count: 0,				// The number of fields processed.
-	validation_errors: [],		// All validation errors encountered.
-	coerced_values: [],			// An array of coerced values.
-}
+let number_42 = Liquicode.Types.Coerce( '42' ).ToNumber();
 ~~~
 
-	 * @param {object} Values
-	 * The values to validate. This can be an array of values, or an object described by Schemas.
-	 * @param {object} Schemas
-	 * An array of FieldSchemas to validate the Values with. Can also be an object whose top-most fields are instances of FieldSchema.
+Another way is to reuse the `Coercion` object and alter the `Coercion.value` property yourself:
+~~~javascript
+let coercion = Liquicode.Types.Coerce();
+coercion.value = '42';
+let number_42 = coercion.ToNumber();
+~~~
+
+**Examples**
+
+~~~javascript
+// Coercing to boolean
+Schema.Coerce( null ).ToBoolean()           // = false
+Schema.Coerce( 0 ).ToBoolean()              // = false
+Schema.Coerce( 'true' ).ToBoolean()         // = true
+
+// Coercing to number
+Schema.Coerce( null ).ToNumber()            // = 0
+Schema.Coerce( '3.14' ).ToNumber()          // = 3.14
+Schema.Coerce( 'foo' ).ToNumber()           // = 0
+
+// Coercing to string
+Schema.Coerce( null ).ToString()            // = ''
+Schema.Coerce( '3.14' ).ToString()          // = '3.14'
+Schema.Coerce( { foo: 'bar' } ).ToString()  // = '{"foo":"bar"}'
+
+// Coercing to object
+Schema.Coerce( null ).ToObject()            // = null
+Schema.Coerce( 3.14 ).ToObject()            // = null
+Schema.Coerce( '{"foo":"bar"}' ).ToObject() // = { foo: 'bar' }
+
+// Coercing with a Default
+Schema.Coerce( 'Hello' ).ToNumber( -1 )     // = -1
+Schema.Coerce( true ).ToObject( {} )        // = {}
+Schema.Coerce( 1024 ).ToObject( {} )        // = {}
+Schema.Coerce( null ).ToObject( { a: 1 } )  // = { a: 1 }
+Schema.Coerce( null ).ToObject( [ 1, 2 ] )  // = [ 1, 2 ]
+~~~
+
+	 * @param {*} [Value]
+	 * The value to coerce. This value is set to `Coercion.value`.
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 

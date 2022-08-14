@@ -4,7 +4,7 @@
 //---------------------------------------------------------------------
 let _Schema = {
 	id: '821',
-	member_of: 'OS',
+	member_of: 'System',
 	name: 'AsyncExecute',
 	type: 'function',
 	// returns: 'number',
@@ -28,14 +28,8 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function CountFiles
-	 * @returns {number}
-	 * @description
-	 * Scans a folder and calls the Visitor callback function for each folder/file encountered.
-	 * Returns the number of folders/files visited.
-	 * @param {string} StartFolder
-	 * @param {string} [FilePattern="*"]
-	 * @param {boolean} [Recurse]
+	 * @function AsyncExecute
+	 * @param {number} [Milliseconds]
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 

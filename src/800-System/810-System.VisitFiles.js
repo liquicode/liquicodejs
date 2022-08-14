@@ -4,8 +4,8 @@
 //---------------------------------------------------------------------
 let _Schema = {
 	id: '810',
-	member_of: 'File',
-	name: 'Visit',
+	member_of: 'System',
+	name: 'VisitFiles',
 	type: 'function',
 	returns: 'number',
 	description: [
@@ -48,7 +48,7 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function Visit
+	 * @function VisitFiles
 	 * @returns {number}
 	 * @description
 	 * Scans a folder and calls the Visitor callback function for each folder/file encountered.
@@ -65,7 +65,7 @@ module.exports = function ( Liquicode )
 	const LIB_PATH = require( 'path' );
 
 
-	function Visit( StartFolder, FilePattern, Recurse, Visitor ) 
+	function VisitFiles( StartFolder, FilePattern, Recurse, Visitor ) 
 	{
 		StartFolder = Liquicode.Types.Coerce( StartFolder ).ToString();
 		FilePattern = Liquicode.Types.Coerce( FilePattern ).ToString();
@@ -104,7 +104,7 @@ module.exports = function ( Liquicode )
 				}
 				if ( Recurse )
 				{
-					count += Visit( from_path, FilePattern, Recurse, Visitor );
+					count += VisitFiles( from_path, FilePattern, Recurse, Visitor );
 				}
 			}
 		}
@@ -116,6 +116,6 @@ module.exports = function ( Liquicode )
 	// Return the module exports.
 	return {
 		_Schema: _Schema,
-		Visit: Visit,
+		VisitFiles: VisitFiles,
 	};
 };

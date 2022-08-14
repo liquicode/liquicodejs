@@ -3,15 +3,14 @@ exports = {
     "Schemas": [
         {
             "id": "000",
-            "name": "Schema",
+            "name": "Types",
             "type": "namespace",
-            "summary": "Data value and type handling",
+            "summary": "Data Type Handling",
             "description": [
-                "\n\n**The FieldSchema Object**\n\n~~~javascript\nFieldSchema = {\n\ttype: '',\t\t\t\t// Javascript data type (boolean, number, string, object).\n\tformat: '',\t\t\t\t// A data type specific designation.\n\tdefault: undefined,\t\t// A default value used for missing fields.\n\tname: '',\t\t\t\t// Name of the field.\n}\n~~~\n\nLiquicodeJS can classify and identify value types beyond the primitive data types supported by Javascript.\nWhen obtaining FieldSchema objects from `Schema.ValueSchema()` or `Schema.ObjectSchema()`,\n`FieldSchema.type` will contain the Javascript data type and `FieldSchema.format` will have a more specific type description.\n\nPossible values for \"FieldSchema.type\" and \"FieldSchema.format\" are as follows:\n\n| Type    | Format        | Default Value | Examples                          |\n|---------|---------------|---------------|-----------------------------------|\n| boolean | boolean       | false         | true, or false                    |\n| number  | integer       | 0             | 1, 2, or 3.0                      |\n| number  | float         | 0             | 1.1, 2.071, or 3.14               |\n| string  | string        | \"\"            | Hello', or ''                     |\n| object  | object        | {}            | { foo: 'bar' }                    |\n| object  | array         | []            | [ 1, 'two', 3.14, null ]          |\n| object  | boolean-array | []            | [ true, false, true ]             |\n| object  | number-array  | []            | [ 1, 2, 3.14 ]                    |\n| object  | string-array  | []            | [ 'one', 'two', 'three' ]         |\n| object  | object-array  | []            | [ { foo: 'bar' }, [1,2,3], null ] |\n| object  | array-array   | []            | [ [1,2,3], [], [4,5] ]            |\n",
-                "\n**The ErrorValue Object**\n\n~~~javascript\nErrorValue = {\n\tok: false,\t\t// Always set to \"false\".\n\terror: '',\t\t// Error message.\n\tcontext: '',\t// Context for the error (e.g. a function name).\n}\n~~~\n\nLiquicodeJS introduces an \"ErrorValue\" object that it can use to indicate errors.\nSome functions will optionally return an \"ErrorValue\" object instead of throwing a Javascript Error.\nIn some cases, this can make code more efficient and legible when certain errors are tolerable\nand you want to avoid the expensive cost of a Javascript Error that includes a call stack.\n\nUse the \"Schema.ErrorValue()\" function to create ErrorValue objects and \"Schema.IsErrorValue()\" to test for errors.\nAn ErrorValue will always have \"ErrorValue.ok = false\" and \"ErrorValue.error\" equal to a string.\n",
-                "\n**Value Coercion**\n\nThe functions \"Schema.CoerceValue()\", \"Schema.ValidateValue()\", and \"Schema.ValidateObject()\" can optionally coerce values\nfrom their given type to the types specified in Schema.\n\nThis tables describes how values are converted from one data type to another during coercion:\n\n| From Type | To Boolean     | To Number      | To String        | To Object      |\n|-----------|----------------|----------------|------------------|----------------|\n| undefined | DefaultValue() | DefaultValue() | DefaultValue()   | DefaultValue() |\n| null      | DefaultValue() | DefaultValue() | DefaultValue()   | DefaultValue() |\n| Boolean   | Value          | Number()       | toString()       | ErrorValue     |\n| Number    | Boolean()      | Value          | toString()       | ErrorValue     |\n| String    | Boolean()      | Number()       | Value            | JSON.parse()   |\n| Object    | Boolean()      | Number()       | JSON.stringify() | Value          |\n",
-                "\n**Object Schema and Validation**\n\nThe functions \"Schema.ObjectSchema()\" and \"Schema.ValidateObject()\" take these concepts to the next level and\nprovides schemas functionality on an object level rather than an individual value level.\n",
-                "\n**Additional References**\n\n- [You Don't Know JS: Types & Grammar - Chapter 4. Coercion](https://www.oreilly.com/library/view/you-dont-know/9781491905159/ch04.html)\n"
+                "\nLiquicodeJS can classify and identify value types beyond the primitive data types supported by Javascript.\n\n\nWhen obtaining FieldSchema objects from `Schema.ValueSchema()` or `Schema.ObjectSchema()`,\n`FieldSchema.type` will contain the Javascript data type and `FieldSchema.format` will have a more specific type description.\n\nJavascript (and JSON) offers four data types for your variable values: `boolean`, `number`, `string`,\nand everything else is essentially an `object`.\nThis suits Javascript well for the types of things that Javascript needs to do like storing values in memory\nand executing program statements with those values.\nThis is not always great on an application level though.\nWhen you need to, for example, make sure that a variable contains an `array` of `string` or that value represents a floating point number.\nCases like these require additional progrma statements and type checking which can be consolidated into a set of functions.\n\nThe `Schema` module defines a few objects and functions to alleviate this burden from the application developer.\n\n**The FieldSchema Object**\n\nThis object describes a value (or field) with greater precision then Javascript's `typeof` statement.\nThe `FieldSchema.type` member will always contain a Javascript data type while the `FieldSchema.format` field contains a more\ndetailed data type.\n\n~~~javascript\nFieldSchema = {\n\ttype: '',\t\t\t\t// Javascript data type (boolean, number, string, or object).\n\tformat: '',\t\t\t\t// A data type specific designation.\n\tdefault: undefined,\t\t// A default value used for missing fields.\n\tname: '',\t\t\t\t// Name of the field.\n}\n~~~\n\nThese functions will generate a `FieldSchema` from a single value or an object.\nBe aware that only the top level members of an object are scrutinized as this is what we are typically interested in most cases.\nFunctions of the `Schema` module do not recurse into an object providing the schema for every single field in the object.\nRather, they inspect the top level of objects only and return an array of schema objects as a result.\nAgain, this handles most use cases with a consistent set of functions.\nAny further validation/coercion that may be required can also be perfomed by the same functions on an individual case basis.\n\n- `Schema.ValueSchema( FromValue )`\n- `Schema.ObjectSchema( FromObject )`\n\nPossible values for `FieldSchema.type` and `FieldSchema.format` are as follows:\n\n| Type    | Format        | Default Value | Examples                              |\n|---------|---------------|---------------|---------------------------------------|\n| boolean | boolean       | false         | `true`, or `false`                |\n| number  | integer       | 0             | `1`, `2`, or `3.0`              |\n| number  | float         | 0             | `1.1`, `2.071`, or `3.14`       |\n| string  | string        | \"\"            | `\"Hello\"`, or `\"\"`                |\n| object  | object        | {}            | `{ foo: 'bar' }`                    |\n| object  | array         | []            | `[ 1, 'two', 3.14, null ]`          |\n| object  | boolean-array | []            | `[ true, false, true ]`             |\n| object  | number-array  | []            | `[ 1, 2, 3.14 ]`                    |\n| object  | string-array  | []            | `[ 'one', 'two', 'three' ]`         |\n| object  | object-array  | []            | `[ { foo: 'bar' }, [1,2,3], null ]` |\n| object  | array-array   | []            | `[ [1,2,3], [], [4,5] ]`            |\n",
+                "\n\n**The ErrorValue Object**\n\nLiquicodeJS introduces an `ErrorValue` object that is used to indicate and convey errors.\nSome functions will return an `ErrorValue` object instead of throwing a Javascript `Error`.\nIn some cases, this can make code more efficient and legible when certain errors are tolerable\nand you want to avoid the expensive cost of a Javascript `Error` that includes a call stack.\n\nUse the `Schema.ErrorValue()` function to create an `ErrorValue` object and `Schema.IsErrorValue()` to test for errors.\nAn `ErrorValue` will always have `ErrorValue.ok = false` and `ErrorValue.error` will contain the error message.\n\n~~~javascript\nErrorValue = {\n\tok: false,\t\t// Always set to \"false\".\n\terror: '',\t\t// Error message.\n\tcontext: '',\t// Context for the error (e.g. a function name).\n}\n~~~\n",
+                "\n\n**Value Coercion**\n\nAs data gets shuttled around between memory, files, and network transmissions, the representation of the data might\nchange to suit to the medium.\nFor example, an integer value being stored in a file might be read back out later as a string.\nIt's actual value hasn't changed, but the way it is represented has changed.\nJavascript can be pretty forgiving in these cases by allowing a certain amount of type fluidity;\nHowever, this can also cause some difficult to spot errors like when `'2' + 2` equals the string `'22'` and not the integer `4`.\n\nUse these functions the validate that a value's type is of an expected type and to coerce the value, in a common sense way,\nto that expected type.\n\n- `Types.Coerce( Value, Schema, ThrowErrors )`\n- `Types.Coerce( Value, Schema, ThrowErrors )`\n- `Types.Coerces( Values, Schemas, ThrowErrors )`\n\nThis tables describes how values are converted from one data type to another during coercion:\n\n| From Type | To Boolean     | To Number      | To String        | To Object      |\n|-----------|----------------|----------------|------------------|----------------|\n| undefined | DefaultValue() | DefaultValue() | DefaultValue()   | DefaultValue() |\n| null      | DefaultValue() | DefaultValue() | DefaultValue()   | DefaultValue() |\n| Boolean   | Value          | Number()       | toString()       | ErrorValue     |\n| Number    | Boolean()      | Value          | toString()       | ErrorValue     |\n| String    | Boolean()      | Number()       | Value            | JSON.parse()   |\n| Object    | Boolean()      | Number()       | JSON.stringify() | Value          |\n",
+                "\n\n**Related Reading**\n\n- [You Don't Know JS: Types & Grammar - Chapter 4. Coercion](https://www.oreilly.com/library/view/you-dont-know/9781491905159/ch04.html)\n"
             ],
             "examples": [
                 "Schema = { name: 'PersonName', type: 'string' }",
@@ -23,223 +22,91 @@ exports = {
                 "Support type: function",
                 "Support format plugin-ins. Must implement: get_default(), is_type_of(value), can_coerce(type), coerce(value)"
             ],
-            "source_filename": "000-Schema\\000-Schema.js"
+            "source_filename": "000-Types\\000-Types.js"
         },
         {
             "id": "010",
-            "member_of": "Schema",
-            "name": "ErrorValue",
+            "member_of": "Types",
+            "name": "Coerce",
             "type": "function",
             "returns": "object",
-            "returns_description": "An ErrorValue object.",
-            "summary": "Returns an ErrorValue object containing error information.",
-            "description": [
-                ""
-            ],
-            "Parameters": {
-                "Message": {
-                    "name": "Message",
-                    "type": "string",
-                    "required": false,
-                    "default": "error",
-                    "description": "The error message."
-                },
-                "Context": {
-                    "name": "Context",
-                    "type": "string",
-                    "required": false,
-                    "description": "Context for the error (e.g. a function name)."
-                }
-            },
-            "todo": [],
-            "source_filename": "000-Schema\\010-Schema.ErrorValue.js"
-        },
-        {
-            "id": "011",
-            "member_of": "Schema",
-            "name": "IsErrorValue",
-            "type": "function",
-            "returns": "boolean",
-            "returns_description": "True if Value is an ErrorValue object, otherwise false.",
-            "summary": "Tests if a Value is an ErrorValue object.",
-            "description": "",
+            "returns_description": "A `Coercion` object.",
+            "summary": "Returns a `Coercion` object which is used to coerce values to different types.",
+            "description": "\nThe returned `Coercion` object has a single member `Coercion.value` and a number of coercion functions:\n\n- `ToBoolean( Default = false )` :\n\tReturns the boolean value of `Coercion.value`.\n\tAnything can be coerced to a boolean.\n\tIf value is a string, then 'false' and '0' will return false while 'true' will return true.\n\n- `ToNumber( Default = 0 )` :\n\tReturns the numeric value of `Coercion.value`.\n\tBooleans, other numbers, and numeric strings can be coerced to a number.\n\n- `ToString( Default = '' )` :\n\tReturns the string value of `Coercion.value`.\n\tAnything can be coerced to a string.\n\tIf value is an object, then it is JSON stringified and returned.\n\n- `ToObject( Default = null )` :\n\tReturns the object value of `Coercion.value`.\n\tOnly JSON strings and other objects can be coerced to an object.\n\tIf value is a JSON string, then it is JSON parsed and returned.\n\n`Coercion.value` is set to the Value parameter.\n\n**Usage**\n\nThere are two ways to use the `Coercion` object.\n\nOne way is to immediately call one of the coercion functions after obtaining the `Coercion` object:\n~~~javascript\nlet number_42 = LiquicodeJS.Schema.Coerce( '42' ).ToNumber();\n~~~\n\nAnother way is to reuse the `Coercion` object and alter the `Coercion.value` property yourself:\n~~~javascript\nlet coercion = LiquicodeJS.Schema.Coerce();\ncoercion.value = '42';\nlet number_42 = coercion.ToNumber();\n~~~\n\n**Examples**\n\n~~~javascript\n// Coercing to boolean\nSchema.Coerce( null ).ToBoolean()           // = false\nSchema.Coerce( 0 ).ToBoolean()              // = false\nSchema.Coerce( 'true' ).ToBoolean()         // = true\n\n// Coercing to number\nSchema.Coerce( null ).ToNumber()            // = 0\nSchema.Coerce( '3.14' ).ToNumber()          // = 3.14\nSchema.Coerce( 'foo' ).ToNumber()           // = 0\n\n// Coercing to string\nSchema.Coerce( null ).ToString()            // = ''\nSchema.Coerce( '3.14' ).ToString()          // = '3.14'\nSchema.Coerce( { foo: 'bar' } ).ToString()  // = '{\"foo\":\"bar\"}'\n\n// Coercing to object\nSchema.Coerce( null ).ToObject()            // = null\nSchema.Coerce( 3.14 ).ToObject()            // = null\nSchema.Coerce( '{\"foo\":\"bar\"}' ).ToObject() // = { foo: 'bar' }\n\n// Coercing with a Default\nSchema.Coerce( 'Hello' ).ToNumber( -1 )     // = -1\nSchema.Coerce( true ).ToObject( {} )        // = {}\nSchema.Coerce( 1024 ).ToObject( {} )        // = {}\nSchema.Coerce( null ).ToObject( { a: 1 } )  // = { a: 1 }\nSchema.Coerce( null ).ToObject( [ 1, 2 ] )  // = [ 1, 2 ]\n~~~\n",
             "Parameters": {
                 "Value": {
                     "name": "Value",
-                    "type": "object",
+                    "type": "*",
                     "required": false,
-                    "description": "The value to test."
+                    "description": "The value to coerce. This value is set to `Coercion.value`."
                 }
             },
             "todo": [],
-            "source_filename": "000-Schema\\011-Schema.IsErrorValue.js"
+            "source_filename": "000-Types\\010-Types.Coerce.js"
         },
         {
             "id": "020",
-            "member_of": "Schema",
-            "name": "ValueSchema",
-            "type": "function",
+            "member_of": "Types",
+            "name": "Formats",
+            "source_type": "function",
             "returns": "object",
-            "returns_description": "A FieldSchema object.",
-            "summary": "Returns a FieldSchema based upon a specific value.",
-            "description": [
-                "\nThis function is used to obtain extended type information about a value.\nWhile it does return an entire FieldSchema object, only the \"FieldSchema.type\" and \"FieldSchema.format\" fields are set.\n"
-            ],
-            "Parameters": {
-                "Value": {
-                    "name": "Value",
-                    "type": "*",
-                    "required": false,
-                    "description": "The value to infer a schema from."
-                }
-            },
+            "returns_description": "An array of `SchemaFormat` objects.",
+            "summary": "Returns an array of `SchemaFormat` objects used to convert values between different formats.",
+            "description": "\nReturns the library's internal array of format objects, `Types.Formats`.\n\nEach format has a `type` and `format` string, and an `IsFormat( Value )` function.\nThis list of formats is used by the `Types.GetFormat()` and `Types.IsFormat()` functions.\n\nApplications can ammend this array in order to customize type processing or add new formats.\nThe structure of each format in the array is:\n~~~javascript\n{\n\ttype: '',    // The Javascript data type. e.g. 'boolean', 'number', 'string', 'object'\n\tformat: '',  // A type specific format. e.g. 'integer', 'date'. \n\tIsFormat: function ( Value )\n\t{\n\t\treturn true;  // Return true, if Value is of this format.\n\t}\n}\n~~~\n\nFor example, here is the format object for `\"string:string\"`:\n~~~javascript\n{\n\ttype: 'string',\n\tformat: 'string',\n\tIsFormat: function ( Value )\n\t{\n\t\tif ( typeof Value !== 'string' ) { return false; }\n\t\treturn true;\n\t},\n},\n~~~\n\nYou have the ability to directly modify the `Types.Formats` array.\n\nFor example, suppose you want to define two new formats to detect objects of 'object:person' and 'object:employee'.\n~~~javascript\nPerson = {\n\tfirst_name: '',\n\tlast_name: '',\n}\nEmployee = {\n\tfirst_name: '',\n\tlast_name: '',\n\ttitle: '',\n}\n~~~\n\nThe format objects might look something like this:\n~~~javascript\nobject_person = {\n\ttype: 'object',\n\tformat: 'person',\n\tIsFormat: function( Value )\n\t{\n\t\tif ( typeof Value !== 'object' ) { return false; }\n\t\tif ( !Value ) { return false; }\n\t\tif ( !Value.first_name ) { return false; }\n\t\tif ( !Value.last_name ) { return false; }\n\t\treturn true;\n\t},\n},\nobject_employee = {\n\ttype: 'object',\n\tformat: 'employee',\n\tIsFormat: function( Value )\n\t{\n\t\tif ( typeof Value !== 'object' ) { return false; }\n\t\tif ( !Value ) { return false; }\n\t\tif ( !Value.first_name ) { return false; }\n\t\tif ( !Value.last_name ) { return false; }\n\t\tif ( !Value.title ) { return false; }\n\t\treturn true;\n\t},\n},\n~~~\n\nAnd tou can add them to the `Types.Formats` array:\n~~~javascript\nlet formats = LiquicodeJS.Types.Formats();\nformats.push( object_person );\nformats.push( object_employee );\n~~~\n\nThe `Types.GetFormat()` function reads the formats array in reverse order when matching a value to a format.\nThis is done so that more complex types will not get \"short-circuited\" by less complex types.\nThe more complex format in this case is \"object:employee\" and should appear after \"object:person\" in the array.\n\n",
+            "Parameters": {},
             "todo": [],
-            "source_filename": "000-Schema\\020-Schema.ValueSchema.js"
+            "source_filename": "000-Types\\020-Types.Formats.js"
         },
         {
             "id": "021",
-            "member_of": "Schema",
-            "name": "DefaultValue",
+            "member_of": "Types",
+            "name": "GetFormat",
             "type": "function",
-            "returns": "*",
-            "returns_description": "The default value.",
-            "summary": "Returns the default value for the FieldSchema.",
-            "description": "\nIf the FieldSchema specifies a default value, then that value will be returned.\nOtherwise, a default value is calculated based upon the type and format of the FieldSchema.\n\n| Type    | Format        | Default\n|---------|---------------|-----------\n| boolean | -             | false\n| number  | integer       | 0\n| number  | float         | 0\n| string  | -             | ''\n| object  | -             | {}\n| object  | array         | []\n| object  | boolean-array | []\n| object  | number-array  | []\n| object  | string-array  | []\n| object  | object-array  | []\n",
+            "returns": "string",
+            "returns_description": "An extended type description.",
+            "summary": "Determine the type and format of a value.",
+            "description": "\nIterates through `Types.Formats` in reverse order and calls each `Format.IsFormat()` function.\nWhen one of the formats returns `true`, then it's type and format are returned separated by `:`.\n\n**Examples**\n\n~~~javascript\nLiquicodeJS.Types.GetFormat( '42' )         // = 'number:integer'\nLiquicodeJS.Types.GetFormat( 'Hello' )      // = 'string:string'\nLiquicodeJS.Types.GetFormat( new Date() )   // = 'object:datetime'\nLiquicodeJS.Types.GetFormat( [ 1, 2, 3 ] )  // = 'object:number-array'\n~~~\n",
             "Parameters": {
-                "Schema": {
-                    "name": "Schema",
-                    "type": "object",
+                "Value": {
+                    "name": "Value",
+                    "type": "*",
                     "required": true,
-                    "description": "The schema to use when calculating a default value."
-                },
-                "ThrowErrors": {
-                    "name": "ThrowErrors",
-                    "type": "boolean",
-                    "required": false,
-                    "default": false,
-                    "description": "Errors are thrown if true, otherwise an ErrorValue object is returned."
+                    "description": "The value to get the format for."
                 }
             },
-            "source_filename": "000-Schema\\021-Schema.DefaultValue.js"
+            "todo": [],
+            "source_filename": "000-Types\\021-Types.GetFormat.js"
         },
         {
             "id": "022",
-            "member_of": "Schema",
-            "name": "CoerceValue",
+            "member_of": "Types",
+            "name": "IsFormat",
             "type": "function",
-            "returns": "*",
-            "returns_description": "The coerced value or an error object.",
-            "summary": "Attempt to coerce the Value parameter to match the Schema's type.",
-            "description": "\n\nThis function uses the Schema to coerce the Value to a particular data type.\n\nIf the \"Schema.type\" === \"*\", then no validation or coercion is performed and the Value is returned.\nIf the \"Schema.type\" === \"function\", then no validation or coercion is performed and the Value is returned.\n\nIf Value is \"undefined\" or \"null\", then the default value for \"FieldSchema.type\" will be returned.\nThis is done by calling \"Schema.DefaultValue()\" for the FieldSchema.\n\n\"Schema.ValueSchema()\" is called the get the schema for Value, which is then compared against the expected Schema.\n\n\t",
+            "returns": "boolean",
+            "returns_description": "True if the value matches the format.",
+            "summary": "Determine if a value is of a particular format.",
+            "description": "\nLooks up the specified format in `Types.Formats` and calls the `Format.IsFormat()` function.\n\nThe `Format` parameter must specify both type and format to be tested for.\n\n**Examples**\n\n~~~javascript\nLiquicodeJS.Types.IsFormat( 'Hello', 'string:string' )            // = true\nLiquicodeJS.Types.IsFormat( 'Hello', 'string:json' )              // = false\nLiquicodeJS.Types.IsFormat( [ 1, 2, 3 ], 'object:array' )         // = true\nLiquicodeJS.Types.IsFormat( [ 1, 2, 3 ], 'object:number-array' )  // = true\nLiquicodeJS.Types.IsFormat( [ 1, 2, 3 ], 'object:string-array' )  // = false\n~~~\n",
             "Parameters": {
                 "Value": {
                     "name": "Value",
                     "type": "*",
                     "required": true,
-                    "description": [
-                        "The value to coerce."
-                    ]
+                    "description": "The value to test."
                 },
-                "Schema": {
-                    "name": "Schema",
-                    "type": "object",
+                "Format": {
+                    "name": "Format",
+                    "type": "string",
                     "required": true,
-                    "description": "The schema to use when coercing Value."
-                },
-                "ThrowErrors": {
-                    "name": "ThrowErrors",
-                    "type": "boolean",
-                    "required": false,
-                    "default": false,
-                    "description": "Errors are thrown if true, otherwise an ErrorValue object is returned."
-                }
-            },
-            "source_filename": "000-Schema\\022-Schema.CoerceValue.js"
-        },
-        {
-            "id": "023",
-            "member_of": "Schema",
-            "name": "ValidateValue",
-            "type": "function",
-            "returns": "*",
-            "returns_description": "The validated/coerced Value or an ErrorValue object.",
-            "summary": "Validates a field value according to a schema and optionally coerces the value to match.",
-            "description": "\n\nThis function uses \"Schema.type\", \"Schema.format\", \"Schema.required', and \"Schema.default\" to validate the given Value.\n\nIf \"Options.coerce = true\", then an attempt will be made to coerce the given value to match the type and format specified in the FieldSchema.\n(See: \"Schema.CoerceValue()\")\n\n\t",
-            "Parameters": {
-                "Value": {
-                    "name": "Value",
-                    "type": "*",
-                    "required": true,
-                    "description": [
-                        "The value to validate."
-                    ]
-                },
-                "Schema": {
-                    "name": "Schema",
-                    "type": "object",
-                    "required": true,
-                    "description": "The FieldSchema object to validate against.",
+                    "description": "The type and format to test for as: `\"type:format\"`.",
                     "examples": [
-                        "{ name: 'Name', type: 'string' }",
-                        "{ name: 'options', type: 'object', default: { hoist: true, swab: 'decks' } }",
-                        "{ name: 'max_tries', type: 'number', format: 'integer', required: true, default: 3 }"
+                        "string:string",
+                        "string:json",
+                        "object:datetime"
                     ]
-                },
-                "Options": {
-                    "name": "Options",
-                    "type": "object",
-                    "required": false,
-                    "default": "{ coerce: false, throw_errors: false, context: null }",
-                    "description": "An options object to control validation:\n~~~javascript\nOptions = {\n\tcoerce_values: false,\t// Attempt to coerce the provided value to match the schema's type.\n\tthrow_errors: false,\t// When true, throw an error validation errors are encountered.\n\tcontext: null,\t\t\t// A context name (function name) to include in any error messages.\n}\n~~~"
-                }
-            },
-            "source_filename": "000-Schema\\023-Schema.ValidateValue.js"
-        },
-        {
-            "id": "030",
-            "member_of": "Schema",
-            "name": "ObjectSchema",
-            "type": "function",
-            "returns": "object",
-            "returns_description": "An array of FieldSchema.",
-            "summary": "Returns an array of FieldSchema describing the top-most members of \"FromObject\".",
-            "description": "",
-            "Parameters": {
-                "FromObject": {
-                    "name": "FromObject",
-                    "type": "object",
-                    "required": true,
-                    "description": "An object to retrieve the schema for."
                 }
             },
             "todo": [],
-            "source_filename": "000-Schema\\030-Schema.ObjectSchema.js"
-        },
-        {
-            "id": "031",
-            "member_of": "Schema",
-            "name": "ValidateValues",
-            "type": "function",
-            "returns": "object",
-            "returns_description": "An object containing the validation result.",
-            "summary": "Validate a set of values against an array of FieldSchema.",
-            "description": "\n\nTakes an array of Values and an array of FieldSchema to validate a number of fields at once.\nThis function does not throw validation errors.\nInstead, all validation errors are returned to the caller in the return value.\nAdditionally, the number of fields processed and a set of coerced values is also returned.\n\n**The Return Value**\n\n~~~javascript\nReturnValue = {\n\tfield_count: 0,\t\t\t\t// The number of fields processed.\n\tvalidation_errors: [],\t\t// All validation errors encountered.\n\tcoerced_values: [],\t\t\t// An array of coerced values.\n}\n~~~\n",
-            "Parameters": {
-                "Values": {
-                    "name": "Values",
-                    "type": "object",
-                    "required": true,
-                    "description": "The values to validate. This can be an array of values, or an object described by Schemas."
-                },
-                "Schemas": {
-                    "name": "Schemas",
-                    "type": "object",
-                    "required": true,
-                    "description": "An array of FieldSchemas to validate the Values with. Can also be an object whose top-most fields are instances of FieldSchema."
-                }
-            },
-            "todo": [],
-            "source_filename": "000-Schema\\031-Schema.ValidateValues.js"
+            "source_filename": "000-Types\\022-Types.IsFormat.js"
         },
         {
             "id": "100",
@@ -743,66 +610,15 @@ exports = {
             "source_filename": "200-Text\\223-Text.BeforeLastWord.js"
         },
         {
-            "id": "300",
-            "name": "Json",
-            "type": "namespace",
-            "summary": "Functions for manipulating Json.",
-            "source_filename": "300-Json\\300-Json.js"
-        },
-        {
-            "id": "400",
-            "name": "Date",
-            "type": "namespace",
-            "summary": "Functions for manipulating dates.",
-            "source_filename": "400-Date\\400-Date.js"
-        },
-        {
-            "id": "401",
-            "member_of": "Date",
-            "name": "Parse",
-            "type": "function",
-            "returns": "object",
-            "description": [
-                "Converts a string to a date-time value.",
-                "Returns a `date_time_parts` structure."
-            ],
-            "Parameters": {
-                "Text": {
-                    "name": "Text",
-                    "type": "string",
-                    "required": true
-                },
-                "TimeZoneOffset": {
-                    "name": "TimeZoneOffset",
-                    "type": "function",
-                    "required": false,
-                    "default": "+0000"
-                }
-            },
-            "source_filename": "400-Date\\401-Date.Parse.js"
-        },
-        {
-            "id": "410",
-            "member_of": "Date",
-            "name": "ZuluTimestamp",
-            "type": "function",
-            "returns": "string",
-            "description": [
-                "Returns the current date and time as a string."
-            ],
-            "Parameters": {},
-            "source_filename": "400-Date\\410-Date.ZuluTimestamp.js"
-        },
-        {
             "id": "500",
-            "name": "Token",
+            "name": "Parse",
             "type": "namespace",
             "summary": "Functions for tokenizing text strings.",
-            "source_filename": "500-Token\\500-Token.js"
+            "source_filename": "500-Parse\\500-Parse.js"
         },
         {
             "id": "501",
-            "member_of": "Token",
+            "member_of": "Parse",
             "name": "TokenizeOptions",
             "type": "function",
             "returns": "object",
@@ -822,11 +638,11 @@ exports = {
                     ]
                 }
             },
-            "source_filename": "500-Token\\501-Token.TokenizeOptions.js"
+            "source_filename": "500-Parse\\501-Parse.TokenizeOptions.js"
         },
         {
             "id": "502",
-            "member_of": "Token",
+            "member_of": "Parse",
             "name": "Tokenize",
             "type": "function",
             "returns": "object",
@@ -845,19 +661,44 @@ exports = {
                     ]
                 }
             },
-            "source_filename": "500-Token\\502-Token.Tokenize.js"
+            "source_filename": "500-Parse\\502-Parse.Tokenize.js"
+        },
+        {
+            "id": "011",
+            "member_of": "Parse",
+            "name": "DateParse",
+            "type": "function",
+            "returns": "object",
+            "returns_summary": "Returns a `DateParts` object containing Date/Time detail.",
+            "description": [
+                "\nDates and times are funny little creatures.\n"
+            ],
+            "Parameters": {
+                "Value": {
+                    "name": "Value",
+                    "type": "string",
+                    "required": true
+                },
+                "TimeZoneOffset": {
+                    "name": "TimeZoneOffset",
+                    "type": "string",
+                    "required": false,
+                    "default": "+0000"
+                }
+            },
+            "source_filename": "500-Parse\\510-Parse.DateParse.js"
         },
         {
             "id": "800",
-            "name": "File",
+            "name": "System",
             "type": "namespace",
-            "summary": "Functions for manipulating files. (nodejs only)",
-            "source_filename": "800-File\\800-File.js"
+            "summary": "File system and process functions. (nodejs only)",
+            "source_filename": "800-System\\800-System.js"
         },
         {
             "id": "810",
-            "member_of": "File",
-            "name": "Visit",
+            "member_of": "System",
+            "name": "VisitFiles",
             "type": "function",
             "returns": "number",
             "description": [
@@ -889,11 +730,11 @@ exports = {
                     "default": null
                 }
             },
-            "source_filename": "800-File\\810-File.Visit.js"
+            "source_filename": "800-System\\810-System.VisitFiles.js"
         },
         {
             "id": "811",
-            "member_of": "File",
+            "member_of": "System",
             "name": "CountFiles",
             "type": "function",
             "returns": "number",
@@ -920,11 +761,11 @@ exports = {
                     "default": false
                 }
             },
-            "source_filename": "800-File\\811-File.CountFiles.js"
+            "source_filename": "800-System\\811-System.CountFiles.js"
         },
         {
             "id": "812",
-            "member_of": "File",
+            "member_of": "System",
             "name": "CountFolders",
             "type": "function",
             "returns": "number",
@@ -945,11 +786,11 @@ exports = {
                     "default": false
                 }
             },
-            "source_filename": "800-File\\812-File.CountFolders.js"
+            "source_filename": "800-System\\812-System.CountFolders.js"
         },
         {
             "id": "813",
-            "member_of": "File",
+            "member_of": "System",
             "name": "CopyFolder",
             "type": "function",
             "returns": "number",
@@ -987,11 +828,11 @@ exports = {
                     "default": false
                 }
             },
-            "source_filename": "800-File\\813-File.CopyFolder.js"
+            "source_filename": "800-System\\813-System.CopyFolder.js"
         },
         {
             "id": "814",
-            "member_of": "File",
+            "member_of": "System",
             "name": "DeleteFolder",
             "type": "function",
             "returns": "number",
@@ -1012,11 +853,11 @@ exports = {
                     "default": false
                 }
             },
-            "source_filename": "800-File\\814-File.DeleteFolder.js"
+            "source_filename": "800-System\\814-System.DeleteFolder.js"
         },
         {
             "id": "820",
-            "member_of": "OS",
+            "member_of": "System",
             "name": "AsyncSleep",
             "type": "function",
             "description": "",
@@ -1027,11 +868,11 @@ exports = {
                     "format": "integer"
                 }
             },
-            "source_filename": "800-File\\820-OS.AsyncSleep.js"
+            "source_filename": "800-System\\820-System.AsyncSleep.js"
         },
         {
             "id": "821",
-            "member_of": "OS",
+            "member_of": "System",
             "name": "AsyncExecute",
             "type": "function",
             "description": "",
@@ -1042,28 +883,28 @@ exports = {
                     "format": "integer"
                 }
             },
-            "source_filename": "800-File\\821-OS.AsyncExecute.js"
+            "source_filename": "800-System\\821-System.AsyncExecute.js"
         },
         {
             "id": "900",
-            "name": "Net",
+            "name": "Network",
             "type": "namespace",
             "summary": "Functions for working with networks. (nodejs only)",
-            "source_filename": "900-Net\\900-Net.js"
+            "source_filename": "900-Network\\900-Network.js"
         },
         {
             "id": "910",
-            "member_of": "Net",
+            "member_of": "Network",
             "name": "AsyncDownloadFile",
             "type": "function",
             "returns": "string",
             "description": "Download a file from an url.",
             "Parameters": {},
-            "source_filename": "900-Net\\910-Net.AsyncDownloadFile.js"
+            "source_filename": "900-Network\\910-Network.AsyncDownloadFile.js"
         },
         {
             "id": "920",
-            "member_of": "Net",
+            "member_of": "Network",
             "name": "AsyncGetRequest",
             "type": "function",
             "returns": "string",
@@ -1075,7 +916,7 @@ exports = {
                     "required": true
                 }
             },
-            "source_filename": "900-Net\\920-Net.AsyncGetRequest.js"
+            "source_filename": "900-Network\\920-Network.AsyncGetRequest.js"
         }
     ]
 };

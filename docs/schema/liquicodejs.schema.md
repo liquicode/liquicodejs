@@ -2,50 +2,84 @@
 <br>
 <br>
 
-## ***Schema***: Data value and type handling
+## ***Types***: Data Type Handling
 
 <details>
 <summary>
 <strong>
-Schema Details
+Types Details
 </strong>
 </summary>
 
 
+LiquicodeJS can classify and identify value types beyond the primitive data types supported by Javascript.
+
+
+When obtaining FieldSchema objects from `Schema.ValueSchema()` or `Schema.ObjectSchema()`,
+`FieldSchema.type` will contain the Javascript data type and `FieldSchema.format` will have a more specific type description.
+
+Javascript (and JSON) offers four data types for your variable values: `boolean`, `number`, `string`,
+and everything else is essentially an `object`.
+This suits Javascript well for the types of things that Javascript needs to do like storing values in memory
+and executing program statements with those values.
+This is not always great on an application level though.
+When you need to, for example, make sure that a variable contains an `array` of `string` or that value represents a floating point number.
+Cases like these require additional progrma statements and type checking which can be consolidated into a set of functions.
+
+The `Schema` module defines a few objects and functions to alleviate this burden from the application developer.
 
 **The FieldSchema Object**
 
+This object describes a value (or field) with greater precision then Javascript's `typeof` statement.
+The `FieldSchema.type` member will always contain a Javascript data type while the `FieldSchema.format` field contains a more
+detailed data type.
+
 ~~~javascript
 FieldSchema = {
-	type: '',				// Javascript data type (boolean, number, string, object).
+	type: '',				// Javascript data type (boolean, number, string, or object).
 	format: '',				// A data type specific designation.
 	default: undefined,		// A default value used for missing fields.
 	name: '',				// Name of the field.
 }
 ~~~
 
-LiquicodeJS can classify and identify value types beyond the primitive data types supported by Javascript.
-When obtaining FieldSchema objects from `Schema.ValueSchema()` or `Schema.ObjectSchema()`,
-`FieldSchema.type` will contain the Javascript data type and `FieldSchema.format` will have a more specific type description.
+These functions will generate a `FieldSchema` from a single value or an object.
+Be aware that only the top level members of an object are scrutinized as this is what we are typically interested in most cases.
+Functions of the `Schema` module do not recurse into an object providing the schema for every single field in the object.
+Rather, they inspect the top level of objects only and return an array of schema objects as a result.
+Again, this handles most use cases with a consistent set of functions.
+Any further validation/coercion that may be required can also be perfomed by the same functions on an individual case basis.
 
-Possible values for "FieldSchema.type" and "FieldSchema.format" are as follows:
+- `Schema.ValueSchema( FromValue )`
+- `Schema.ObjectSchema( FromObject )`
 
-| Type    | Format        | Default Value | Examples                          |
-|---------|---------------|---------------|-----------------------------------|
-| boolean | boolean       | false         | true, or false                    |
-| number  | integer       | 0             | 1, 2, or 3.0                      |
-| number  | float         | 0             | 1.1, 2.071, or 3.14               |
-| string  | string        | ""            | Hello', or ''                     |
-| object  | object        | {}            | { foo: 'bar' }                    |
-| object  | array         | []            | [ 1, 'two', 3.14, null ]          |
-| object  | boolean-array | []            | [ true, false, true ]             |
-| object  | number-array  | []            | [ 1, 2, 3.14 ]                    |
-| object  | string-array  | []            | [ 'one', 'two', 'three' ]         |
-| object  | object-array  | []            | [ { foo: 'bar' }, [1,2,3], null ] |
-| object  | array-array   | []            | [ [1,2,3], [], [4,5] ]            |
+Possible values for `FieldSchema.type` and `FieldSchema.format` are as follows:
+
+| Type    | Format        | Default Value | Examples                              |
+|---------|---------------|---------------|---------------------------------------|
+| boolean | boolean       | false         | `true`, or `false`                |
+| number  | integer       | 0             | `1`, `2`, or `3.0`              |
+| number  | float         | 0             | `1.1`, `2.071`, or `3.14`       |
+| string  | string        | ""            | `"Hello"`, or `""`                |
+| object  | object        | {}            | `{ foo: 'bar' }`                    |
+| object  | array         | []            | `[ 1, 'two', 3.14, null ]`          |
+| object  | boolean-array | []            | `[ true, false, true ]`             |
+| object  | number-array  | []            | `[ 1, 2, 3.14 ]`                    |
+| object  | string-array  | []            | `[ 'one', 'two', 'three' ]`         |
+| object  | object-array  | []            | `[ { foo: 'bar' }, [1,2,3], null ]` |
+| object  | array-array   | []            | `[ [1,2,3], [], [4,5] ]`            |
+
 
 
 **The ErrorValue Object**
+
+LiquicodeJS introduces an `ErrorValue` object that is used to indicate and convey errors.
+Some functions will return an `ErrorValue` object instead of throwing a Javascript `Error`.
+In some cases, this can make code more efficient and legible when certain errors are tolerable
+and you want to avoid the expensive cost of a Javascript `Error` that includes a call stack.
+
+Use the `Schema.ErrorValue()` function to create an `ErrorValue` object and `Schema.IsErrorValue()` to test for errors.
+An `ErrorValue` will always have `ErrorValue.ok = false` and `ErrorValue.error` will contain the error message.
 
 ~~~javascript
 ErrorValue = {
@@ -55,19 +89,23 @@ ErrorValue = {
 }
 ~~~
 
-LiquicodeJS introduces an "ErrorValue" object that it can use to indicate errors.
-Some functions will optionally return an "ErrorValue" object instead of throwing a Javascript Error.
-In some cases, this can make code more efficient and legible when certain errors are tolerable
-and you want to avoid the expensive cost of a Javascript Error that includes a call stack.
-
-Use the "Schema.ErrorValue()" function to create ErrorValue objects and "Schema.IsErrorValue()" to test for errors.
-An ErrorValue will always have "ErrorValue.ok = false" and "ErrorValue.error" equal to a string.
 
 
 **Value Coercion**
 
-The functions "Schema.CoerceValue()", "Schema.ValidateValue()", and "Schema.ValidateObject()" can optionally coerce values
-from their given type to the types specified in Schema.
+As data gets shuttled around between memory, files, and network transmissions, the representation of the data might
+change to suit to the medium.
+For example, an integer value being stored in a file might be read back out later as a string.
+It's actual value hasn't changed, but the way it is represented has changed.
+Javascript can be pretty forgiving in these cases by allowing a certain amount of type fluidity;
+However, this can also cause some difficult to spot errors like when `'2' + 2` equals the string `'22'` and not the integer `4`.
+
+Use these functions the validate that a value's type is of an expected type and to coerce the value, in a common sense way,
+to that expected type.
+
+- `Types.Coerce( Value, Schema, ThrowErrors )`
+- `Types.Coerce( Value, Schema, ThrowErrors )`
+- `Types.Coerces( Values, Schemas, ThrowErrors )`
 
 This tables describes how values are converted from one data type to another during coercion:
 
@@ -81,13 +119,8 @@ This tables describes how values are converted from one data type to another dur
 | Object    | Boolean()      | Number()       | JSON.stringify() | Value          |
 
 
-**Object Schema and Validation**
 
-The functions "Schema.ObjectSchema()" and "Schema.ValidateObject()" take these concepts to the next level and
-provides schemas functionality on an object level rather than an individual value level.
-
-
-**Additional References**
+**Related Reading**
 
 - [You Don't Know JS: Types & Grammar - Chapter 4. Coercion](https://www.oreilly.com/library/view/you-dont-know/9781491905159/ch04.html)
 
@@ -96,317 +129,194 @@ provides schemas functionality on an object level rather than an individual valu
 
 <br>
 
-### ***Schema*** Functions
+### ***Types*** Functions
 
 <br>
 
 <details>
 <summary>
 <strong>
-ErrorValue( Message, Context )
+Coerce( Value )
 </strong>
 <small>
-- Returns an ErrorValue object containing error information.
+- Returns a `Coercion` object which is used to coerce values to different types.
 </small>
 </summary>
 
-> ### Schema.***ErrorValue***( Message, Context )
+> ### Types.***Coerce***( Value )
 > 
-> Returns an ErrorValue object containing error information.
+> Returns a `Coercion` object which is used to coerce values to different types.
 > 
-> **Returns**: `object` - An ErrorValue object.
+> **Returns**: `object` - A `Coercion` object.
 
 ***Parameters***
 
 |  Name              |  Type   | Required  |  Default          |  Description  
 |--------------------|---------|-----------|-------------------|---------------
-| Message            | `string` | -        | "error"           | The error message.
-| Context            | `string` | -        |                   | Context for the error (e.g. a function name).
+| Value              | `*`     | -         |                   | The value to coerce. This value is set to `Coercion.value`.
 
 ***Description***
 
 
+The returned `Coercion` object has a single member `Coercion.value` and a number of coercion functions:
 
+- `ToBoolean( Default = false )` :
+	Returns the boolean value of `Coercion.value`.
+	Anything can be coerced to a boolean.
+	If value is a string, then 'false' and '0' will return false while 'true' will return true.
 
----
-</details>
+- `ToNumber( Default = 0 )` :
+	Returns the numeric value of `Coercion.value`.
+	Booleans, other numbers, and numeric strings can be coerced to a number.
 
-<br>
+- `ToString( Default = '' )` :
+	Returns the string value of `Coercion.value`.
+	Anything can be coerced to a string.
+	If value is an object, then it is JSON stringified and returned.
 
-<details>
-<summary>
-<strong>
-IsErrorValue( Value )
-</strong>
-<small>
-- Tests if a Value is an ErrorValue object.
-</small>
-</summary>
+- `ToObject( Default = null )` :
+	Returns the object value of `Coercion.value`.
+	Only JSON strings and other objects can be coerced to an object.
+	If value is a JSON string, then it is JSON parsed and returned.
 
-> ### Schema.***IsErrorValue***( Value )
-> 
-> Tests if a Value is an ErrorValue object.
-> 
-> **Returns**: `boolean` - True if Value is an ErrorValue object, otherwise false.
+`Coercion.value` is set to the Value parameter.
 
-***Parameters***
+**Usage**
 
-|  Name              |  Type   | Required  |  Default          |  Description  
-|--------------------|---------|-----------|-------------------|---------------
-| Value              | `object` | -        |                   | The value to test.
+There are two ways to use the `Coercion` object.
 
-
----
-</details>
-
-<br>
-
-<details>
-<summary>
-<strong>
-ValueSchema( Value )
-</strong>
-<small>
-- Returns a FieldSchema based upon a specific value.
-</small>
-</summary>
-
-> ### Schema.***ValueSchema***( Value )
-> 
-> Returns a FieldSchema based upon a specific value.
-> 
-> **Returns**: `object` - A FieldSchema object.
-
-***Parameters***
-
-|  Name              |  Type   | Required  |  Default          |  Description  
-|--------------------|---------|-----------|-------------------|---------------
-| Value              | `*`     | -         |                   | The value to infer a schema from.
-
-***Description***
-
-
-This function is used to obtain extended type information about a value.
-While it does return an entire FieldSchema object, only the "FieldSchema.type" and "FieldSchema.format" fields are set.
-
-
-
----
-</details>
-
-<br>
-
-<details>
-<summary>
-<strong>
-DefaultValue( Schema, ThrowErrors )
-</strong>
-<small>
-- Returns the default value for the FieldSchema.
-</small>
-</summary>
-
-> ### Schema.***DefaultValue***( Schema, ThrowErrors )
-> 
-> Returns the default value for the FieldSchema.
-> 
-> **Returns**: `*` - The default value.
-
-***Parameters***
-
-|  Name              |  Type   | Required  |  Default          |  Description  
-|--------------------|---------|-----------|-------------------|---------------
-| Schema             | `object` | required |                   | The schema to use when calculating a default value.
-| ThrowErrors        | `boolean` | -       |                   | Errors are thrown if true, otherwise an ErrorValue object is returned.
-
-***Description***
-
-
-If the FieldSchema specifies a default value, then that value will be returned.
-Otherwise, a default value is calculated based upon the type and format of the FieldSchema.
-
-| Type    | Format        | Default
-|---------|---------------|-----------
-| boolean | -             | false
-| number  | integer       | 0
-| number  | float         | 0
-| string  | -             | ''
-| object  | -             | {}
-| object  | array         | []
-| object  | boolean-array | []
-| object  | number-array  | []
-| object  | string-array  | []
-| object  | object-array  | []
-
-
-
----
-</details>
-
-<br>
-
-<details>
-<summary>
-<strong>
-CoerceValue( Value, Schema, ThrowErrors )
-</strong>
-<small>
-- Attempt to coerce the Value parameter to match the Schema's type.
-</small>
-</summary>
-
-> ### Schema.***CoerceValue***( Value, Schema, ThrowErrors )
-> 
-> Attempt to coerce the Value parameter to match the Schema's type.
-> 
-> **Returns**: `*` - The coerced value or an error object.
-
-***Parameters***
-
-|  Name              |  Type   | Required  |  Default          |  Description  
-|--------------------|---------|-----------|-------------------|---------------
-| Value              | `*`     | required  |                   | The value to coerce.
-| Schema             | `object` | required |                   | The schema to use when coercing Value.
-| ThrowErrors        | `boolean` | -       |                   | Errors are thrown if true, otherwise an ErrorValue object is returned.
-
-***Description***
-
-
-
-This function uses the Schema to coerce the Value to a particular data type.
-
-If the "Schema.type" === "*", then no validation or coercion is performed and the Value is returned.
-If the "Schema.type" === "function", then no validation or coercion is performed and the Value is returned.
-
-If Value is "undefined" or "null", then the default value for "FieldSchema.type" will be returned.
-This is done by calling "Schema.DefaultValue()" for the FieldSchema.
-
-"Schema.ValueSchema()" is called the get the schema for Value, which is then compared against the expected Schema.
-
-	
-
-
----
-</details>
-
-<br>
-
-<details>
-<summary>
-<strong>
-ValidateValue( Value, Schema, Options )
-</strong>
-<small>
-- Validates a field value according to a schema and optionally coerces the value to match.
-</small>
-</summary>
-
-> ### Schema.***ValidateValue***( Value, Schema, Options )
-> 
-> Validates a field value according to a schema and optionally coerces the value to match.
-> 
-> **Returns**: `*` - The validated/coerced Value or an ErrorValue object.
-
-***Parameters***
-
-|  Name              |  Type   | Required  |  Default          |  Description  
-|--------------------|---------|-----------|-------------------|---------------
-| Value              | `*`     | required  |                   | The value to validate.
-| Schema             | `object` | required |                   | The FieldSchema object to validate against.
-| Options            | `object` | -        | "{ coerce: false, throw_errors: false, context: null }" | An options object to control validation:
+One way is to immediately call one of the coercion functions after obtaining the `Coercion` object:
 ~~~javascript
-Options = {
-	coerce_values: false,	// Attempt to coerce the provided value to match the schema's type.
-	throw_errors: false,	// When true, throw an error validation errors are encountered.
-	context: null,			// A context name (function name) to include in any error messages.
-}
+let number_42 = LiquicodeJS.Schema.Coerce( '42' ).ToNumber();
 ~~~
 
-***Description***
+Another way is to reuse the `Coercion` object and alter the `Coercion.value` property yourself:
+~~~javascript
+let coercion = LiquicodeJS.Schema.Coerce();
+coercion.value = '42';
+let number_42 = coercion.ToNumber();
+~~~
 
-
-
-This function uses "Schema.type", "Schema.format", "Schema.required', and "Schema.default" to validate the given Value.
-
-If "Options.coerce = true", then an attempt will be made to coerce the given value to match the type and format specified in the FieldSchema.
-(See: "Schema.CoerceValue()")
-
-	
-
-
----
-</details>
-
-<br>
-
-<details>
-<summary>
-<strong>
-ObjectSchema( FromObject )
-</strong>
-<small>
-- Returns an array of FieldSchema describing the top-most members of "FromObject".
-</small>
-</summary>
-
-> ### Schema.***ObjectSchema***( FromObject )
-> 
-> Returns an array of FieldSchema describing the top-most members of "FromObject".
-> 
-> **Returns**: `object` - An array of FieldSchema.
-
-***Parameters***
-
-|  Name              |  Type   | Required  |  Default          |  Description  
-|--------------------|---------|-----------|-------------------|---------------
-| FromObject         | `object` | required |                   | An object to retrieve the schema for.
-
-
----
-</details>
-
-<br>
-
-<details>
-<summary>
-<strong>
-ValidateValues( Values, Schemas )
-</strong>
-<small>
-- Validate a set of values against an array of FieldSchema.
-</small>
-</summary>
-
-> ### Schema.***ValidateValues***( Values, Schemas )
-> 
-> Validate a set of values against an array of FieldSchema.
-> 
-> **Returns**: `object` - An object containing the validation result.
-
-***Parameters***
-
-|  Name              |  Type   | Required  |  Default          |  Description  
-|--------------------|---------|-----------|-------------------|---------------
-| Values             | `object` | required |                   | The values to validate. This can be an array of values, or an object described by Schemas.
-| Schemas            | `object` | required |                   | An array of FieldSchemas to validate the Values with. Can also be an object whose top-most fields are instances of FieldSchema.
-
-***Description***
-
-
-
-Takes an array of Values and an array of FieldSchema to validate a number of fields at once.
-This function does not throw validation errors.
-Instead, all validation errors are returned to the caller in the return value.
-Additionally, the number of fields processed and a set of coerced values is also returned.
-
-**The Return Value**
+**Examples**
 
 ~~~javascript
-ReturnValue = {
-	field_count: 0,				// The number of fields processed.
-	validation_errors: [],		// All validation errors encountered.
-	coerced_values: [],			// An array of coerced values.
-}
+// Coercing to boolean
+Schema.Coerce( null ).ToBoolean()           // = false
+Schema.Coerce( 0 ).ToBoolean()              // = false
+Schema.Coerce( 'true' ).ToBoolean()         // = true
+
+// Coercing to number
+Schema.Coerce( null ).ToNumber()            // = 0
+Schema.Coerce( '3.14' ).ToNumber()          // = 3.14
+Schema.Coerce( 'foo' ).ToNumber()           // = 0
+
+// Coercing to string
+Schema.Coerce( null ).ToString()            // = ''
+Schema.Coerce( '3.14' ).ToString()          // = '3.14'
+Schema.Coerce( { foo: 'bar' } ).ToString()  // = '{"foo":"bar"}'
+
+// Coercing to object
+Schema.Coerce( null ).ToObject()            // = null
+Schema.Coerce( 3.14 ).ToObject()            // = null
+Schema.Coerce( '{"foo":"bar"}' ).ToObject() // = { foo: 'bar' }
+
+// Coercing with a Default
+Schema.Coerce( 'Hello' ).ToNumber( -1 )     // = -1
+Schema.Coerce( true ).ToObject( {} )        // = {}
+Schema.Coerce( 1024 ).ToObject( {} )        // = {}
+Schema.Coerce( null ).ToObject( { a: 1 } )  // = { a: 1 }
+Schema.Coerce( null ).ToObject( [ 1, 2 ] )  // = [ 1, 2 ]
+~~~
+
+
+
+---
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+GetFormat( Value )
+</strong>
+<small>
+- Determine the type and format of a value.
+</small>
+</summary>
+
+> ### Types.***GetFormat***( Value )
+> 
+> Determine the type and format of a value.
+> 
+> **Returns**: `string` - An extended type description.
+
+***Parameters***
+
+|  Name              |  Type   | Required  |  Default          |  Description  
+|--------------------|---------|-----------|-------------------|---------------
+| Value              | `*`     | required  |                   | The value to get the format for.
+
+***Description***
+
+
+Iterates through `Types.Formats` in reverse order and calls each `Format.IsFormat()` function.
+When one of the formats returns `true`, then it's type and format are returned separated by `:`.
+
+**Examples**
+
+~~~javascript
+LiquicodeJS.Types.GetFormat( '42' )         // = 'number:integer'
+LiquicodeJS.Types.GetFormat( 'Hello' )      // = 'string:string'
+LiquicodeJS.Types.GetFormat( new Date() )   // = 'object:datetime'
+LiquicodeJS.Types.GetFormat( [ 1, 2, 3 ] )  // = 'object:number-array'
+~~~
+
+
+
+---
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+IsFormat( Value, Format )
+</strong>
+<small>
+- Determine if a value is of a particular format.
+</small>
+</summary>
+
+> ### Types.***IsFormat***( Value, Format )
+> 
+> Determine if a value is of a particular format.
+> 
+> **Returns**: `boolean` - True if the value matches the format.
+
+***Parameters***
+
+|  Name              |  Type   | Required  |  Default          |  Description  
+|--------------------|---------|-----------|-------------------|---------------
+| Value              | `*`     | required  |                   | The value to test.
+| Format             | `string` | required |                   | The type and format to test for as: `"type:format"`.
+
+***Description***
+
+
+Looks up the specified format in `Types.Formats` and calls the `Format.IsFormat()` function.
+
+The `Format` parameter must specify both type and format to be tested for.
+
+**Examples**
+
+~~~javascript
+LiquicodeJS.Types.IsFormat( 'Hello', 'string:string' )            // = true
+LiquicodeJS.Types.IsFormat( 'Hello', 'string:json' )              // = false
+LiquicodeJS.Types.IsFormat( [ 1, 2, 3 ], 'object:array' )         // = true
+LiquicodeJS.Types.IsFormat( [ 1, 2, 3 ], 'object:number-array' )  // = true
+LiquicodeJS.Types.IsFormat( [ 1, 2, 3 ], 'object:string-array' )  // = false
 ~~~
 
 
@@ -1072,86 +982,12 @@ Returns the remainder of a text phrase occurring befiore the last word.
 <br>
 <br>
 
-## ***Json***: Functions for manipulating Json.
+## ***Parse***: Functions for tokenizing text strings.
 
 
 <br>
 
-### ***Json*** Functions
-
-<br>
-<br>
-
-## ***Date***: Functions for manipulating dates.
-
-
-<br>
-
-### ***Date*** Functions
-
-<br>
-
-<details>
-<summary>
-<strong>
-Parse( Text, TimeZoneOffset )
-</strong>
-</summary>
-
-> ### Date.***Parse***( Text, TimeZoneOffset )
-> 
-> undefined
-> 
-> **Returns**: `object`
-
-***Parameters***
-
-|  Name              |  Type   | Required  |  Default          |  Description  
-|--------------------|---------|-----------|-------------------|---------------
-| Text               | `string` | required |                   | 
-| TimeZoneOffset     | `function` | -      | "+0000"           | 
-
-***Description***
-
-Converts a string to a date-time value.
-Returns a `date_time_parts` structure.
-
-
----
-</details>
-
-<br>
-
-<details>
-<summary>
-<strong>
-ZuluTimestamp(  )
-</strong>
-</summary>
-
-> ### Date.***ZuluTimestamp***(  )
-> 
-> undefined
-> 
-> **Returns**: `string`
-
-***Description***
-
-Returns the current date and time as a string.
-
-
----
-</details>
-
-<br>
-<br>
-
-## ***Token***: Functions for tokenizing text strings.
-
-
-<br>
-
-### ***Token*** Functions
+### ***Parse*** Functions
 
 <br>
 
@@ -1162,7 +998,7 @@ TokenizeOptions( PresetName )
 </strong>
 </summary>
 
-> ### Token.***TokenizeOptions***( PresetName )
+> ### Parse.***TokenizeOptions***( PresetName )
 > 
 > undefined
 > 
@@ -1192,7 +1028,7 @@ Tokenize( PresetName )
 </strong>
 </summary>
 
-> ### Token.***Tokenize***( PresetName )
+> ### Parse.***Tokenize***( PresetName )
 > 
 > undefined
 > 
@@ -1213,25 +1049,57 @@ Returns the parsed tokens.
 </details>
 
 <br>
+
+<details>
+<summary>
+<strong>
+DateParse( Value, TimeZoneOffset )
+</strong>
+</summary>
+
+> ### Parse.***DateParse***( Value, TimeZoneOffset )
+> 
+> undefined
+> 
+> **Returns**: `object`
+
+***Parameters***
+
+|  Name              |  Type   | Required  |  Default          |  Description  
+|--------------------|---------|-----------|-------------------|---------------
+| Value              | `string` | required |                   | 
+| TimeZoneOffset     | `string` | -        | "+0000"           | 
+
+***Description***
+
+
+Dates and times are funny little creatures.
+
+
+
+---
+</details>
+
+<br>
 <br>
 
-## ***File***: Functions for manipulating files. (nodejs only)
+## ***System***: File system and process functions. (nodejs only)
 
 
 <br>
 
-### ***File*** Functions
+### ***System*** Functions
 
 <br>
 
 <details>
 <summary>
 <strong>
-Visit( StartFolder, FilePattern, Recurse, Visitor )
+VisitFiles( StartFolder, FilePattern, Recurse, Visitor )
 </strong>
 </summary>
 
-> ### File.***Visit***( StartFolder, FilePattern, Recurse, Visitor )
+> ### System.***VisitFiles***( StartFolder, FilePattern, Recurse, Visitor )
 > 
 > undefined
 > 
@@ -1264,7 +1132,7 @@ CountFiles( StartFolder, FilePattern, Recurse )
 </strong>
 </summary>
 
-> ### File.***CountFiles***( StartFolder, FilePattern, Recurse )
+> ### System.***CountFiles***( StartFolder, FilePattern, Recurse )
 > 
 > undefined
 > 
@@ -1296,7 +1164,7 @@ CountFolders( StartFolder, Recurse )
 </strong>
 </summary>
 
-> ### File.***CountFolders***( StartFolder, Recurse )
+> ### System.***CountFolders***( StartFolder, Recurse )
 > 
 > undefined
 > 
@@ -1327,7 +1195,7 @@ CopyFolder( FromFolder, ToFolder, FilePattern, Overwrite, Recurse )
 </strong>
 </summary>
 
-> ### File.***CopyFolder***( FromFolder, ToFolder, FilePattern, Overwrite, Recurse )
+> ### System.***CopyFolder***( FromFolder, ToFolder, FilePattern, Overwrite, Recurse )
 > 
 > undefined
 > 
@@ -1361,7 +1229,7 @@ DeleteFolder( Folder, Recurse )
 </strong>
 </summary>
 
-> ### File.***DeleteFolder***( Folder, Recurse )
+> ### System.***DeleteFolder***( Folder, Recurse )
 > 
 > undefined
 > 
@@ -1392,7 +1260,7 @@ AsyncSleep( Milliseconds )
 </strong>
 </summary>
 
-> ### OS.***AsyncSleep***( Milliseconds )
+> ### System.***AsyncSleep***( Milliseconds )
 > 
 > undefined
 > 
@@ -1415,7 +1283,7 @@ AsyncExecute( Milliseconds )
 </strong>
 </summary>
 
-> ### OS.***AsyncExecute***( Milliseconds )
+> ### System.***AsyncExecute***( Milliseconds )
 > 
 > undefined
 > 
@@ -1432,12 +1300,12 @@ AsyncExecute( Milliseconds )
 <br>
 <br>
 
-## ***Net***: Functions for working with networks. (nodejs only)
+## ***Network***: Functions for working with networks. (nodejs only)
 
 
 <br>
 
-### ***Net*** Functions
+### ***Network*** Functions
 
 <br>
 
@@ -1448,7 +1316,7 @@ AsyncDownloadFile(  )
 </strong>
 </summary>
 
-> ### Net.***AsyncDownloadFile***(  )
+> ### Network.***AsyncDownloadFile***(  )
 > 
 > undefined
 > 
@@ -1471,7 +1339,7 @@ AsyncGetRequest( Url )
 </strong>
 </summary>
 
-> ### Net.***AsyncGetRequest***( Url )
+> ### Network.***AsyncGetRequest***( Url )
 > 
 > undefined
 > 

@@ -9,13 +9,13 @@ const TEST_DATA_FOLDER = LIB_PATH.resolve( __dirname, '../../tests/_test-data/fo
 
 
 //---------------------------------------------------------------------
-describe( `810) File.Visit Tests`, function ()
+describe( `810) System.VisitFiles Tests`, function ()
 {
 
 	//---------------------------------------------------------------------
 	it( `should visit all elements of a folder`, function ()
 	{
-		let count = LQC.File.Visit( TEST_DATA_FOLDER );
+		let count = LQC.System.VisitFiles( TEST_DATA_FOLDER );
 		LIB_ASSERT.strictEqual( count, 3 );
 		return;
 	} );
@@ -23,7 +23,7 @@ describe( `810) File.Visit Tests`, function ()
 	//---------------------------------------------------------------------
 	it( `should visit all elements of a folder recursively`, function ()
 	{
-		let count = LQC.File.Visit( TEST_DATA_FOLDER, '', true );
+		let count = LQC.System.VisitFiles( TEST_DATA_FOLDER, '', true );
 		LIB_ASSERT.strictEqual( count, 9 );
 		return;
 	} );
@@ -31,7 +31,7 @@ describe( `810) File.Visit Tests`, function ()
 	//---------------------------------------------------------------------
 	it( `should visit only files when a pattern is supplied`, function ()
 	{
-		let count = LQC.File.Visit( TEST_DATA_FOLDER, '*.txt', true );
+		let count = LQC.System.VisitFiles( TEST_DATA_FOLDER, '*.txt', true );
 		LIB_ASSERT.strictEqual( count, 6 );
 		return;
 	} );

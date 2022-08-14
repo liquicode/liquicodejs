@@ -3,9 +3,9 @@
 
 //---------------------------------------------------------------------
 let _Schema = {
-	id: '811',
-	member_of: 'File',
-	name: 'CountFiles',
+	id: '812',
+	member_of: 'System',
+	name: 'CountFolders',
 	type: 'function',
 	returns: 'number',
 	description: [
@@ -17,12 +17,6 @@ let _Schema = {
 			name: 'StartFolder',
 			type: 'string',
 			required: true,
-		},
-		FilePattern: {
-			name: 'FilePattern',
-			type: 'string',
-			required: false,
-			default: '*',
 		},
 		Recurse: {
 			name: 'Recurse',
@@ -42,26 +36,32 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function CountFiles
+	 * @function CountFolders
 	 * @returns {number}
 	 * @description
 	 * Scans a folder and calls the Visitor callback function for each folder/file encountered.
 	 * Returns the number of folders/files visited.
 	 * @param {string} StartFolder
-	 * @param {string} [FilePattern="*"]
 	 * @param {boolean} [Recurse]
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 
 
-	function CountFiles( StartFolder, FilePattern, Recurse ) 
+	function CountFolders( StartFolder, Recurse ) 
 	{
 		StartFolder = Liquicode.Types.Coerce( StartFolder ).ToString();
-		FilePattern = Liquicode.Types.Coerce( FilePattern ).ToString();
 		Recurse = Liquicode.Types.Coerce( Recurse ).ToBoolean();
 
-		let count = Liquicode.File.Visit( StartFolder, FilePattern, Recurse );
-		return count;
+		let folder_count = 0;
+		Liquicode.System.VisitFiles( StartFolder, '', Recurse,
+			function ( Folder, Filename )
+			{
+				if ( Folder && !Filename )
+				{
+					folder_count++;
+				}
+			} );
+		return folder_count;
 	}
 
 
@@ -69,6 +69,6 @@ module.exports = function ( Liquicode )
 	// Return the module exports.
 	return {
 		_Schema: _Schema,
-		CountFiles: CountFiles,
+		CountFolders: CountFolders,
 	};
 };

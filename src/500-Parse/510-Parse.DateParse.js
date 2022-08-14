@@ -36,13 +36,14 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function Parse
+	 * @function DateParse
 	 * @returns {object}
 	 * @description
-	 * Converts a string to a date-time value.
-	 * Returns a `date_time_parts` structure.
+	 * 
+Dates and times are funny little creatures.
+
 	 * @param {string} Value
-	 * @param {function} [TimeZoneOffset="+0000"]
+	 * @param {string} [TimeZoneOffset="+0000"]
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 
