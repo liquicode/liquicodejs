@@ -272,10 +272,10 @@ Coerce( Value )
 <p><strong>Usage</strong></p>
 <p>There are two ways to use the <code>Coercion</code> object.</p>
 <p>One way is to immediately call one of the coercion functions after obtaining the <code>Coercion</code> object:</p>
-<pre><code class="language-javascript">let number_42 = LiquicodeJS.Schema.Coerce( &#39;42&#39; ).ToNumber();
+<pre><code class="language-javascript">let number_42 = Liquicode.Types.Coerce( &#39;42&#39; ).ToNumber();
 </code></pre>
 <p>Another way is to reuse the <code>Coercion</code> object and alter the <code>Coercion.value</code> property yourself:</p>
-<pre><code class="language-javascript">let coercion = LiquicodeJS.Schema.Coerce();
+<pre><code class="language-javascript">let coercion = Liquicode.Types.Coerce();
 coercion.value = &#39;42&#39;;
 let number_42 = coercion.ToNumber();
 </code></pre>
@@ -349,10 +349,10 @@ GetFormat( Value )
 <p>Iterates through <code>Types.Formats</code> in reverse order and calls each <code>Format.IsFormat()</code> function.
 When one of the formats returns <code>true</code>, then it&#39;s type and format are returned separated by <code>:</code>.</p>
 <p><strong>Examples</strong></p>
-<pre><code class="language-javascript">LiquicodeJS.Types.GetFormat( &#39;42&#39; )         // = &#39;number:integer&#39;
-LiquicodeJS.Types.GetFormat( &#39;Hello&#39; )      // = &#39;string:string&#39;
-LiquicodeJS.Types.GetFormat( new Date() )   // = &#39;object:datetime&#39;
-LiquicodeJS.Types.GetFormat( [ 1, 2, 3 ] )  // = &#39;object:number-array&#39;
+<pre><code class="language-javascript">Liquicode.Types.GetFormat( &#39;42&#39; )         // = &#39;number:integer&#39;
+Liquicode.Types.GetFormat( &#39;Hello&#39; )      // = &#39;string:string&#39;
+Liquicode.Types.GetFormat( new Date() )   // = &#39;object:datetime&#39;
+Liquicode.Types.GetFormat( [ 1, 2, 3 ] )  // = &#39;object:number-array&#39;
 </code></pre>
 <hr>
 </details>
@@ -403,11 +403,11 @@ IsFormat( Value, Format )
 <p>Looks up the specified format in <code>Types.Formats</code> and calls the <code>Format.IsFormat()</code> function.</p>
 <p>The <code>Format</code> parameter must specify both type and format to be tested for.</p>
 <p><strong>Examples</strong></p>
-<pre><code class="language-javascript">LiquicodeJS.Types.IsFormat( &#39;Hello&#39;, &#39;string:string&#39; )            // = true
-LiquicodeJS.Types.IsFormat( &#39;Hello&#39;, &#39;string:json&#39; )              // = false
-LiquicodeJS.Types.IsFormat( [ 1, 2, 3 ], &#39;object:array&#39; )         // = true
-LiquicodeJS.Types.IsFormat( [ 1, 2, 3 ], &#39;object:number-array&#39; )  // = true
-LiquicodeJS.Types.IsFormat( [ 1, 2, 3 ], &#39;object:string-array&#39; )  // = false
+<pre><code class="language-javascript">Liquicode.Types.IsFormat( &#39;Hello&#39;, &#39;string:string&#39; )            // = true
+Liquicode.Types.IsFormat( &#39;Hello&#39;, &#39;string:json&#39; )              // = false
+Liquicode.Types.IsFormat( [ 1, 2, 3 ], &#39;object:array&#39; )         // = true
+Liquicode.Types.IsFormat( [ 1, 2, 3 ], &#39;object:number-array&#39; )  // = true
+Liquicode.Types.IsFormat( [ 1, 2, 3 ], &#39;object:string-array&#39; )  // = false
 </code></pre>
 <hr>
 </details>
@@ -1350,6 +1350,230 @@ BeforeLastWord( Phrase, Delimiters )
 </tbody></table>
 <p><em><strong>Description</strong></em></p>
 <p>Returns the remainder of a text phrase occurring befiore the last word.</p>
+<hr>
+</details>
+<br>
+<br>
+
+<h2 id="shapes-functions-for-manipulating-data-in-different-shapes"><em><strong>Shapes</strong></em>: Functions for manipulating data in different shapes.</h2>
+<br>
+
+<h3 id="shapes-functions"><em><strong>Shapes</strong></em> Functions</h3>
+<br>
+
+<details>
+<summary>
+<strong>
+Matrix( Values, Options )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="shapesmatrix-values-options-">Shapes.<em><strong>Matrix</strong></em>( Values, Options )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code>object</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Values</td>
+<td><code>object</code></td>
+<td>required</td>
+<td>[[]]</td>
+<td>One of: a two-dimensional array of arrays, a one-dimensional array of values, or an integer.</td>
+</tr>
+<tr>
+<td>Options</td>
+<td><code>object</code></td>
+<td>-</td>
+<td>{}</td>
+<td>Set of options controlling Matrix operation.</td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>A Matrix object is essentially a two-dimensional array (an array of arrays).
+This function will create and return a new Matrix object.</p>
+<p><em><strong>Values Parameter</strong></em></p>
+<p>You can specify the initial contents of the Matrix with the Values parameter.
+If Values is an array of arrays, then Matrix will contain those values.
+If Values is a one-dimensional array, then Matrix will have a single row reflecting those values.
+If Values is an integer, then Matrix will be created with that number of blank rows.</p>
+<p>Note that the only way to create a new Matrix with no rows in it is: <code>Shapes.Matrix( 0, Options )</code></p>
+<p><em><strong>Options Parameter</strong></em></p>
+<p>The Options parameter is an options object:</p>
+<pre><code class="language-javascript">Options = {
+    default_value: null,    // A default value to use when no other value exists.
+    clone_values: false,    // If true, any values read or written to the Matrix are cloned first.
+}
+</code></pre>
+<p><em><strong>How It Works</strong></em></p>
+<p>The Matrix object contains a <code>RowData</code> member which is an array of arrays that contains the values for the matrix.
+This is maintained as a jagged array, meaning that each row of the matrix may be of different lengths.</p>
+<pre><code class="language-javascript">[	// Matrix maintains values in a jagged array:
+    [ 1, 2, 3, 4 ],
+    [ 1, 2, 3 ],
+    [ 1, 2, 3, 4, 5 ],
+]
+</code></pre>
+<p>When calling the <code>AppendColumns</code>, <code>InsertColumns</code>, <code>SetColumn</code>, or <code>SetValue</code> functions,
+it may be necessary for the matrix to fill out the columns of shorter rows so that the target column exists.
+For example, appending a blank column (<code>AppendColumns()</code>) to the matrix above would yield:</p>
+<pre><code class="language-javascript">[	// Matrix fills columns with
+    // default values as needed:
+    [ 1, 2, 3, 4,    null, null ],
+    [ 1, 2, 3, null, null, null ],
+    [ 1, 2, 3, 4,    5,    null ],
+]
+</code></pre>
+<p>You can change the value used to fill blank columns by changing <code>Option.default_value</code>.</p>
+<p><em><strong>Cell Addressing</strong></em></p>
+<p>When working with Matrix, you will usually need to identify a particular Row or Column to work with.
+Matrix supports three types addressing modes:</p>
+<ul>
+<li><ol>
+<li>A zero-based index used as a row/column index.
+This index must be greater than or equal to zero and less than the extent (i.e. the RowCount or ColumnCount).</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>A negative index that serves as an offset from the extent (e.g. -1 = RowCount - 1).
+This type of index must be between -extent and -1, inclusive.</li>
+</ol>
+</li>
+<li><ol start="3">
+<li>A spreadsheet style address (e.g. &#39;A1&#39;, &#39;B2&#39;, etc.).
+This type of address has letters component which indicates a column.
+This is followed by a digits component that is a one-based row number.</li>
+</ol>
+</li>
+</ul>
+<p><em><strong>Matrix Functions</strong></em></p>
+<p>The Matrix object also has a number of functions which allow you to manipulate the Matrix object.</p>
+<ul>
+<li><p>Addressing Functions:
+  These are utility functions that assist when working with the spreadsheet style of addressing.
+  These functions are used internally by Matrix.
+  They do not consider the validity of any particular address or index within the current Matrix.</p>
+<ul>
+<li><p><code>IsValidAddress( Address )</code>:
+  Returns <code>true</code> if Address is a valid address, otherwise <code>false</code>.
+  A valid address must contain a column component in letters (&#39;AB&#39;) and a row component in digits (&#39;12&#39;).
+  This function determines only if the Address parameter is a properly formatted address,
+  regardless if the address lies outside the bounds of this particular Matrix.</p>
+</li>
+<li><p><code>NumberToLetters( Number )</code>:
+  Returns the letters component of an address for any positive number (e.g. 1=&#39;A&#39;, 2=&#39;B&#39;, 28=&#39;AB&#39;, etc.).</p>
+</li>
+<li><p><code>LettersToNumber( Address )</code>:
+  Converts the letters component of an address to a positive number.
+  Address is a string that starts with, or is entirely composed of, letters.</p>
+</li>
+</ul>
+</li>
+<li><p>Row Functions:</p>
+<ul>
+<li><p><code>RowIndexOf( Address )</code>:
+  Will return a valid row index for this Matrix from the given Address.
+  Address can represent any of the three addressing styles.</p>
+</li>
+<li><p><code>RowCount()</code>:
+  Returns the number of rows within the Matrix.</p>
+</li>
+<li><p><code>AppendRows( Values )</code>:
+  Appends one or more rows to the end of the Matrix.
+  If Values is not supplied, then a blank row is appended.
+  If Values is a one-dimensional array, then a single row is appended.
+  If Values is a two-dimensional array, then multiple rows are appended.</p>
+</li>
+<li><p><code>InsertRows( Row, Values )</code>:
+  Inserts one or more rows within the Matrix, starting at the given Row address.
+  If Values is not supplied, then a blank row is appended.
+  If Values is a one-dimensional array, then a single row is appended.
+  If Values is a two-dimensional array, then multiple rows are appended.
+  Note that it is not possible to append a row to a Matrix by using this function.</p>
+</li>
+<li><p><code>DeleteRows( Row, Count )</code>:
+  Deletes one or more rows within the Matrix, starting at the given Row address.
+  If Count is not supplied, then a single row is deleted.</p>
+</li>
+<li><p><code>GetRow( Row )</code>:
+  Returns a single row of values from the Matrix, at the given Row address.</p>
+</li>
+<li><p><code>SetRow( Row, Values )</code>:
+  Replaces a single row of values (a one-dimensional array) within the Matrix, at the given Row address.
+  If Values is not supplied, then a blank row is set at that location.</p>
+</li>
+</ul>
+</li>
+<li><p>Column Functions:</p>
+<ul>
+<li><p><code>ColumnIndexOf( Address )</code>:
+  Will return a valid column index for this Matrix from the given Address.
+  Address can represent any of the three addressing styles.</p>
+</li>
+<li><p><code>ColumnCount()</code>:
+  Returns the number of columns within the Matrix.</p>
+</li>
+<li><p><code>AppendColumns( Values )</code>:
+  Appends one or more columns to the end of the Matrix.
+  If Values is not supplied, then a blank column is appended.
+  If Values is a one-dimensional array, then a single column is appended.
+  If Values is a two-dimensional array, then multiple columns are appended.</p>
+</li>
+<li><p><code>InsertColumns( Column, Values )</code>:
+  Inserts one or more columns within the Matrix, starting at the given Column address.
+  If Values is not supplied, then a blank column is appended.
+  If Values is a one-dimensional array, then a single column is appended.
+  If Values is a two-dimensional array, then multiple columns are appended.
+  Note that it is not possible to append a column to a Matrix by using this function.</p>
+</li>
+<li><p><code>DeleteColumns( Column, Count )</code>:
+  Deletes one or more columns within the Matrix, starting at the given Column address.
+  If Count is not supplied, then a single column is deleted.</p>
+</li>
+<li><p><code>GetColumn( Column )</code>:
+  Returns a single column of values from the Matrix, at the given Column address.</p>
+</li>
+<li><p><code>SetColumn( Column, Values )</code>:
+  Replaces a single column of values (a one-dimensional array) within the Matrix, at the given Column address.
+  If Values is not supplied, then a blank column is set at that location.</p>
+</li>
+</ul>
+</li>
+<li><p>Value Functions:</p>
+<ul>
+<li><p><code>GetValue( Row, Column )</code>:
+  Returns a single value located at Row and Column within the Matrix.
+  Row can be a string address, in which case the Column parameter is omitted.</p>
+</li>
+<li><p><code>SetValue( Row, Column, Value )</code>:
+  Sets a single value located at Row and Column within the Matrix.
+  Row can be a string address, in which case the Column parameter is omitted.</p>
+</li>
+<li><p><code>GetMatrix( Row, Column, RowCount, ColumnCount )</code>:
+  Constructs a new Matrix of values from within the called Matrix.
+  Values are taken starting at the location described by Row and Column and extending for RowCount rows and ColumnCount columns.</p>
+<ul>
+<li>You can call this using four parameters: <code>GetMatrix( Row, Column, RowCount, ColumnCount )</code></li>
+<li>You can call this using three parameters: <code>GetMatrix( Address, RowCount, ColumnCount )</code></li>
+<li>You can call this using two parameters: <code>GetMatrix( Address, Size )</code></li>
+</ul>
+</li>
+<li><p><code>SetMatrix( Row, Column, Matrix )</code>:
+  Sets a matrix of values starting at Row and Column.</p>
+</li>
+</ul>
+</li>
+</ul>
 <hr>
 </details>
 <br>

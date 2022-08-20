@@ -271,6 +271,7 @@ module.exports = function ( Liquicode )
 
 		Formats: require( './020-Types.Formats.js' )( Liquicode ).Formats,
 		GetFormat: require( './021-Types.GetFormat.js' )( Liquicode ).GetFormat,
+		IsFormat: require( './022-Types.IsFormat.js' )( Liquicode ).IsFormat,
 
 	};
 };
