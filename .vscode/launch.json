@@ -1,0 +1,264 @@
+{
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "--- TESTS ---------------------------------------",
+		},
+		{
+			"name": "All Tests",
+			"type": "node",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"cwd": "${workspaceFolder}",
+			"program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
+			"args": [
+				"-u",
+				"bdd",
+				"src/*/*.Tests.js",
+				"--timeout",
+				"0",
+				"--slow",
+				"10",
+				"--colors",
+			],
+			"outputCapture": "std",
+			"internalConsoleOptions": "openOnSessionStart",
+		},
+		{
+			"name": "000) Types Tests",
+			"type": "node",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"cwd": "${workspaceFolder}",
+			"program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
+			"args": [
+				"-u",
+				"bdd",
+				"src/000-Types/*.Tests.js",
+				"--timeout",
+				"0",
+				"--slow",
+				"10",
+				"--colors",
+			],
+			"outputCapture": "std",
+			"internalConsoleOptions": "openOnSessionStart",
+		},
+		{
+			"name": "100) Object Tests",
+			"type": "node",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"cwd": "${workspaceFolder}",
+			"program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
+			"args": [
+				"-u",
+				"bdd",
+				"src/100-Object/*.Tests.js",
+				"--timeout",
+				"0",
+				"--slow",
+				"10",
+				"--colors",
+			],
+			"outputCapture": "std",
+			"internalConsoleOptions": "openOnSessionStart",
+		},
+		{
+			"name": "200) Text Tests",
+			"type": "node",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"cwd": "${workspaceFolder}",
+			"program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
+			"args": [
+				"-u",
+				"bdd",
+				"src/200-Text/*.Tests.js",
+				"--timeout",
+				"0",
+				"--slow",
+				"10",
+				"--colors",
+			],
+			"outputCapture": "std",
+			"internalConsoleOptions": "openOnSessionStart",
+		},
+		{
+			"name": "300) Shapes Tests",
+			"type": "node",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"cwd": "${workspaceFolder}",
+			"program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
+			"args": [
+				"-u",
+				"bdd",
+				"src/300-Shapes/*.Tests.js",
+				"--timeout",
+				"0",
+				"--slow",
+				"10",
+				"--colors",
+			],
+			"outputCapture": "std",
+			"internalConsoleOptions": "openOnSessionStart",
+		},
+		{
+			"name": "400) Date Tests",
+			"type": "node",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"cwd": "${workspaceFolder}",
+			"program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
+			"args": [
+				"-u",
+				"bdd",
+				"src/400-Date/*.Tests.js",
+				"--timeout",
+				"0",
+				"--slow",
+				"10",
+				"--colors",
+			],
+			"outputCapture": "std",
+			"internalConsoleOptions": "openOnSessionStart",
+		},
+		{
+			"name": "500) Token Tests",
+			"type": "node",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"cwd": "${workspaceFolder}",
+			"program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
+			"args": [
+				"-u",
+				"bdd",
+				"src/500-Token/*.Tests.js",
+				"--timeout",
+				"0",
+				"--slow",
+				"10",
+				"--colors",
+			],
+			"outputCapture": "std",
+			"internalConsoleOptions": "openOnSessionStart",
+		},
+		{
+			"name": "800) File Tests",
+			"type": "node",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"cwd": "${workspaceFolder}",
+			"program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
+			"args": [
+				"-u",
+				"bdd",
+				"src/800-File/*.Tests.js",
+				"--timeout",
+				"0",
+				"--slow",
+				"10",
+				"--colors",
+			],
+			"outputCapture": "std",
+			"internalConsoleOptions": "openOnSessionStart",
+		},
+		{
+			"name": "900) Net Tests",
+			"type": "node",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"cwd": "${workspaceFolder}",
+			"program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
+			"args": [
+				"-u",
+				"bdd",
+				"src/900-Net/*.Tests.js",
+				"--timeout",
+				"0",
+				"--slow",
+				"10",
+				"--colors",
+			],
+			"outputCapture": "std",
+			"internalConsoleOptions": "openOnSessionStart",
+		},
+		{
+			"name": "--- BUILD ---------------------------------------",
+		},
+		{
+			"name": "100) Build Schema Docs",
+			"type": "node",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"cwd": "${workspaceFolder}",
+			"program": "${workspaceFolder}/build/100-build-schema-docs.js",
+			"args": [],
+			"outputCapture": "std",
+			"internalConsoleOptions": "openOnSessionStart",
+		},
+		{
+			"name": "110) Compile Html Docs",
+			"type": "node",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"cwd": "${workspaceFolder}",
+			"program": "${workspaceFolder}/build/110-compile-html-docs.js",
+			"args": [],
+			"outputCapture": "std",
+			"internalConsoleOptions": "openOnSessionStart",
+		},
+		{
+			"name": "200) Inject JSDoc Tags",
+			"type": "node",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"cwd": "${workspaceFolder}",
+			"program": "${workspaceFolder}/build/200-inject-jsdoc-tags.js",
+			"args": [],
+			"outputCapture": "std",
+			"internalConsoleOptions": "openOnSessionStart",
+		},
+		{
+			"name": "900) Build Dist",
+			"type": "node",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"cwd": "${workspaceFolder}",
+			"program": "${workspaceFolder}/build/900-build-dist.js",
+			"args": [],
+			"outputCapture": "std",
+			"internalConsoleOptions": "openOnSessionStart",
+		},
+	]
+}

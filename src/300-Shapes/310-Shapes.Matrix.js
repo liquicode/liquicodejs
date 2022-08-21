@@ -217,9 +217,9 @@ The Matrix object also has a number of functions which allow you to manipulate t
 	Return a copy of this matrix with its rows and column transposed.
 
 	- \`Join( AtColumn, JoinType, JoinMatrix, MatrixColumn )\`:
-		Return a new matrix by joining this matrix with another one.
-		The join is produced by matching column values between the two matrices.
-		The different supported join types are: 'inner', 'left', 'right', and 'full'.
+	Return a new matrix by joining this matrix with another one.
+	The join is produced by matching column values between the two matrices.
+	The different supported join types are: 'inner', 'left', 'right', and 'full'.
 
 `,
 	Parameters: {
