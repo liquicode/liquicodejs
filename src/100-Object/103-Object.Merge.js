@@ -8,7 +8,11 @@ let _Schema = {
 	name: 'Merge',
 	type: 'function',
 	returns: 'object',
-	description: ``,
+	description: `
+Merges the content of two objects and returns the composite result.
+
+Similar to Clone, this function will remove any non-data fields (i.e. functions and symbols) from the objects.
+`,
 	Parameters: {
 		Original: {
 			name: 'Original',

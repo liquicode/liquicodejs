@@ -267,6 +267,8 @@ module.exports = function ( Liquicode )
 	return {
 		_Schema: _Schema,
 
+		HasValue: require( './001-Types.HasValue.js' )( Liquicode ).HasValue,
+
 		Coerce: require( './010-Types.Coerce.js' )( Liquicode ).Coerce,
 
 		Formats: require( './020-Types.Formats.js' )( Liquicode ).Formats,

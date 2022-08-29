@@ -5,7 +5,7 @@
 let _Schema = {
 	id: '810',
 	member_of: 'System',
-	name: 'VisitFiles',
+	name: 'AsyncVisitFiles',
 	type: 'function',
 	returns: '*',
 	description: `
@@ -20,7 +20,7 @@ If the Visitor callback returns a value, then the visitation process is halted
 and that value is returned by the \`VisitFiles\` function.
 The Visitor callback is called for each file encountered and for each folder encountered.
 When called for a folder, the \`Filename\` parameter will be null.
-The Visitor callback function must be synchronous.
+The Visitor callback function can be either synchronous or asymchronous.
 `,
 	Parameters: {
 		StartFolder: {
@@ -76,7 +76,7 @@ module.exports = function ( Liquicode )
 	const LIB_PATH = require( 'path' );
 
 
-	function VisitFiles( StartFolder, FilePattern, Recurse, Visitor ) 
+	async function AsyncVisitFiles( StartFolder, FilePattern, Recurse, Visitor ) 
 	{
 		StartFolder = Liquicode.Types.Coerce( StartFolder ).ToString();
 		FilePattern = Liquicode.Types.Coerce( FilePattern ).ToString();
@@ -100,7 +100,7 @@ module.exports = function ( Liquicode )
 						// count++;
 						if ( Visitor ) 
 						{
-							let value = Visitor( StartFolder, element );
+							let value = await Visitor( StartFolder, element );
 							if ( value !== undefined ) { return value; }
 						}
 					}
@@ -111,7 +111,7 @@ module.exports = function ( Liquicode )
 					// count++;
 					if ( Visitor ) 
 					{
-						let value = Visitor( StartFolder, element );
+						let value = await Visitor( StartFolder, element );
 						if ( value !== undefined ) { return value; }
 					}
 				}
@@ -124,13 +124,13 @@ module.exports = function ( Liquicode )
 					// count++;
 					if ( Visitor ) 
 					{
-						let value = Visitor( from_path, null );
+						let value = await Visitor( from_path, null );
 						if ( value !== undefined ) { return value; }
 					}
 				}
 				if ( Recurse )
 				{
-					let value = VisitFiles( from_path, FilePattern, Recurse, Visitor );
+					let value = AsyncVisitFiles( from_path, FilePattern, Recurse, Visitor );
 					if ( value !== undefined ) { return value; }
 				}
 			}
@@ -143,6 +143,6 @@ module.exports = function ( Liquicode )
 	// Return the module exports.
 	return {
 		_Schema: _Schema,
-		VisitFiles: VisitFiles,
+		AsyncVisitFiles: AsyncVisitFiles,
 	};
 };

@@ -67,6 +67,10 @@ module.exports = function ( Liquicode )
 	//-end-jsdoc-----------------------------------------------------------
 
 
+	const LIB_FS = require( 'fs' );
+	const LIB_PATH = require( 'path' );
+
+
 	function CopyFolder( FromFolder, ToFolder, FilePattern, Overwrite, Recurse ) 
 	{
 		FromFolder = Liquicode.Types.Coerce( FromFolder ).ToString();
