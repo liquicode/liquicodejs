@@ -42,5 +42,7 @@ module.exports = function ( Liquicode )
 		FromIni: require( './125-Object.FromIni.js' )( Liquicode ).FromIni,
 		ToIni: require( './126-Object.ToIni.js' )( Liquicode ).ToIni,
 
+		ValueArrayOf: require( './130-Object.ValueArrayOf.js' )( Liquicode ).ValueArrayOf,
+
 	};
 };
