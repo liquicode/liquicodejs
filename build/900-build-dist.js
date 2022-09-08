@@ -12,23 +12,15 @@ const WEBPACK_CONFIG = LIB_PATH.resolve( BASE_PATH, 'build', 'webpack.config.js'
 //---------------------------------------------------------------------
 function execute( Command, Environment )
 {
+	console.log( `---------------------------------------------------------------------` );
 	console.log( `Executing: ${Command}` );
-	LIB_CHILD_PROCESS.execSync( Command, {
+	console.log( `---------------------------------------------------------------------` );
+	let result = LIB_CHILD_PROCESS.execSync( Command, {
+		// stdio: 'stdio',
+		encoding: 'utf-8',
 		env: Environment,
-	},
-		( error, stdout, stderror ) =>
-		{
-			// if any error while executing
-			if ( error )
-			{
-				console.error( "Error: ", error );
-				return;
-			}
-
-			console.log( stdout ); // output from stdout
-			console.error( stderror ); // std errors
-		}
-	);
+	} );
+	console.log( result ); // output from stdout
 	return;
 }
 
