@@ -60,14 +60,27 @@ module.exports = function ( Liquicode )
 	/**
 	 * @public
 	 * @function VisitFiles
-	 * @returns {number}
+	 * @returns {*}
 	 * @description
-	 * Scans a folder and calls the Visitor callback function for each folder/file encountered.
-	 * Returns the number of folders/files visited.
+	 * 
+Scans a folder and calls the Visitor callback function for each folder/file encountered.
+
+The `FilePattern` parameter is optional and can be a wildcard type string.
+For example, to visit all text files, you can pass '*.txt'.
+If `FilePattern` is not empty, then the callback will not be called for folders.
+
+The Visitor callback function takes two parameters `Visitor( Path, Filename )`.
+If the Visitor callback returns a value, then the visitation process is halted
+and that value is returned by the `VisitFiles` function.
+The Visitor callback is called for each file encountered and for each folder encountered.
+When called for a folder, the `Filename` parameter will be null.
+The Visitor callback function must be synchronous.
+
 	 * @param {string} StartFolder
 	 * @param {string} [FilePattern]
 	 * @param {boolean} [Recurse]
 	 * @param {function} [Visitor]
+	 * Function to be called for each folder and file: Visitor( Path, Filename )
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 

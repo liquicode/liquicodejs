@@ -38,6 +38,12 @@ module.exports = function ( Liquicode )
 	 * @public
 	 * @function Merge
 	 * @returns {object}
+	 * @description
+	 * 
+Merges the content of two objects and returns the composite result.
+
+Similar to Clone, this function will remove any non-data fields (i.e. functions and symbols) from the objects.
+
 	 * @param {object} Original
 	 * @param {object} [Updates]
 	*/

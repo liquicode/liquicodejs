@@ -36,7 +36,16 @@ module.exports = function ( Liquicode )
 
 		// Process
 		AsyncSleep: require( './820-System.AsyncSleep.js' )( Liquicode ).AsyncSleep,
-		AsyncExecute: require( './821-System.AsyncExecute.js' )( Liquicode ).AsyncExecute,
+		ExecuteProcess: require( './821-System.ExecuteProcess.js' )( Liquicode ).ExecuteProcess,
+		AsyncExecuteProcess: require( './822-System.AsyncExecuteProcess.js' )( Liquicode ).AsyncExecuteProcess,
+		StartProcess: require( './823-System.StartProcess.js' )( Liquicode ).StartProcess,
+		StopProcess: require( './824-System.StopProcess.js' )( Liquicode ).StopProcess,
+
+		// Docker
+		StartContainer: require( './830-System.StartContainer.js' )( Liquicode ).StartContainer,
+		StopContainer: require( './831-System.StopContainer.js' )( Liquicode ).StopContainer,
+		ContainerStatus: require( './832-System.ContainerStatus.js' )( Liquicode ).ContainerStatus,
 
 	};
 };
+

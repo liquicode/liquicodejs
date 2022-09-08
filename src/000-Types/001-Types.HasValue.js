@@ -36,30 +36,19 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function IsFormat
+	 * @function HasValue
 	 * @returns {boolean}
-	 * True if the value matches the format.
-	 * @summary Determine if a value is of a particular format.
+	 * True if Value actually contains a value.
+	 * @summary Determine if a variable contains a value or or not.
 	 * @description
 	 * 
-Looks up the specified format in `Types.Formats` and calls the `Format.IsFormat()` function.
-
-The `Format` parameter must specify both type and format to be tested for.
-
-**Examples**
-
-~~~javascript
-Liquicode.Types.IsFormat( 'Hello', 'string:string' )            // = true
-Liquicode.Types.IsFormat( 'Hello', 'string:json' )              // = false
-Liquicode.Types.IsFormat( [ 1, 2, 3 ], 'object:array' )         // = true
-Liquicode.Types.IsFormat( [ 1, 2, 3 ], 'object:number-array' )  // = true
-Liquicode.Types.IsFormat( [ 1, 2, 3 ], 'object:string-array' )  // = false
-~~~
+Tests the provided Value parameter and returns false if it does not represent a value.
+More specifically, if Value is undefined or null, then false is returned.
+if Value is a zero length string `""` or an empty object `{}`, false is also returned.
+In all other cases, this function returns true.
 
 	 * @param {*} Value
 	 * The value to test.
-	 * @param {string} Format
-	 * The type and format to test for as: `"type:format"`.
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 

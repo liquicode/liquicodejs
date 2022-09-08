@@ -33,14 +33,17 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function ToIni
-	 * @returns {object}
+	 * @function ValueArrayOf
+	 * @returns {array}
 	 * @description
 	 * 
-Parse an Ini string and return an object value.
+Returns an array of values.
+If the Value parameter is missing or null, then an empty array `[]` is returned.
+If Value is an object, its values are returned in the array.
+If Value is already an array, it is returned unmodified.
+Otherwise, an array is returned containing Value as its only member.
 
-
-	 * @param {object} [Value]
+	 * @param {any} [Value]
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 

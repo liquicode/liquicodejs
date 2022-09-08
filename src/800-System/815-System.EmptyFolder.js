@@ -42,13 +42,12 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function DeleteFolder
+	 * @function EmptyFolder
 	 * @returns {number}
 	 * @description
-	 * Deletes a folder and all of its sub-folders and files.
+	 * Empties a folder by removing all of its sub-folders and files.
 	 * Returns the number of folders and files deleted.
 	 * @param {string} Folder
-	 * @param {boolean} [Recurse]
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 

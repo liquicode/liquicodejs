@@ -214,7 +214,50 @@ to that expected type.</p>
 <details>
 <summary>
 <strong>
-Coerce( Value )
+HasValue( Value )
+</strong>
+<small>
+- Determine if a variable contains a value or or not.
+</small>
+</summary>
+
+<blockquote>
+<h3 id="typeshasvalue-value-">Types.<em><strong>HasValue</strong></em>( Value )</h3>
+<p>Determine if a variable contains a value or or not.</p>
+<p><strong>Returns</strong>: <code>boolean</code> - True if Value actually contains a value.</p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Value</td>
+<td><code>*</code></td>
+<td>required</td>
+<td></td>
+<td>The value to test.</td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Tests the provided Value parameter and returns false if it does not represent a value.
+More specifically, if Value is undefined or null, then false is returned.
+if Value is a zero length string <code>&quot;&quot;</code> or an empty object <code>{}</code>, false is also returned.
+In all other cases, this function returns true.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+Coerce( Value, Loud )
 </strong>
 <small>
 - Returns a `Coercion` object which is used to coerce values to different types.
@@ -222,7 +265,7 @@ Coerce( Value )
 </summary>
 
 <blockquote>
-<h3 id="typescoerce-value-">Types.<em><strong>Coerce</strong></em>( Value )</h3>
+<h3 id="typescoerce-value-loud-">Types.<em><strong>Coerce</strong></em>( Value, Loud )</h3>
 <p>Returns a <code>Coercion</code> object which is used to coerce values to different types.</p>
 <p><strong>Returns</strong>: <code>object</code> - A <code>Coercion</code> object.</p>
 </blockquote>
@@ -243,6 +286,13 @@ Coerce( Value )
 <td>-</td>
 <td></td>
 <td>The value to coerce. This value is set to <code>Coercion.value</code>.</td>
+</tr>
+<tr>
+<td>Loud</td>
+<td><code>boolean</code></td>
+<td>-</td>
+<td></td>
+<td>Throws errors when set to <code>true</code>.</td>
 </tr>
 </tbody></table>
 <p><em><strong>Description</strong></em></p>
@@ -496,6 +546,9 @@ Merge( Original, Updates )
 <td></td>
 </tr>
 </tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Merges the content of two objects and returns the composite result.</p>
+<p>Similar to Clone, this function will remove any non-data fields (i.e. functions and symbols) from the objects.</p>
 <hr>
 </details>
 <br>
@@ -963,6 +1016,47 @@ ToIni( Value )
 <hr>
 </details>
 <br>
+
+<details>
+<summary>
+<strong>
+ValueArrayOf( Value )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="objectvaluearrayof-value-">Object.<em><strong>ValueArrayOf</strong></em>( Value )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code>array</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Value</td>
+<td><code>any</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Returns an array of values.
+If the Value parameter is missing or null, then an empty array <code>[]</code> is returned.
+If Value is an object, its values are returned in the array.
+If Value is already an array, it is returned unmodified.
+Otherwise, an array is returned containing Value as its only member.</p>
+<hr>
+</details>
+<br>
 <br>
 
 <h2 id="text-functions-for-text-parsing-and-manipulation"><em><strong>Text</strong></em>: Functions for text parsing and manipulation.</h2>
@@ -1366,11 +1460,14 @@ BeforeLastWord( Phrase, Delimiters )
 <strong>
 Matrix( Values, Options )
 </strong>
+<small>
+- Matrix stores a two-dimensional jagged array and exposes manipulation functions.
+</small>
 </summary>
 
 <blockquote>
 <h3 id="shapesmatrix-values-options-">Shapes.<em><strong>Matrix</strong></em>( Values, Options )</h3>
-<p>undefined</p>
+<p>Matrix stores a two-dimensional jagged array and exposes manipulation functions.</p>
 <p><strong>Returns</strong>: <code>object</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
@@ -1412,8 +1509,26 @@ If Values is an integer, then Matrix will be created with that number of blank r
 <p>The Options parameter is an options object:</p>
 <pre><code class="language-javascript">Options = {
     default_value: null,    // A default value to use when no other value exists.
-    clone_values: false,    // If true, any values read or written to the Matrix are cloned first.
+    clone_values: true,     // If true, any values read from or written to the Matrix are cloned first.
 }
+</code></pre>
+<p>The <code>clone_values</code> option is very important.
+It is initialliy set to true, providing the safest and most sensible operation.
+A performance improvement can be had by setting this to false;
+However, unintended consequences may occur if you are not careful.
+Alsa, this is a valid intended consequence if you want to use Matrix to quickly manipulate an existing array.</p>
+<p>For example:</p>
+<pre><code class="language-javascript">let test_array = [
+    [ 1, 2, 3, 4 ],
+    [ 5, 6, 7, 8 ],
+];
+// test_array.length == 2
+// Encapsulate the array in a matrix.
+let matrix = Liquicode.Shapes.Matrix( test_array, { clone_values: false } );
+// Append a row to the matrix.
+matrix.AppendRows( [ &#39;A&#39;, &#39;B&#39;, &#39;C&#39; ] );
+// Since test_array was not cloned first, the new row also appears in test_array.
+// test_array.length == 3 !!!
 </code></pre>
 <p><em><strong>How It Works</strong></em></p>
 <p>The Matrix object contains a <code>RowData</code> member which is an array of arrays that contains the values for the matrix.
@@ -1437,7 +1552,7 @@ For example, appending a blank column (<code>AppendColumns()</code>) to the matr
 <p>You can change the value used to fill blank columns by changing <code>Option.default_value</code>.</p>
 <p><em><strong>Cell Addressing</strong></em></p>
 <p>When working with Matrix, you will usually need to identify a particular Row or Column to work with.
-Matrix supports three types addressing modes:</p>
+Matrix supports three types of addressing modes:</p>
 <ul>
 <li><ol>
 <li>A zero-based index used as a row/column index.
@@ -1570,6 +1685,22 @@ This is followed by a digits component that is a one-based row number.</li>
 </li>
 <li><p><code>SetMatrix( Row, Column, Matrix )</code>:
   Sets a matrix of values starting at Row and Column.</p>
+</li>
+</ul>
+</li>
+<li><p>Table Functions:</p>
+<ul>
+<li><p><code>Clone()</code>:
+  Return a clone of this matrix.
+  The clone will contain a copy of this matrix&#39;s data and options.</p>
+</li>
+<li><p><code>Transpose()</code>:
+  Return a copy of this matrix with its rows and column transposed.</p>
+</li>
+<li><p><code>Join( AtColumn, JoinType, JoinMatrix, MatrixColumn )</code>:
+  Return a new matrix by joining this matrix with another one.
+  The join is produced by matching column values between the two matrices.
+  The different supported join types are: &#39;inner&#39;, &#39;left&#39;, &#39;right&#39;, and &#39;full&#39;.</p>
 </li>
 </ul>
 </li>
@@ -1714,14 +1845,14 @@ DateParse( Value, TimeZoneOffset )
 <details>
 <summary>
 <strong>
-VisitFiles( StartFolder, FilePattern, Recurse, Visitor )
+AsyncVisitFiles( StartFolder, FilePattern, Recurse, Visitor )
 </strong>
 </summary>
 
 <blockquote>
-<h3 id="systemvisitfiles-startfolder-filepattern-recurse-visitor-">System.<em><strong>VisitFiles</strong></em>( StartFolder, FilePattern, Recurse, Visitor )</h3>
+<h3 id="systemasyncvisitfiles-startfolder-filepattern-recurse-visitor-">System.<em><strong>AsyncVisitFiles</strong></em>( StartFolder, FilePattern, Recurse, Visitor )</h3>
 <p>undefined</p>
-<p><strong>Returns</strong>: <code>number</code></p>
+<p><strong>Returns</strong>: <code>*</code></p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
 <table>
@@ -1760,12 +1891,87 @@ VisitFiles( StartFolder, FilePattern, Recurse, Visitor )
 <td><code>function</code></td>
 <td>-</td>
 <td></td>
-<td></td>
+<td>Function to be called for each folder and file: Visitor( Path, Filename )</td>
 </tr>
 </tbody></table>
 <p><em><strong>Description</strong></em></p>
-<p>Scans a folder and calls the Visitor callback function for each folder/file encountered.
-Returns the number of folders/files visited.</p>
+<p>Scans a folder and calls the Visitor callback function for each folder/file encountered.</p>
+<p>The <code>FilePattern</code> parameter is optional and can be a wildcard type string.
+For example, to visit all text files, you can pass &#39;*.txt&#39;.
+If <code>FilePattern</code> is not empty, then the callback will not be called for folders.</p>
+<p>The Visitor callback function takes two parameters <code>Visitor( Path, Filename )</code>.
+If the Visitor callback returns a value, then the visitation process is halted
+and that value is returned by the <code>VisitFiles</code> function.
+The Visitor callback is called for each file encountered and for each folder encountered.
+When called for a folder, the <code>Filename</code> parameter will be null.
+The Visitor callback function can be either synchronous or asymchronous.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+VisitFiles( StartFolder, FilePattern, Recurse, Visitor )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systemvisitfiles-startfolder-filepattern-recurse-visitor-">System.<em><strong>VisitFiles</strong></em>( StartFolder, FilePattern, Recurse, Visitor )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code>*</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>StartFolder</td>
+<td><code>string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>FilePattern</td>
+<td><code>string</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Recurse</td>
+<td><code>boolean</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Visitor</td>
+<td><code>function</code></td>
+<td>-</td>
+<td></td>
+<td>Function to be called for each folder and file: Visitor( Path, Filename )</td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Scans a folder and calls the Visitor callback function for each folder/file encountered.</p>
+<p>The <code>FilePattern</code> parameter is optional and can be a wildcard type string.
+For example, to visit all text files, you can pass &#39;*.txt&#39;.
+If <code>FilePattern</code> is not empty, then the callback will not be called for folders.</p>
+<p>The Visitor callback function takes two parameters <code>Visitor( Path, Filename )</code>.
+If the Visitor callback returns a value, then the visitation process is halted
+and that value is returned by the <code>VisitFiles</code> function.
+The Visitor callback is called for each file encountered and for each folder encountered.
+When called for a folder, the <code>Filename</code> parameter will be null.
+The Visitor callback function must be synchronous.</p>
 <hr>
 </details>
 <br>
@@ -1981,6 +2187,44 @@ Returns the number of folders and files deleted.</p>
 <details>
 <summary>
 <strong>
+EmptyFolder( Folder )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systememptyfolder-folder-">System.<em><strong>EmptyFolder</strong></em>( Folder )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code>number</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Folder</td>
+<td><code>string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Empties a folder by removing all of its sub-folders and files.
+Returns the number of folders and files deleted.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
 AsyncSleep( Milliseconds )
 </strong>
 </summary>
@@ -2015,12 +2259,12 @@ AsyncSleep( Milliseconds )
 <details>
 <summary>
 <strong>
-AsyncExecute( Milliseconds )
+ExecuteProcess( Command, Environment, StartFolder )
 </strong>
 </summary>
 
 <blockquote>
-<h3 id="systemasyncexecute-milliseconds-">System.<em><strong>AsyncExecute</strong></em>( Milliseconds )</h3>
+<h3 id="systemexecuteprocess-command-environment-startfolder-">System.<em><strong>ExecuteProcess</strong></em>( Command, Environment, StartFolder )</h3>
 <p>undefined</p>
 </blockquote>
 <p><em><strong>Parameters</strong></em></p>
@@ -2035,13 +2279,281 @@ AsyncExecute( Milliseconds )
 </tr>
 </thead>
 <tbody><tr>
-<td>Milliseconds</td>
-<td><code>number</code></td>
+<td>Command</td>
+<td><code>string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Environment</td>
+<td><code>object</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>StartFolder</td>
+<td><code>string</code></td>
 <td>-</td>
 <td></td>
 <td></td>
 </tr>
 </tbody></table>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+AsyncExecuteProcess( Command, Environment, StartFolder )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systemasyncexecuteprocess-command-environment-startfolder-">System.<em><strong>AsyncExecuteProcess</strong></em>( Command, Environment, StartFolder )</h3>
+<p>undefined</p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Command</td>
+<td><code>string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Environment</td>
+<td><code>object</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>StartFolder</td>
+<td><code>string</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+StartProcess( Command, Environment, StartFolder )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systemstartprocess-command-environment-startfolder-">System.<em><strong>StartProcess</strong></em>( Command, Environment, StartFolder )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code>string</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Command</td>
+<td><code>string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Environment</td>
+<td><code>object</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>StartFolder</td>
+<td><code>string</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Starts a new process and returns the ProcessID.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+StopProcess( ProcessID )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systemstopprocess-processid-">System.<em><strong>StopProcess</strong></em>( ProcessID )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code>string</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ProcessID</td>
+<td><code>string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Stops a running process by its ProcessID.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+StartContainer( ImageName, Options )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systemstartcontainer-imagename-options-">System.<em><strong>StartContainer</strong></em>( ImageName, Options )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code>string</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ImageName</td>
+<td><code>string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Options</td>
+<td><code>object</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Starts a Docker Container.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+StopContainer( ContainerID )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systemstopcontainer-containerid-">System.<em><strong>StopContainer</strong></em>( ContainerID )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code>string</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ContainerID</td>
+<td><code>string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Stops a running Docker Container.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+ContainerStatus( ContainerID )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systemcontainerstatus-containerid-">System.<em><strong>ContainerStatus</strong></em>( ContainerID )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code>string</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ContainerID</td>
+<td><code>string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Gets the status of a running Docker Container.</p>
 <hr>
 </details>
 <br>

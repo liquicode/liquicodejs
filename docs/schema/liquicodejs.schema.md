@@ -136,14 +136,51 @@ This tables describes how values are converted from one data type to another dur
 <details>
 <summary>
 <strong>
-Coerce( Value )
+HasValue( Value )
+</strong>
+<small>
+- Determine if a variable contains a value or or not.
+</small>
+</summary>
+
+> ### Types.***HasValue***( Value )
+> 
+> Determine if a variable contains a value or or not.
+> 
+> **Returns**: `boolean` - True if Value actually contains a value.
+
+***Parameters***
+
+|  Name              |  Type   | Required  |  Default          |  Description  
+|--------------------|---------|-----------|-------------------|---------------
+| Value              | `*`     | required  |                   | The value to test.
+
+***Description***
+
+
+Tests the provided Value parameter and returns false if it does not represent a value.
+More specifically, if Value is undefined or null, then false is returned.
+if Value is a zero length string `""` or an empty object `{}`, false is also returned.
+In all other cases, this function returns true.
+
+
+
+---
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+Coerce( Value, Loud )
 </strong>
 <small>
 - Returns a `Coercion` object which is used to coerce values to different types.
 </small>
 </summary>
 
-> ### Types.***Coerce***( Value )
+> ### Types.***Coerce***( Value, Loud )
 > 
 > Returns a `Coercion` object which is used to coerce values to different types.
 > 
@@ -154,6 +191,7 @@ Coerce( Value )
 |  Name              |  Type   | Required  |  Default          |  Description  
 |--------------------|---------|-----------|-------------------|---------------
 | Value              | `*`     | -         |                   | The value to coerce. This value is set to `Coercion.value`.
+| Loud               | `boolean` | -       |                   | Throws errors when set to `true`.
 
 ***Description***
 
@@ -385,6 +423,14 @@ Merge( Original, Updates )
 |--------------------|---------|-----------|-------------------|---------------
 | Original           | `object` | required |                   | 
 | Updates            | `object` | -        |                   | 
+
+***Description***
+
+
+Merges the content of two objects and returns the composite result.
+
+Similar to Clone, this function will remove any non-data fields (i.e. functions and symbols) from the objects.
+
 
 
 ---
@@ -725,6 +771,41 @@ Parse an Ini string and return an object value.
 </details>
 
 <br>
+
+<details>
+<summary>
+<strong>
+ValueArrayOf( Value )
+</strong>
+</summary>
+
+> ### Object.***ValueArrayOf***( Value )
+> 
+> undefined
+> 
+> **Returns**: `array`
+
+***Parameters***
+
+|  Name              |  Type   | Required  |  Default          |  Description  
+|--------------------|---------|-----------|-------------------|---------------
+| Value              | `any`   | -         |                   | 
+
+***Description***
+
+
+Returns an array of values.
+If the Value parameter is missing or null, then an empty array `[]` is returned.
+If Value is an object, its values are returned in the array.
+If Value is already an array, it is returned unmodified.
+Otherwise, an array is returned containing Value as its only member.
+
+
+
+---
+</details>
+
+<br>
 <br>
 
 ## ***Text***: Functions for text parsing and manipulation.
@@ -996,11 +1077,14 @@ Returns the remainder of a text phrase occurring befiore the last word.
 <strong>
 Matrix( Values, Options )
 </strong>
+<small>
+- Matrix stores a two-dimensional jagged array and exposes manipulation functions.
+</small>
 </summary>
 
 > ### Shapes.***Matrix***( Values, Options )
 > 
-> undefined
+> Matrix stores a two-dimensional jagged array and exposes manipulation functions.
 > 
 > **Returns**: `object`
 
@@ -1034,8 +1118,29 @@ The Options parameter is an options object:
 ~~~javascript
 Options = {
 	default_value: null,    // A default value to use when no other value exists.
-	clone_values: false,    // If true, any values read or written to the Matrix are cloned first.
+	clone_values: true,     // If true, any values read from or written to the Matrix are cloned first.
 }
+~~~
+
+The `clone_values` option is very important.
+It is initialliy set to true, providing the safest and most sensible operation.
+A performance improvement can be had by setting this to false;
+However, unintended consequences may occur if you are not careful.
+Alsa, this is a valid intended consequence if you want to use Matrix to quickly manipulate an existing array.
+
+For example:
+~~~javascript
+let test_array = [
+	[ 1, 2, 3, 4 ],
+	[ 5, 6, 7, 8 ],
+];
+// test_array.length == 2
+// Encapsulate the array in a matrix.
+let matrix = Liquicode.Shapes.Matrix( test_array, { clone_values: false } );
+// Append a row to the matrix.
+matrix.AppendRows( [ 'A', 'B', 'C' ] );
+// Since test_array was not cloned first, the new row also appears in test_array.
+// test_array.length == 3 !!!
 ~~~
 
 
@@ -1068,7 +1173,7 @@ You can change the value used to fill blank columns by changing `Option.default_
 ***Cell Addressing***
 
 When working with Matrix, you will usually need to identify a particular Row or Column to work with.
-Matrix supports three types addressing modes:
+Matrix supports three types of addressing modes:
 
 - 1) A zero-based index used as a row/column index.
 This index must be greater than or equal to zero and less than the extent (i.e. the RowCount or ColumnCount).
@@ -1188,6 +1293,20 @@ The Matrix object also has a number of functions which allow you to manipulate t
 
 	- `SetMatrix( Row, Column, Matrix )`:
 	Sets a matrix of values starting at Row and Column.
+
+- Table Functions:
+
+	- `Clone()`:
+	Return a clone of this matrix.
+	The clone will contain a copy of this matrix's data and options.
+
+	- `Transpose()`:
+	Return a copy of this matrix with its rows and column transposed.
+
+	- `Join( AtColumn, JoinType, JoinMatrix, MatrixColumn )`:
+	Return a new matrix by joining this matrix with another one.
+	The join is produced by matching column values between the two matrices.
+	The different supported join types are: 'inner', 'left', 'right', and 'full'.
 
 
 
@@ -1311,15 +1430,15 @@ Dates and times are funny little creatures.
 <details>
 <summary>
 <strong>
-VisitFiles( StartFolder, FilePattern, Recurse, Visitor )
+AsyncVisitFiles( StartFolder, FilePattern, Recurse, Visitor )
 </strong>
 </summary>
 
-> ### System.***VisitFiles***( StartFolder, FilePattern, Recurse, Visitor )
+> ### System.***AsyncVisitFiles***( StartFolder, FilePattern, Recurse, Visitor )
 > 
 > undefined
 > 
-> **Returns**: `number`
+> **Returns**: `*`
 
 ***Parameters***
 
@@ -1328,12 +1447,69 @@ VisitFiles( StartFolder, FilePattern, Recurse, Visitor )
 | StartFolder        | `string` | required |                   | 
 | FilePattern        | `string` | -        |                   | 
 | Recurse            | `boolean` | -       |                   | 
-| Visitor            | `function` | -      |                   | 
+| Visitor            | `function` | -      |                   | Function to be called for each folder and file: Visitor( Path, Filename )
 
 ***Description***
 
+
 Scans a folder and calls the Visitor callback function for each folder/file encountered.
-Returns the number of folders/files visited.
+
+The `FilePattern` parameter is optional and can be a wildcard type string.
+For example, to visit all text files, you can pass '*.txt'.
+If `FilePattern` is not empty, then the callback will not be called for folders.
+
+The Visitor callback function takes two parameters `Visitor( Path, Filename )`.
+If the Visitor callback returns a value, then the visitation process is halted
+and that value is returned by the `VisitFiles` function.
+The Visitor callback is called for each file encountered and for each folder encountered.
+When called for a folder, the `Filename` parameter will be null.
+The Visitor callback function can be either synchronous or asymchronous.
+
+
+
+---
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+VisitFiles( StartFolder, FilePattern, Recurse, Visitor )
+</strong>
+</summary>
+
+> ### System.***VisitFiles***( StartFolder, FilePattern, Recurse, Visitor )
+> 
+> undefined
+> 
+> **Returns**: `*`
+
+***Parameters***
+
+|  Name              |  Type   | Required  |  Default          |  Description  
+|--------------------|---------|-----------|-------------------|---------------
+| StartFolder        | `string` | required |                   | 
+| FilePattern        | `string` | -        |                   | 
+| Recurse            | `boolean` | -       |                   | 
+| Visitor            | `function` | -      |                   | Function to be called for each folder and file: Visitor( Path, Filename )
+
+***Description***
+
+
+Scans a folder and calls the Visitor callback function for each folder/file encountered.
+
+The `FilePattern` parameter is optional and can be a wildcard type string.
+For example, to visit all text files, you can pass '*.txt'.
+If `FilePattern` is not empty, then the callback will not be called for folders.
+
+The Visitor callback function takes two parameters `Visitor( Path, Filename )`.
+If the Visitor callback returns a value, then the visitation process is halted
+and that value is returned by the `VisitFiles` function.
+The Visitor callback is called for each file encountered and for each folder encountered.
+When called for a folder, the `Filename` parameter will be null.
+The Visitor callback function must be synchronous.
+
 
 
 ---
@@ -1472,6 +1648,36 @@ Returns the number of folders and files deleted.
 <details>
 <summary>
 <strong>
+EmptyFolder( Folder )
+</strong>
+</summary>
+
+> ### System.***EmptyFolder***( Folder )
+> 
+> undefined
+> 
+> **Returns**: `number`
+
+***Parameters***
+
+|  Name              |  Type   | Required  |  Default          |  Description  
+|--------------------|---------|-----------|-------------------|---------------
+| Folder             | `string` | required |                   | 
+
+***Description***
+
+Empties a folder by removing all of its sub-folders and files.
+Returns the number of folders and files deleted.
+
+
+---
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
 AsyncSleep( Milliseconds )
 </strong>
 </summary>
@@ -1495,11 +1701,11 @@ AsyncSleep( Milliseconds )
 <details>
 <summary>
 <strong>
-AsyncExecute( Milliseconds )
+ExecuteProcess( Command, Environment, StartFolder )
 </strong>
 </summary>
 
-> ### System.***AsyncExecute***( Milliseconds )
+> ### System.***ExecuteProcess***( Command, Environment, StartFolder )
 > 
 > undefined
 > 
@@ -1507,7 +1713,182 @@ AsyncExecute( Milliseconds )
 
 |  Name              |  Type   | Required  |  Default          |  Description  
 |--------------------|---------|-----------|-------------------|---------------
-| Milliseconds       | `number` | -        |                   | 
+| Command            | `string` | required |                   | 
+| Environment        | `object` | -        |                   | 
+| StartFolder        | `string` | -        |                   | 
+
+
+---
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+AsyncExecuteProcess( Command, Environment, StartFolder )
+</strong>
+</summary>
+
+> ### System.***AsyncExecuteProcess***( Command, Environment, StartFolder )
+> 
+> undefined
+> 
+***Parameters***
+
+|  Name              |  Type   | Required  |  Default          |  Description  
+|--------------------|---------|-----------|-------------------|---------------
+| Command            | `string` | required |                   | 
+| Environment        | `object` | -        |                   | 
+| StartFolder        | `string` | -        |                   | 
+
+
+---
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+StartProcess( Command, Environment, StartFolder )
+</strong>
+</summary>
+
+> ### System.***StartProcess***( Command, Environment, StartFolder )
+> 
+> undefined
+> 
+> **Returns**: `string`
+
+***Parameters***
+
+|  Name              |  Type   | Required  |  Default          |  Description  
+|--------------------|---------|-----------|-------------------|---------------
+| Command            | `string` | required |                   | 
+| Environment        | `object` | -        |                   | 
+| StartFolder        | `string` | -        |                   | 
+
+***Description***
+
+Starts a new process and returns the ProcessID.
+
+
+---
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+StopProcess( ProcessID )
+</strong>
+</summary>
+
+> ### System.***StopProcess***( ProcessID )
+> 
+> undefined
+> 
+> **Returns**: `string`
+
+***Parameters***
+
+|  Name              |  Type   | Required  |  Default          |  Description  
+|--------------------|---------|-----------|-------------------|---------------
+| ProcessID          | `string` | required |                   | 
+
+***Description***
+
+Stops a running process by its ProcessID.
+
+
+---
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+StartContainer( ImageName, Options )
+</strong>
+</summary>
+
+> ### System.***StartContainer***( ImageName, Options )
+> 
+> undefined
+> 
+> **Returns**: `string`
+
+***Parameters***
+
+|  Name              |  Type   | Required  |  Default          |  Description  
+|--------------------|---------|-----------|-------------------|---------------
+| ImageName          | `string` | required |                   | 
+| Options            | `object` | -        |                   | 
+
+***Description***
+
+Starts a Docker Container.
+
+
+---
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+StopContainer( ContainerID )
+</strong>
+</summary>
+
+> ### System.***StopContainer***( ContainerID )
+> 
+> undefined
+> 
+> **Returns**: `string`
+
+***Parameters***
+
+|  Name              |  Type   | Required  |  Default          |  Description  
+|--------------------|---------|-----------|-------------------|---------------
+| ContainerID        | `string` | required |                   | 
+
+***Description***
+
+Stops a running Docker Container.
+
+
+---
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+ContainerStatus( ContainerID )
+</strong>
+</summary>
+
+> ### System.***ContainerStatus***( ContainerID )
+> 
+> undefined
+> 
+> **Returns**: `string`
+
+***Parameters***
+
+|  Name              |  Type   | Required  |  Default          |  Description  
+|--------------------|---------|-----------|-------------------|---------------
+| ContainerID        | `string` | required |                   | 
+
+***Description***
+
+Gets the status of a running Docker Container.
 
 
 ---

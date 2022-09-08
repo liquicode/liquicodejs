@@ -37,7 +37,22 @@
 		"js",
 		"nodejs",
 		"node",
-		"json"
+		"json",
+		"ini",
+		"clone",
+		"merge",
+		"parse",
+		"match",
+		"wildcard",
+		"replace",
+		"tokenize",
+		"matrix",
+		"process",
+		"child_process",
+		"docker",
+		"container",
+		"download",
+		"get"
 	],
 	"dependencies": {},
 	"devDependencies": {

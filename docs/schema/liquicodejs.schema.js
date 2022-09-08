@@ -25,6 +25,26 @@ exports = {
             "source_filename": "000-Types\\000-Types.js"
         },
         {
+            "id": "001",
+            "member_of": "Types",
+            "name": "HasValue",
+            "type": "function",
+            "returns": "boolean",
+            "returns_description": "True if Value actually contains a value.",
+            "summary": "Determine if a variable contains a value or or not.",
+            "description": "\nTests the provided Value parameter and returns false if it does not represent a value.\nMore specifically, if Value is undefined or null, then false is returned.\nif Value is a zero length string `\"\"` or an empty object `{}`, false is also returned.\nIn all other cases, this function returns true.\n",
+            "Parameters": {
+                "Value": {
+                    "name": "Value",
+                    "type": "*",
+                    "required": true,
+                    "description": "The value to test."
+                }
+            },
+            "todo": [],
+            "source_filename": "000-Types\\001-Types.HasValue.js"
+        },
+        {
             "id": "010",
             "member_of": "Types",
             "name": "Coerce",
@@ -39,6 +59,13 @@ exports = {
                     "type": "*",
                     "required": false,
                     "description": "The value to coerce. This value is set to `Coercion.value`."
+                },
+                "Loud": {
+                    "name": "Loud",
+                    "type": "boolean",
+                    "required": false,
+                    "default": false,
+                    "description": "Throws errors when set to `true`."
                 }
             },
             "todo": [],
@@ -140,7 +167,7 @@ exports = {
             "name": "Merge",
             "type": "function",
             "returns": "object",
-            "description": "",
+            "description": "\nMerges the content of two objects and returns the composite result.\n\nSimilar to Clone, this function will remove any non-data fields (i.e. functions and symbols) from the objects.\n",
             "Parameters": {
                 "Original": {
                     "name": "Original",
@@ -368,6 +395,21 @@ exports = {
                 }
             },
             "source_filename": "100-Object\\126-Object.ToIni.js"
+        },
+        {
+            "id": "130",
+            "member_of": "Object",
+            "name": "ValueArrayOf",
+            "type": "function",
+            "returns": "array",
+            "description": "\nReturns an array of values.\nIf the Value parameter is missing or null, then an empty array `[]` is returned.\nIf Value is an object, its values are returned in the array.\nIf Value is already an array, it is returned unmodified.\nOtherwise, an array is returned containing Value as its only member.\n",
+            "Parameters": {
+                "Value": {
+                    "name": "Value",
+                    "type": "any"
+                }
+            },
+            "source_filename": "100-Object\\130-Object.ValueArrayOf.js"
         },
         {
             "id": "200",
@@ -623,7 +665,8 @@ exports = {
             "type": "function",
             "returns": "object",
             "returns_summary": "Returns a new Matrix object.",
-            "description": "\nA Matrix object is essentially a two-dimensional array (an array of arrays).\nThis function will create and return a new Matrix object.\n\n\n***Values Parameter***\n\nYou can specify the initial contents of the Matrix with the Values parameter.\nIf Values is an array of arrays, then Matrix will contain those values.\nIf Values is a one-dimensional array, then Matrix will have a single row reflecting those values.\nIf Values is an integer, then Matrix will be created with that number of blank rows.\n\nNote that the only way to create a new Matrix with no rows in it is: `Shapes.Matrix( 0, Options )`\n\n\n***Options Parameter***\n\nThe Options parameter is an options object:\n~~~javascript\nOptions = {\n\tdefault_value: null,    // A default value to use when no other value exists.\n\tclone_values: false,    // If true, any values read or written to the Matrix are cloned first.\n}\n~~~\n\n\n***How It Works***\n\nThe Matrix object contains a `RowData` member which is an array of arrays that contains the values for the matrix.\nThis is maintained as a jagged array, meaning that each row of the matrix may be of different lengths.\n~~~javascript\n[\t// Matrix maintains values in a jagged array:\n\t[ 1, 2, 3, 4 ],\n\t[ 1, 2, 3 ],\n\t[ 1, 2, 3, 4, 5 ],\n]\n~~~\n\nWhen calling the `AppendColumns`, `InsertColumns`, `SetColumn`, or `SetValue` functions,\nit may be necessary for the matrix to fill out the columns of shorter rows so that the target column exists.\nFor example, appending a blank column (`AppendColumns()`) to the matrix above would yield:\n~~~javascript\n[\t// Matrix fills columns with\n\t// default values as needed:\n\t[ 1, 2, 3, 4,    null, null ],\n\t[ 1, 2, 3, null, null, null ],\n\t[ 1, 2, 3, 4,    5,    null ],\n]\n~~~\nYou can change the value used to fill blank columns by changing `Option.default_value`.\n\n\n***Cell Addressing***\n\nWhen working with Matrix, you will usually need to identify a particular Row or Column to work with.\nMatrix supports three types addressing modes:\n\n- 1) A zero-based index used as a row/column index.\nThis index must be greater than or equal to zero and less than the extent (i.e. the RowCount or ColumnCount).\n\n- 2) A negative index that serves as an offset from the extent (e.g. -1 = RowCount - 1).\nThis type of index must be between -extent and -1, inclusive.\n\n- 3) A spreadsheet style address (e.g. 'A1', 'B2', etc.).\nThis type of address has letters component which indicates a column.\nThis is followed by a digits component that is a one-based row number.\n\n\n***Matrix Functions***\n\nThe Matrix object also has a number of functions which allow you to manipulate the Matrix object.\n\n- Addressing Functions:\n\tThese are utility functions that assist when working with the spreadsheet style of addressing.\n\tThese functions are used internally by Matrix.\n\tThey do not consider the validity of any particular address or index within the current Matrix.\n\n\t- `IsValidAddress( Address )`:\n\t\tReturns `true` if Address is a valid address, otherwise `false`.\n\t\tA valid address must contain a column component in letters ('AB') and a row component in digits ('12').\n\t\tThis function determines only if the Address parameter is a properly formatted address,\n\t\tregardless if the address lies outside the bounds of this particular Matrix.\n\n\t- `NumberToLetters( Number )`:\n\t\tReturns the letters component of an address for any positive number (e.g. 1='A', 2='B', 28='AB', etc.).\n\n\t- `LettersToNumber( Address )`:\n\t\tConverts the letters component of an address to a positive number.\n\t\tAddress is a string that starts with, or is entirely composed of, letters.\n\n- Row Functions:\n\t\n\t- `RowIndexOf( Address )`:\n\tWill return a valid row index for this Matrix from the given Address.\n\tAddress can represent any of the three addressing styles.\n\n\t- `RowCount()`:\n\tReturns the number of rows within the Matrix.\n\n\t- `AppendRows( Values )`:\n\tAppends one or more rows to the end of the Matrix.\n\tIf Values is not supplied, then a blank row is appended.\n\tIf Values is a one-dimensional array, then a single row is appended.\n\tIf Values is a two-dimensional array, then multiple rows are appended.\n\n\t- `InsertRows( Row, Values )`:\n\tInserts one or more rows within the Matrix, starting at the given Row address.\n\tIf Values is not supplied, then a blank row is appended.\n\tIf Values is a one-dimensional array, then a single row is appended.\n\tIf Values is a two-dimensional array, then multiple rows are appended.\n\tNote that it is not possible to append a row to a Matrix by using this function.\n\n\t- `DeleteRows( Row, Count )`:\n\tDeletes one or more rows within the Matrix, starting at the given Row address.\n\tIf Count is not supplied, then a single row is deleted.\n\n\t- `GetRow( Row )`:\n\tReturns a single row of values from the Matrix, at the given Row address.\n\n\t- `SetRow( Row, Values )`:\n\tReplaces a single row of values (a one-dimensional array) within the Matrix, at the given Row address.\n\tIf Values is not supplied, then a blank row is set at that location.\n\n- Column Functions:\n\n\t- `ColumnIndexOf( Address )`:\n\tWill return a valid column index for this Matrix from the given Address.\n\tAddress can represent any of the three addressing styles.\n\n\t- `ColumnCount()`:\n\tReturns the number of columns within the Matrix.\n\n\t- `AppendColumns( Values )`:\n\tAppends one or more columns to the end of the Matrix.\n\tIf Values is not supplied, then a blank column is appended.\n\tIf Values is a one-dimensional array, then a single column is appended.\n\tIf Values is a two-dimensional array, then multiple columns are appended.\n\n\t- `InsertColumns( Column, Values )`:\n\tInserts one or more columns within the Matrix, starting at the given Column address.\n\tIf Values is not supplied, then a blank column is appended.\n\tIf Values is a one-dimensional array, then a single column is appended.\n\tIf Values is a two-dimensional array, then multiple columns are appended.\n\tNote that it is not possible to append a column to a Matrix by using this function.\n\n\t- `DeleteColumns( Column, Count )`:\n\tDeletes one or more columns within the Matrix, starting at the given Column address.\n\tIf Count is not supplied, then a single column is deleted.\n\n\t- `GetColumn( Column )`:\n\tReturns a single column of values from the Matrix, at the given Column address.\n\n\t- `SetColumn( Column, Values )`:\n\tReplaces a single column of values (a one-dimensional array) within the Matrix, at the given Column address.\n\tIf Values is not supplied, then a blank column is set at that location.\n\n- Value Functions:\n\n\t- `GetValue( Row, Column )`:\n\tReturns a single value located at Row and Column within the Matrix.\n\tRow can be a string address, in which case the Column parameter is omitted.\n\n\t- `SetValue( Row, Column, Value )`:\n\tSets a single value located at Row and Column within the Matrix.\n\tRow can be a string address, in which case the Column parameter is omitted.\n\t\n\t- `GetMatrix( Row, Column, RowCount, ColumnCount )`:\n\tConstructs a new Matrix of values from within the called Matrix.\n\tValues are taken starting at the location described by Row and Column and extending for RowCount rows and ColumnCount columns.\n\t\t- You can call this using four parameters: `GetMatrix( Row, Column, RowCount, ColumnCount )`\n\t\t- You can call this using three parameters: `GetMatrix( Address, RowCount, ColumnCount )`\n\t\t- You can call this using two parameters: `GetMatrix( Address, Size )`\n\n\t- `SetMatrix( Row, Column, Matrix )`:\n\tSets a matrix of values starting at Row and Column.\n\n",
+            "summary": "Matrix stores a two-dimensional jagged array and exposes manipulation functions.",
+            "description": "\nA Matrix object is essentially a two-dimensional array (an array of arrays).\nThis function will create and return a new Matrix object.\n\n\n***Values Parameter***\n\nYou can specify the initial contents of the Matrix with the Values parameter.\nIf Values is an array of arrays, then Matrix will contain those values.\nIf Values is a one-dimensional array, then Matrix will have a single row reflecting those values.\nIf Values is an integer, then Matrix will be created with that number of blank rows.\n\nNote that the only way to create a new Matrix with no rows in it is: `Shapes.Matrix( 0, Options )`\n\n\n***Options Parameter***\n\nThe Options parameter is an options object:\n~~~javascript\nOptions = {\n\tdefault_value: null,    // A default value to use when no other value exists.\n\tclone_values: true,     // If true, any values read from or written to the Matrix are cloned first.\n}\n~~~\n\nThe `clone_values` option is very important.\nIt is initialliy set to true, providing the safest and most sensible operation.\nA performance improvement can be had by setting this to false;\nHowever, unintended consequences may occur if you are not careful.\nAlsa, this is a valid intended consequence if you want to use Matrix to quickly manipulate an existing array.\n\nFor example:\n~~~javascript\nlet test_array = [\n\t[ 1, 2, 3, 4 ],\n\t[ 5, 6, 7, 8 ],\n];\n// test_array.length == 2\n// Encapsulate the array in a matrix.\nlet matrix = Liquicode.Shapes.Matrix( test_array, { clone_values: false } );\n// Append a row to the matrix.\nmatrix.AppendRows( [ 'A', 'B', 'C' ] );\n// Since test_array was not cloned first, the new row also appears in test_array.\n// test_array.length == 3 !!!\n~~~\n\n\n***How It Works***\n\nThe Matrix object contains a `RowData` member which is an array of arrays that contains the values for the matrix.\nThis is maintained as a jagged array, meaning that each row of the matrix may be of different lengths.\n~~~javascript\n[\t// Matrix maintains values in a jagged array:\n\t[ 1, 2, 3, 4 ],\n\t[ 1, 2, 3 ],\n\t[ 1, 2, 3, 4, 5 ],\n]\n~~~\n\nWhen calling the `AppendColumns`, `InsertColumns`, `SetColumn`, or `SetValue` functions,\nit may be necessary for the matrix to fill out the columns of shorter rows so that the target column exists.\nFor example, appending a blank column (`AppendColumns()`) to the matrix above would yield:\n~~~javascript\n[\t// Matrix fills columns with\n\t// default values as needed:\n\t[ 1, 2, 3, 4,    null, null ],\n\t[ 1, 2, 3, null, null, null ],\n\t[ 1, 2, 3, 4,    5,    null ],\n]\n~~~\nYou can change the value used to fill blank columns by changing `Option.default_value`.\n\n\n***Cell Addressing***\n\nWhen working with Matrix, you will usually need to identify a particular Row or Column to work with.\nMatrix supports three types of addressing modes:\n\n- 1) A zero-based index used as a row/column index.\nThis index must be greater than or equal to zero and less than the extent (i.e. the RowCount or ColumnCount).\n\n- 2) A negative index that serves as an offset from the extent (e.g. -1 = RowCount - 1).\nThis type of index must be between -extent and -1, inclusive.\n\n- 3) A spreadsheet style address (e.g. 'A1', 'B2', etc.).\nThis type of address has letters component which indicates a column.\nThis is followed by a digits component that is a one-based row number.\n\n\n***Matrix Functions***\n\nThe Matrix object also has a number of functions which allow you to manipulate the Matrix object.\n\n- Addressing Functions:\n\tThese are utility functions that assist when working with the spreadsheet style of addressing.\n\tThese functions are used internally by Matrix.\n\tThey do not consider the validity of any particular address or index within the current Matrix.\n\n\t- `IsValidAddress( Address )`:\n\t\tReturns `true` if Address is a valid address, otherwise `false`.\n\t\tA valid address must contain a column component in letters ('AB') and a row component in digits ('12').\n\t\tThis function determines only if the Address parameter is a properly formatted address,\n\t\tregardless if the address lies outside the bounds of this particular Matrix.\n\n\t- `NumberToLetters( Number )`:\n\t\tReturns the letters component of an address for any positive number (e.g. 1='A', 2='B', 28='AB', etc.).\n\n\t- `LettersToNumber( Address )`:\n\t\tConverts the letters component of an address to a positive number.\n\t\tAddress is a string that starts with, or is entirely composed of, letters.\n\n- Row Functions:\n\t\n\t- `RowIndexOf( Address )`:\n\tWill return a valid row index for this Matrix from the given Address.\n\tAddress can represent any of the three addressing styles.\n\n\t- `RowCount()`:\n\tReturns the number of rows within the Matrix.\n\n\t- `AppendRows( Values )`:\n\tAppends one or more rows to the end of the Matrix.\n\tIf Values is not supplied, then a blank row is appended.\n\tIf Values is a one-dimensional array, then a single row is appended.\n\tIf Values is a two-dimensional array, then multiple rows are appended.\n\n\t- `InsertRows( Row, Values )`:\n\tInserts one or more rows within the Matrix, starting at the given Row address.\n\tIf Values is not supplied, then a blank row is appended.\n\tIf Values is a one-dimensional array, then a single row is appended.\n\tIf Values is a two-dimensional array, then multiple rows are appended.\n\tNote that it is not possible to append a row to a Matrix by using this function.\n\n\t- `DeleteRows( Row, Count )`:\n\tDeletes one or more rows within the Matrix, starting at the given Row address.\n\tIf Count is not supplied, then a single row is deleted.\n\n\t- `GetRow( Row )`:\n\tReturns a single row of values from the Matrix, at the given Row address.\n\n\t- `SetRow( Row, Values )`:\n\tReplaces a single row of values (a one-dimensional array) within the Matrix, at the given Row address.\n\tIf Values is not supplied, then a blank row is set at that location.\n\n- Column Functions:\n\n\t- `ColumnIndexOf( Address )`:\n\tWill return a valid column index for this Matrix from the given Address.\n\tAddress can represent any of the three addressing styles.\n\n\t- `ColumnCount()`:\n\tReturns the number of columns within the Matrix.\n\n\t- `AppendColumns( Values )`:\n\tAppends one or more columns to the end of the Matrix.\n\tIf Values is not supplied, then a blank column is appended.\n\tIf Values is a one-dimensional array, then a single column is appended.\n\tIf Values is a two-dimensional array, then multiple columns are appended.\n\n\t- `InsertColumns( Column, Values )`:\n\tInserts one or more columns within the Matrix, starting at the given Column address.\n\tIf Values is not supplied, then a blank column is appended.\n\tIf Values is a one-dimensional array, then a single column is appended.\n\tIf Values is a two-dimensional array, then multiple columns are appended.\n\tNote that it is not possible to append a column to a Matrix by using this function.\n\n\t- `DeleteColumns( Column, Count )`:\n\tDeletes one or more columns within the Matrix, starting at the given Column address.\n\tIf Count is not supplied, then a single column is deleted.\n\n\t- `GetColumn( Column )`:\n\tReturns a single column of values from the Matrix, at the given Column address.\n\n\t- `SetColumn( Column, Values )`:\n\tReplaces a single column of values (a one-dimensional array) within the Matrix, at the given Column address.\n\tIf Values is not supplied, then a blank column is set at that location.\n\n- Value Functions:\n\n\t- `GetValue( Row, Column )`:\n\tReturns a single value located at Row and Column within the Matrix.\n\tRow can be a string address, in which case the Column parameter is omitted.\n\n\t- `SetValue( Row, Column, Value )`:\n\tSets a single value located at Row and Column within the Matrix.\n\tRow can be a string address, in which case the Column parameter is omitted.\n\t\n\t- `GetMatrix( Row, Column, RowCount, ColumnCount )`:\n\tConstructs a new Matrix of values from within the called Matrix.\n\tValues are taken starting at the location described by Row and Column and extending for RowCount rows and ColumnCount columns.\n\t\t- You can call this using four parameters: `GetMatrix( Row, Column, RowCount, ColumnCount )`\n\t\t- You can call this using three parameters: `GetMatrix( Address, RowCount, ColumnCount )`\n\t\t- You can call this using two parameters: `GetMatrix( Address, Size )`\n\n\t- `SetMatrix( Row, Column, Matrix )`:\n\tSets a matrix of values starting at Row and Column.\n\n- Table Functions:\n\n\t- `Clone()`:\n\tReturn a clone of this matrix.\n\tThe clone will contain a copy of this matrix's data and options.\n\n\t- `Transpose()`:\n\tReturn a copy of this matrix with its rows and column transposed.\n\n\t- `Join( AtColumn, JoinType, JoinMatrix, MatrixColumn )`:\n\tReturn a new matrix by joining this matrix with another one.\n\tThe join is produced by matching column values between the two matrices.\n\tThe different supported join types are: 'inner', 'left', 'right', and 'full'.\n\n",
             "Parameters": {
                 "Values": {
                     "name": "Values",
@@ -733,13 +776,10 @@ exports = {
         {
             "id": "810",
             "member_of": "System",
-            "name": "VisitFiles",
+            "name": "AsyncVisitFiles",
             "type": "function",
-            "returns": "number",
-            "description": [
-                "Scans a folder and calls the Visitor callback function for each folder/file encountered.",
-                "Returns the number of folders/files visited."
-            ],
+            "returns": "*",
+            "description": "\nScans a folder and calls the Visitor callback function for each folder/file encountered.\n\nThe `FilePattern` parameter is optional and can be a wildcard type string.\nFor example, to visit all text files, you can pass '*.txt'.\nIf `FilePattern` is not empty, then the callback will not be called for folders.\n\nThe Visitor callback function takes two parameters `Visitor( Path, Filename )`.\nIf the Visitor callback returns a value, then the visitation process is halted\nand that value is returned by the `VisitFiles` function.\nThe Visitor callback is called for each file encountered and for each folder encountered.\nWhen called for a folder, the `Filename` parameter will be null.\nThe Visitor callback function can be either synchronous or asymchronous.\n",
             "Parameters": {
                 "StartFolder": {
                     "name": "StartFolder",
@@ -761,6 +801,42 @@ exports = {
                 "Visitor": {
                     "name": "Visitor",
                     "type": "function",
+                    "description": "Function to be called for each folder and file: Visitor( Path, Filename )",
+                    "required": false,
+                    "default": null
+                }
+            },
+            "source_filename": "800-System\\810-System.AsyncVisitFiles.js"
+        },
+        {
+            "id": "810",
+            "member_of": "System",
+            "name": "VisitFiles",
+            "type": "function",
+            "returns": "*",
+            "description": "\nScans a folder and calls the Visitor callback function for each folder/file encountered.\n\nThe `FilePattern` parameter is optional and can be a wildcard type string.\nFor example, to visit all text files, you can pass '*.txt'.\nIf `FilePattern` is not empty, then the callback will not be called for folders.\n\nThe Visitor callback function takes two parameters `Visitor( Path, Filename )`.\nIf the Visitor callback returns a value, then the visitation process is halted\nand that value is returned by the `VisitFiles` function.\nThe Visitor callback is called for each file encountered and for each folder encountered.\nWhen called for a folder, the `Filename` parameter will be null.\nThe Visitor callback function must be synchronous.\n",
+            "Parameters": {
+                "StartFolder": {
+                    "name": "StartFolder",
+                    "type": "string",
+                    "required": true
+                },
+                "FilePattern": {
+                    "name": "FilePattern",
+                    "type": "string",
+                    "required": false,
+                    "default": ""
+                },
+                "Recurse": {
+                    "name": "Recurse",
+                    "type": "boolean",
+                    "required": false,
+                    "default": false
+                },
+                "Visitor": {
+                    "name": "Visitor",
+                    "type": "function",
+                    "description": "Function to be called for each folder and file: Visitor( Path, Filename )",
                     "required": false,
                     "default": null
                 }
@@ -891,6 +967,25 @@ exports = {
             "source_filename": "800-System\\814-System.DeleteFolder.js"
         },
         {
+            "id": "815",
+            "member_of": "System",
+            "name": "EmptyFolder",
+            "type": "function",
+            "returns": "number",
+            "description": [
+                "Empties a folder by removing all of its sub-folders and files.",
+                "Returns the number of folders and files deleted."
+            ],
+            "Parameters": {
+                "Folder": {
+                    "name": "Folder",
+                    "type": "string",
+                    "required": true
+                }
+            },
+            "source_filename": "800-System\\815-System.EmptyFolder.js"
+        },
+        {
             "id": "820",
             "member_of": "System",
             "name": "AsyncSleep",
@@ -908,17 +1003,147 @@ exports = {
         {
             "id": "821",
             "member_of": "System",
-            "name": "AsyncExecute",
+            "name": "ExecuteProcess",
             "type": "function",
             "description": "",
             "Parameters": {
-                "Milliseconds": {
-                    "name": "Milliseconds",
-                    "type": "number",
-                    "format": "integer"
+                "Command": {
+                    "name": "Command",
+                    "type": "string",
+                    "required": true
+                },
+                "Environment": {
+                    "name": "Environment",
+                    "type": "object",
+                    "required": false
+                },
+                "StartFolder": {
+                    "name": "StartFolder",
+                    "type": "string",
+                    "required": false
                 }
             },
-            "source_filename": "800-System\\821-System.AsyncExecute.js"
+            "source_filename": "800-System\\821-System.ExecuteProcess.js"
+        },
+        {
+            "id": "822",
+            "member_of": "System",
+            "name": "AsyncExecuteProcess",
+            "type": "function",
+            "description": "",
+            "Parameters": {
+                "Command": {
+                    "name": "Command",
+                    "type": "string",
+                    "required": true
+                },
+                "Environment": {
+                    "name": "Environment",
+                    "type": "object",
+                    "required": false
+                },
+                "StartFolder": {
+                    "name": "StartFolder",
+                    "type": "string",
+                    "required": false
+                }
+            },
+            "source_filename": "800-System\\822-System.AsyncExecuteProcess.js"
+        },
+        {
+            "id": "823",
+            "member_of": "System",
+            "name": "StartProcess",
+            "type": "function",
+            "returns": "string",
+            "description": "Starts a new process and returns the ProcessID.",
+            "Parameters": {
+                "Command": {
+                    "name": "Command",
+                    "type": "string",
+                    "required": true
+                },
+                "Environment": {
+                    "name": "Environment",
+                    "type": "object",
+                    "required": false
+                },
+                "StartFolder": {
+                    "name": "StartFolder",
+                    "type": "string",
+                    "required": false
+                }
+            },
+            "source_filename": "800-System\\823-System.StartProcess.js"
+        },
+        {
+            "id": "824",
+            "member_of": "System",
+            "name": "StopProcess",
+            "type": "function",
+            "returns": "string",
+            "description": "Stops a running process by its ProcessID.",
+            "Parameters": {
+                "ProcessID": {
+                    "name": "ProcessID",
+                    "type": "string",
+                    "required": true
+                }
+            },
+            "source_filename": "800-System\\824-System.StopProcess.js"
+        },
+        {
+            "id": "830",
+            "member_of": "System",
+            "name": "StartContainer",
+            "type": "function",
+            "returns": "string",
+            "description": "Starts a Docker Container.",
+            "Parameters": {
+                "ImageName": {
+                    "name": "ImageName",
+                    "type": "string",
+                    "required": true
+                },
+                "Options": {
+                    "name": "Options",
+                    "type": "object",
+                    "required": false
+                }
+            },
+            "source_filename": "800-System\\830-System.StartContainer.js"
+        },
+        {
+            "id": "831",
+            "member_of": "System",
+            "name": "StopContainer",
+            "type": "function",
+            "returns": "string",
+            "description": "Stops a running Docker Container.",
+            "Parameters": {
+                "ContainerID": {
+                    "name": "ContainerID",
+                    "type": "string",
+                    "required": true
+                }
+            },
+            "source_filename": "800-System\\831-System.StopContainer.js"
+        },
+        {
+            "id": "832",
+            "member_of": "System",
+            "name": "ContainerStatus",
+            "type": "function",
+            "returns": "string",
+            "description": "Gets the status of a running Docker Container.",
+            "Parameters": {
+                "ContainerID": {
+                    "name": "ContainerID",
+                    "type": "string",
+                    "required": true
+                }
+            },
+            "source_filename": "800-System\\832-System.ContainerStatus.js"
         },
         {
             "id": "900",

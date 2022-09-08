@@ -15,7 +15,8 @@ describe( `810) System.VisitFiles Tests`, function ()
 	//---------------------------------------------------------------------
 	it( `should visit all elements of a folder`, function ()
 	{
-		let count = LQC.System.VisitFiles( TEST_DATA_FOLDER );
+		let count = 0;
+		LQC.System.VisitFiles( TEST_DATA_FOLDER, '', false, () => { count++; } );
 		LIB_ASSERT.strictEqual( count, 3 );
 		return;
 	} );
@@ -23,7 +24,8 @@ describe( `810) System.VisitFiles Tests`, function ()
 	//---------------------------------------------------------------------
 	it( `should visit all elements of a folder recursively`, function ()
 	{
-		let count = LQC.System.VisitFiles( TEST_DATA_FOLDER, '', true );
+		let count = 0;
+		LQC.System.VisitFiles( TEST_DATA_FOLDER, '', true, () => { count++; } );
 		LIB_ASSERT.strictEqual( count, 9 );
 		return;
 	} );
@@ -31,7 +33,8 @@ describe( `810) System.VisitFiles Tests`, function ()
 	//---------------------------------------------------------------------
 	it( `should visit only files when a pattern is supplied`, function ()
 	{
-		let count = LQC.System.VisitFiles( TEST_DATA_FOLDER, '*.txt', true );
+		let count = 0;
+		LQC.System.VisitFiles( TEST_DATA_FOLDER, '*.txt', true, () => { count++; } );
 		LIB_ASSERT.strictEqual( count, 6 );
 		return;
 	} );

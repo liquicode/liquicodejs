@@ -34,6 +34,23 @@ function execute( Command, Environment )
 
 
 //---------------------------------------------------------------------
+let filename = '';
+console.log( `Building /docs ...` );
+
+console.log( `Building 100-build-schema-docs ...` );
+filename = LIB_PATH.join( __dirname, '100-build-schema-docs.js' );
+execute( `node ${filename}` );
+
+console.log( `Building 110-compile-html-docs ...` );
+filename = LIB_PATH.join( __dirname, '110-compile-html-docs.js' );
+execute( `node ${filename}` );
+
+console.log( `Building 200-inject-jsdoc-tags ...` );
+filename = LIB_PATH.join( __dirname, '200-inject-jsdoc-tags.js' );
+execute( `node ${filename}` );
+
+
+//---------------------------------------------------------------------
 console.log( `Building /dist ...` );
 
 console.log( `Building es5 ...` );

@@ -88,6 +88,13 @@ Schema.Coerce( null ).ToObject( [ 1, 2 ] )  // = [ 1, 2 ]
 			required: false,
 			description: 'The value to coerce. This value is set to \`Coercion.value\`.',
 		},
+		Loud: {
+			name: 'Loud',
+			type: 'boolean',
+			required: false,
+			default: false,
+			description: 'Throws errors when set to `true`.',
+		},
 	},
 	todo: [],
 };
@@ -179,6 +186,8 @@ Schema.Coerce( null ).ToObject( [ 1, 2 ] )  // = [ 1, 2 ]
 
 	 * @param {*} [Value]
 	 * The value to coerce. This value is set to `Coercion.value`.
+	 * @param {boolean} [Loud]
+	 * Throws errors when set to `true`.
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 

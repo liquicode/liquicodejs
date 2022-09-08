@@ -288,12 +288,96 @@ module.exports = function ( Liquicode )
 	return {
 		_Schema: _Schema,
 
+		HasValue: __webpack_require__( /*! ./001-Types.HasValue.js */ "./src/000-Types/001-Types.HasValue.js" )( Liquicode ).HasValue,
+
 		Coerce: __webpack_require__( /*! ./010-Types.Coerce.js */ "./src/000-Types/010-Types.Coerce.js" )( Liquicode ).Coerce,
 
 		Formats: __webpack_require__( /*! ./020-Types.Formats.js */ "./src/000-Types/020-Types.Formats.js" )( Liquicode ).Formats,
 		GetFormat: __webpack_require__( /*! ./021-Types.GetFormat.js */ "./src/000-Types/021-Types.GetFormat.js" )( Liquicode ).GetFormat,
 		IsFormat: __webpack_require__( /*! ./022-Types.IsFormat.js */ "./src/000-Types/022-Types.IsFormat.js" )( Liquicode ).IsFormat,
 
+	};
+};
+
+
+/***/ }),
+
+/***/ "./src/000-Types/001-Types.HasValue.js":
+/*!*********************************************!*\
+  !*** ./src/000-Types/001-Types.HasValue.js ***!
+  \*********************************************/
+/***/ ((module) => {
+
+
+
+
+//---------------------------------------------------------------------
+let _Schema = {
+	id: '001',
+	member_of: 'Types',
+	name: 'HasValue',
+	type: 'function',
+	returns: 'boolean',
+	returns_description: 'True if Value actually contains a value.',
+	summary: 'Determine if a variable contains a value or or not.',
+	description: `
+Tests the provided Value parameter and returns false if it does not represent a value.
+More specifically, if Value is undefined or null, then false is returned.
+if Value is a zero length string \`""\` or an empty object \`{}\`, false is also returned.
+In all other cases, this function returns true.
+`,
+	Parameters: {
+		Value: {
+			name: 'Value',
+			type: '*',
+			required: true,
+			description: 'The value to test.',
+		},
+	},
+	todo: [],
+};
+
+
+//---------------------------------------------------------------------
+module.exports = function ( Liquicode )
+{
+
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function HasValue
+	 * @returns {boolean}
+	 * True if Value actually contains a value.
+	 * @summary Determine if a variable contains a value or or not.
+	 * @description
+	 * 
+Tests the provided Value parameter and returns false if it does not represent a value.
+More specifically, if Value is undefined or null, then false is returned.
+if Value is a zero length string `""` or an empty object `{}`, false is also returned.
+In all other cases, this function returns true.
+
+	 * @param {*} Value
+	 * The value to test.
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
+	function HasValue( Value )
+	{
+		if ( Value === undefined ) { return false; }
+		if ( Value === null ) { return false; }
+		if ( ( typeof Value === 'string' ) && ( Value.length === 0 ) ) { return false; }
+		if ( ( typeof Value === 'object' ) && ( Object.keys( Value ).length === 0 ) ) { return false; }
+		return true;
+	}
+
+
+	//---------------------------------------------------------------------
+	// Return the module exports.
+	return {
+		_Schema: _Schema,
+		HasValue: HasValue,
 	};
 };
 
@@ -396,6 +480,13 @@ Schema.Coerce( null ).ToObject( [ 1, 2 ] )  // = [ 1, 2 ]
 			required: false,
 			description: 'The value to coerce. This value is set to \`Coercion.value\`.',
 		},
+		Loud: {
+			name: 'Loud',
+			type: 'boolean',
+			required: false,
+			default: false,
+			description: 'Throws errors when set to `true`.',
+		},
 	},
 	todo: [],
 };
@@ -487,6 +578,8 @@ Schema.Coerce( null ).ToObject( [ 1, 2 ] )  // = [ 1, 2 ]
 
 	 * @param {*} [Value]
 	 * The value to coerce. This value is set to `Coercion.value`.
+	 * @param {boolean} [Loud]
+	 * Throws errors when set to `true`.
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 
@@ -1397,6 +1490,8 @@ module.exports = function ( Liquicode )
 		FromIni: __webpack_require__( /*! ./125-Object.FromIni.js */ "./src/100-Object/125-Object.FromIni.js" )( Liquicode ).FromIni,
 		ToIni: __webpack_require__( /*! ./126-Object.ToIni.js */ "./src/100-Object/126-Object.ToIni.js" )( Liquicode ).ToIni,
 
+		ValueArrayOf: __webpack_require__( /*! ./130-Object.ValueArrayOf.js */ "./src/100-Object/130-Object.ValueArrayOf.js" )( Liquicode ).ValueArrayOf,
+
 	};
 };
 
@@ -1454,7 +1549,7 @@ module.exports = function ( Liquicode )
 
 	function Clone( From )
 	{
-		From = Liquicode.Types.Coerce( From, _Schema.Parameters.From, { coerce_values: true, throw_errors: true } );
+		// From = Liquicode.Types.Coerce( From, _Schema.Parameters.From, { coerce_values: true, throw_errors: true } );
 		return JSON.parse( JSON.stringify( From ) );
 	};
 
@@ -1486,7 +1581,11 @@ let _Schema = {
 	name: 'Merge',
 	type: 'function',
 	returns: 'object',
-	description: ``,
+	description: `
+Merges the content of two objects and returns the composite result.
+
+Similar to Clone, this function will remove any non-data fields (i.e. functions and symbols) from the objects.
+`,
 	Parameters: {
 		Original: {
 			name: 'Original',
@@ -1512,6 +1611,12 @@ module.exports = function ( Liquicode )
 	 * @public
 	 * @function Merge
 	 * @returns {object}
+	 * @description
+	 * 
+Merges the content of two objects and returns the composite result.
+
+Similar to Clone, this function will remove any non-data fields (i.e. functions and symbols) from the objects.
+
 	 * @param {object} Original
 	 * @param {object} [Updates]
 	*/
@@ -2849,6 +2954,92 @@ Parse an Ini string and return an object value.
 
 /***/ }),
 
+/***/ "./src/100-Object/130-Object.ValueArrayOf.js":
+/*!***************************************************!*\
+  !*** ./src/100-Object/130-Object.ValueArrayOf.js ***!
+  \***************************************************/
+/***/ ((module) => {
+
+
+
+
+//---------------------------------------------------------------------
+let _Schema = {
+	id: '130',
+	member_of: 'Object',
+	name: 'ValueArrayOf',
+	type: 'function',
+	returns: 'array',
+	description: `
+Returns an array of values.
+If the Value parameter is missing or null, then an empty array \`[]\` is returned.
+If Value is an object, its values are returned in the array.
+If Value is already an array, it is returned unmodified.
+Otherwise, an array is returned containing Value as its only member.
+`,
+	Parameters: {
+		Value: {
+			name: 'Value',
+			type: 'any',
+			// required: true,
+		},
+	},
+};
+
+
+//---------------------------------------------------------------------
+module.exports = function ( Liquicode )
+{
+
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function ValueArrayOf
+	 * @returns {array}
+	 * @description
+	 * 
+Returns an array of values.
+If the Value parameter is missing or null, then an empty array `[]` is returned.
+If Value is an object, its values are returned in the array.
+If Value is already an array, it is returned unmodified.
+Otherwise, an array is returned containing Value as its only member.
+
+	 * @param {any} [Value]
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
+	function ValueArrayOf( Value )
+	{
+		if ( Value === undefined ) { return []; }
+		if ( Value === null ) { return []; }
+		if ( typeof Value === 'object' ) 
+		{
+			if ( Array.isArray( Value ) ) 
+			{
+				return Value;
+			}
+			else
+			{
+				return Object.values( Value );
+			}
+		}
+		return [ Value ];
+	};
+
+
+	//---------------------------------------------------------------------
+	// Return the module exports.
+	return {
+		_Schema: _Schema,
+		ValueArrayOf: ValueArrayOf,
+	};
+};
+
+
+/***/ }),
+
 /***/ "./src/200-Text/200-Text.js":
 /*!**********************************!*\
   !*** ./src/200-Text/200-Text.js ***!
@@ -3730,8 +3921,29 @@ The Options parameter is an options object:
 ~~~javascript
 Options = {
 	default_value: null,    // A default value to use when no other value exists.
-	clone_values: false,    // If true, any values read or written to the Matrix are cloned first.
+	clone_values: true,     // If true, any values read from or written to the Matrix are cloned first.
 }
+~~~
+
+The \`clone_values\` option is very important.
+It is initialliy set to true, providing the safest and most sensible operation.
+A performance improvement can be had by setting this to false;
+However, unintended consequences may occur if you are not careful.
+Alsa, this is a valid intended consequence if you want to use Matrix to quickly manipulate an existing array.
+
+For example:
+~~~javascript
+let test_array = [
+	[ 1, 2, 3, 4 ],
+	[ 5, 6, 7, 8 ],
+];
+// test_array.length == 2
+// Encapsulate the array in a matrix.
+let matrix = Liquicode.Shapes.Matrix( test_array, { clone_values: false } );
+// Append a row to the matrix.
+matrix.AppendRows( [ 'A', 'B', 'C' ] );
+// Since test_array was not cloned first, the new row also appears in test_array.
+// test_array.length == 3 !!!
 ~~~
 
 
@@ -3885,13 +4097,19 @@ The Matrix object also has a number of functions which allow you to manipulate t
 	- \`SetMatrix( Row, Column, Matrix )\`:
 	Sets a matrix of values starting at Row and Column.
 
-- Shaping Functions:
+- Table Functions:
+
+	- \`Clone()\`:
+	Return a clone of this matrix.
+	The clone will contain a copy of this matrix's data and options.
 
 	- \`Transpose()\`:
-	Transposes the rows and columns of the Matrix.
+	Return a copy of this matrix with its rows and column transposed.
 
 	- \`Join( AtColumn, JoinType, JoinMatrix, MatrixColumn )\`:
-	Joins two matrices together into a single matrix by matching common column values.
+	Return a new matrix by joining this matrix with another one.
+	The join is produced by matching column values between the two matrices.
+	The different supported join types are: 'inner', 'left', 'right', and 'full'.
 
 `,
 	Parameters: {
@@ -3923,6 +4141,7 @@ module.exports = function ( Liquicode )
 	 * @public
 	 * @function Matrix
 	 * @returns {object}
+	 * @summary Matrix stores a two-dimensional jagged array and exposes manipulation functions.
 	 * @description
 	 * 
 A Matrix object is essentially a two-dimensional array (an array of arrays).
@@ -3945,8 +4164,29 @@ The Options parameter is an options object:
 ~~~javascript
 Options = {
 	default_value: null,    // A default value to use when no other value exists.
-	clone_values: false,    // If true, any values read or written to the Matrix are cloned first.
+	clone_values: true,     // If true, any values read from or written to the Matrix are cloned first.
 }
+~~~
+
+The `clone_values` option is very important.
+It is initialliy set to true, providing the safest and most sensible operation.
+A performance improvement can be had by setting this to false;
+However, unintended consequences may occur if you are not careful.
+Alsa, this is a valid intended consequence if you want to use Matrix to quickly manipulate an existing array.
+
+For example:
+~~~javascript
+let test_array = [
+	[ 1, 2, 3, 4 ],
+	[ 5, 6, 7, 8 ],
+];
+// test_array.length == 2
+// Encapsulate the array in a matrix.
+let matrix = Liquicode.Shapes.Matrix( test_array, { clone_values: false } );
+// Append a row to the matrix.
+matrix.AppendRows( [ 'A', 'B', 'C' ] );
+// Since test_array was not cloned first, the new row also appears in test_array.
+// test_array.length == 3 !!!
 ~~~
 
 
@@ -3979,7 +4219,7 @@ You can change the value used to fill blank columns by changing `Option.default_
 ***Cell Addressing***
 
 When working with Matrix, you will usually need to identify a particular Row or Column to work with.
-Matrix supports three types addressing modes:
+Matrix supports three types of addressing modes:
 
 - 1) A zero-based index used as a row/column index.
 This index must be greater than or equal to zero and less than the extent (i.e. the RowCount or ColumnCount).
@@ -4100,6 +4340,20 @@ The Matrix object also has a number of functions which allow you to manipulate t
 	- `SetMatrix( Row, Column, Matrix )`:
 	Sets a matrix of values starting at Row and Column.
 
+- Table Functions:
+
+	- `Clone()`:
+	Return a clone of this matrix.
+	The clone will contain a copy of this matrix's data and options.
+
+	- `Transpose()`:
+	Return a copy of this matrix with its rows and column transposed.
+
+	- `Join( AtColumn, JoinType, JoinMatrix, MatrixColumn )`:
+	Return a new matrix by joining this matrix with another one.
+	The join is produced by matching column values between the two matrices.
+	The different supported join types are: 'inner', 'left', 'right', and 'full'.
+
 
 	 * @param {object} Values
 	 * One of: a two-dimensional array of arrays, a one-dimensional array of values, or an integer.
@@ -4142,7 +4396,7 @@ The Matrix object also has a number of functions which allow you to manipulate t
 		Options = Liquicode.Object.Merge(
 			{
 				default_value: null,
-				clone_values: false,
+				clone_values: true,
 			},
 			Options );
 
@@ -4152,6 +4406,15 @@ The Matrix object also has a number of functions which allow you to manipulate t
 			//---------------------------------------------------------------------
 			RowData: JSON.parse( JSON.stringify( Values ) ),
 			Options: JSON.parse( JSON.stringify( Options ) ),
+
+
+			//=====================================================================
+			//=====================================================================
+			//
+			//		ADDRESSING FUNCTIONS
+			//
+			//=====================================================================
+			//=====================================================================
 
 
 			//---------------------------------------------------------------------
@@ -4234,7 +4497,7 @@ The Matrix object also has a number of functions which allow you to manipulate t
 			//=====================================================================
 			//=====================================================================
 			//
-			//		MATRIX ROWS
+			//		MATRIX ROW FUNCTIONS
 			//
 			//=====================================================================
 			//=====================================================================
@@ -4380,7 +4643,7 @@ The Matrix object also has a number of functions which allow you to manipulate t
 			//=====================================================================
 			//=====================================================================
 			//
-			//		MATRIX COLUMNS
+			//		MATRIX COLUMN FUNCTIONS
 			//
 			//=====================================================================
 			//=====================================================================
@@ -4571,7 +4834,7 @@ The Matrix object also has a number of functions which allow you to manipulate t
 			//=====================================================================
 			//=====================================================================
 			//
-			//		MATRIX VALUES
+			//		MATRIX VALUE FUNCTIONS
 			//
 			//=====================================================================
 			//=====================================================================
@@ -4707,6 +4970,25 @@ The Matrix object also has a number of functions which allow you to manipulate t
 			},
 
 
+			//=====================================================================
+			//=====================================================================
+			//
+			//		TABLE FUNCTIONS
+			//
+			//=====================================================================
+			//=====================================================================
+
+
+			//---------------------------------------------------------------------
+			Clone: function () 
+			{
+				return Liquicode.Shapes.Matrix(
+					JSON.parse( JSON.stringify( this.RowData ) ),
+					JSON.parse( JSON.stringify( this.Options ) ),
+				);
+			},
+
+
 			//---------------------------------------------------------------------
 			Transpose: function () 
 			{
@@ -4717,38 +4999,28 @@ The Matrix object also has a number of functions which allow you to manipulate t
 					let values = this.GetColumn( column_index );
 					new_matrix.AppendRows( values );
 				}
-				this.RowData = new_matrix.RowData;
-				return;
+				return new_matrix;
 			},
 
 
 			//---------------------------------------------------------------------
 			Join: function ( AtColumn, JoinType, RightMatrix, RightColumn ) 
 			{
-
 				// Get the left and right column counts.
 				let left_column_count = this.ColumnCount();
+				let right_column_count = RightMatrix.ColumnCount();
 
 				// Get the left join column.
-				let left_join_column = this.GetMatrix( 0, AtColumn, this.RowCount() - 1, AtColumn );
-				left_join_column = left_join_column.map( value => value[ 0 ] );
+				let left_join_column = this.GetColumn( AtColumn );
 
 				// Get the right join column.
-				let right_join_column = RightTable.GetMatrix( 0, RightColumn, RightTable.RowCount() - 1, RightColumn );
-				right_join_column = right_join_column.map( value => value[ 0 ] );
+				let right_join_column = RightMatrix.GetColumn( RightColumn );
 
 				// Get the left values.
-				let left_values = this.ToMatrix();
+				let left_values = this.RowData;
 
 				// Get the right values.
-				let right_values = RightTable.ToMatrix( RightColumnIndexesOrHeadings );
-				if ( !right_values.length ) { return; }
-				if ( !right_values[ 0 ].length ) { return; }
-				let right_column_count = right_values[ 0 ].length;
-
-				// Reset this table.
-				this.DeleteRows( this.RowCount(), 0 );
-				this.InsertBlankColumns( right_column_count, left_column_count );
+				let right_values = RightMatrix.RowData;
 
 				// Build the join map.
 				let join_map = [];
@@ -4838,33 +5110,70 @@ The Matrix object also has a number of functions which allow you to manipulate t
 				}
 				else
 				{
-					throw new Error( `Unknown value for [JoinType] [${JoinType}].` );
+					throw new Error( `The [JoinType] parameter has an unknown value "${JoinType}".` );
 				}
 
 				// Join the data.
+				let join_matrix = [];
 				join_map.forEach(
 					join =>
 					{
-						let row_index = this.RowCount();
-						if ( join.left !== null )
+						// let row_index = this.RowCount();
+						let join_row = [];
+						let has_values = false;
+
+						for ( let index = 0; index < left_column_count; index++ )
 						{
-							this.SetMatrix( [ left_values[ join.left ] ], row_index, 0 );
+							if ( ( join.left !== null ) && ( index < left_values[ join.left ].length ) )
+							{
+								// Append left data values.
+								join_row.push( left_values[ join.left ][ index ] );
+								has_values = true;
+							}
+							else
+							{
+								join_row.push( this.Options.default_value );
+							}
 						}
-						if ( join.right !== null )
+						for ( let index = 0; index < right_column_count; index++ )
 						{
-							this.SetMatrix( [ right_values[ join.right ] ], row_index, left_column_count );
+							if ( ( join.right !== null ) && ( index < right_values[ join.right ].length ) )
+							{
+								// Append left data values.
+								join_row.push( right_values[ join.right ][ index ] );
+								has_values = true;
+							}
+							else
+							{
+								join_row.push( this.Options.default_value );
+							}
+						}
+						if ( has_values )
+						{
+							join_matrix.push( join_row );
 						}
 					}
 				);
+				if ( this.Options.clone_values )
+				{
+					join_matrix = JSON.parse( JSON.stringify( join_matrix ) );
+				}
 
-				return;
+				return Liquicode.Shapes.Matrix( join_matrix, this.Options );
 			},
-
 
 		};
 
+		//---------------------------------------------------------------------
+		// Assign the initial matrix values.
+		if ( Options.clone_values )
+		{
+			Values = JSON.parse( JSON.stringify( Values ) );
+		}
+		matrix.RowData = Values;
 
-		matrix.RowData = JSON.parse( JSON.stringify( Values ) );
+		//---------------------------------------------------------------------
+		// Return the new Matrix.
 		return matrix;
 	};
 
@@ -5861,26 +6170,37 @@ module.exports = function ( Liquicode )
 		_Schema: Schema,
 
 		// File System
+		AsyncVisitFiles: __webpack_require__( /*! ./810-System.AsyncVisitFiles.js */ "./src/800-System/810-System.AsyncVisitFiles.js" )( Liquicode ).AsyncVisitFiles,
 		VisitFiles: __webpack_require__( /*! ./810-System.VisitFiles.js */ "./src/800-System/810-System.VisitFiles.js" )( Liquicode ).VisitFiles,
 		CountFiles: __webpack_require__( /*! ./811-System.CountFiles.js */ "./src/800-System/811-System.CountFiles.js" )( Liquicode ).CountFiles,
 		CountFolders: __webpack_require__( /*! ./812-System.CountFolders.js */ "./src/800-System/812-System.CountFolders.js" )( Liquicode ).CountFolders,
 		CopyFolder: __webpack_require__( /*! ./813-System.CopyFolder.js */ "./src/800-System/813-System.CopyFolder.js" )( Liquicode ).CopyFolder,
 		DeleteFolder: __webpack_require__( /*! ./814-System.DeleteFolder.js */ "./src/800-System/814-System.DeleteFolder.js" )( Liquicode ).DeleteFolder,
+		EmptyFolder: __webpack_require__( /*! ./815-System.EmptyFolder.js */ "./src/800-System/815-System.EmptyFolder.js" )( Liquicode ).EmptyFolder,
 
 		// Process
 		AsyncSleep: __webpack_require__( /*! ./820-System.AsyncSleep.js */ "./src/800-System/820-System.AsyncSleep.js" )( Liquicode ).AsyncSleep,
-		AsyncExecute: __webpack_require__( /*! ./821-System.AsyncExecute.js */ "./src/800-System/821-System.AsyncExecute.js" )( Liquicode ).AsyncExecute,
+		ExecuteProcess: __webpack_require__( /*! ./821-System.ExecuteProcess.js */ "./src/800-System/821-System.ExecuteProcess.js" )( Liquicode ).ExecuteProcess,
+		AsyncExecuteProcess: __webpack_require__( /*! ./822-System.AsyncExecuteProcess.js */ "./src/800-System/822-System.AsyncExecuteProcess.js" )( Liquicode ).AsyncExecuteProcess,
+		StartProcess: __webpack_require__( /*! ./823-System.StartProcess.js */ "./src/800-System/823-System.StartProcess.js" )( Liquicode ).StartProcess,
+		StopProcess: __webpack_require__( /*! ./824-System.StopProcess.js */ "./src/800-System/824-System.StopProcess.js" )( Liquicode ).StopProcess,
+
+		// Docker
+		StartContainer: __webpack_require__( /*! ./830-System.StartContainer.js */ "./src/800-System/830-System.StartContainer.js" )( Liquicode ).StartContainer,
+		StopContainer: __webpack_require__( /*! ./831-System.StopContainer.js */ "./src/800-System/831-System.StopContainer.js" )( Liquicode ).StopContainer,
+		ContainerStatus: __webpack_require__( /*! ./832-System.ContainerStatus.js */ "./src/800-System/832-System.ContainerStatus.js" )( Liquicode ).ContainerStatus,
 
 	};
 };
 
 
+
 /***/ }),
 
-/***/ "./src/800-System/810-System.VisitFiles.js":
-/*!*************************************************!*\
-  !*** ./src/800-System/810-System.VisitFiles.js ***!
-  \*************************************************/
+/***/ "./src/800-System/810-System.AsyncVisitFiles.js":
+/*!******************************************************!*\
+  !*** ./src/800-System/810-System.AsyncVisitFiles.js ***!
+  \******************************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 
@@ -5890,13 +6210,23 @@ module.exports = function ( Liquicode )
 let _Schema = {
 	id: '810',
 	member_of: 'System',
-	name: 'VisitFiles',
+	name: 'AsyncVisitFiles',
 	type: 'function',
-	returns: 'number',
-	description: [
-		'Scans a folder and calls the Visitor callback function for each folder/file encountered.',
-		'Returns the number of folders/files visited.',
-	],
+	returns: '*',
+	description: `
+Scans a folder and calls the Visitor callback function for each folder/file encountered.
+
+The \`FilePattern\` parameter is optional and can be a wildcard type string.
+For example, to visit all text files, you can pass '*.txt'.
+If \`FilePattern\` is not empty, then the callback will not be called for folders.
+
+The Visitor callback function takes two parameters \`Visitor( Path, Filename )\`.
+If the Visitor callback returns a value, then the visitation process is halted
+and that value is returned by the \`VisitFiles\` function.
+The Visitor callback is called for each file encountered and for each folder encountered.
+When called for a folder, the \`Filename\` parameter will be null.
+The Visitor callback function can be either synchronous or asymchronous.
+`,
 	Parameters: {
 		StartFolder: {
 			name: 'StartFolder',
@@ -5918,6 +6248,178 @@ let _Schema = {
 		Visitor: {
 			name: 'Visitor',
 			type: 'function',
+			description: 'Function to be called for each folder and file: Visitor( Path, Filename )',
+			required: false,
+			default: null,
+		},
+	},
+};
+
+
+//---------------------------------------------------------------------
+module.exports = function ( Liquicode )
+{
+
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function AsyncVisitFiles
+	 * @returns {*}
+	 * @description
+	 * 
+Scans a folder and calls the Visitor callback function for each folder/file encountered.
+
+The `FilePattern` parameter is optional and can be a wildcard type string.
+For example, to visit all text files, you can pass '*.txt'.
+If `FilePattern` is not empty, then the callback will not be called for folders.
+
+The Visitor callback function takes two parameters `Visitor( Path, Filename )`.
+If the Visitor callback returns a value, then the visitation process is halted
+and that value is returned by the `VisitFiles` function.
+The Visitor callback is called for each file encountered and for each folder encountered.
+When called for a folder, the `Filename` parameter will be null.
+The Visitor callback function can be either synchronous or asymchronous.
+
+	 * @param {string} StartFolder
+	 * @param {string} [FilePattern]
+	 * @param {boolean} [Recurse]
+	 * @param {function} [Visitor]
+	 * Function to be called for each folder and file: Visitor( Path, Filename )
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
+	const LIB_FS = __webpack_require__( /*! fs */ "fs" );
+	const LIB_PATH = __webpack_require__( /*! path */ "path" );
+
+
+	async function AsyncVisitFiles( StartFolder, FilePattern, Recurse, Visitor ) 
+	{
+		StartFolder = Liquicode.Types.Coerce( StartFolder ).ToString();
+		FilePattern = Liquicode.Types.Coerce( FilePattern ).ToString();
+		Recurse = Liquicode.Types.Coerce( Recurse ).ToBoolean();
+		// Visitor = Liquicode.Types.Coerce( Visitor, Schema.Parameters.Visitor , { coerce_values: true, throw_errors: true });
+
+		if ( !LIB_FS.existsSync( StartFolder ) ) { return; }
+		// let count = 0;
+		let elements = LIB_FS.readdirSync( StartFolder );
+		for ( let element_index = 0; element_index < elements.length; element_index++ )
+		{
+			let element = elements[ element_index ];
+			let from_path = LIB_PATH.join( StartFolder, element );
+			if ( LIB_FS.lstatSync( from_path ).isFile() )
+			{
+				if ( FilePattern ) 
+				{
+					if ( Liquicode.Text.Matches( element, FilePattern ) )
+					{
+						// if ( Visitor ) { Visitor( StartFolder, element ); }
+						// count++;
+						if ( Visitor ) 
+						{
+							let value = await Visitor( StartFolder, element );
+							if ( value !== undefined ) { return value; }
+						}
+					}
+				}
+				else
+				{
+					// if ( Visitor ) { Visitor( StartFolder, element ); }
+					// count++;
+					if ( Visitor ) 
+					{
+						let value = await Visitor( StartFolder, element );
+						if ( value !== undefined ) { return value; }
+					}
+				}
+			}
+			else if ( LIB_FS.lstatSync( from_path ).isDirectory() )
+			{
+				if ( !FilePattern ) 
+				{
+					// if ( Visitor ) { Visitor( from_path, null ); }
+					// count++;
+					if ( Visitor ) 
+					{
+						let value = await Visitor( from_path, null );
+						if ( value !== undefined ) { return value; }
+					}
+				}
+				if ( Recurse )
+				{
+					let value = AsyncVisitFiles( from_path, FilePattern, Recurse, Visitor );
+					if ( value !== undefined ) { return value; }
+				}
+			}
+		}
+		return;
+	}
+
+
+	//---------------------------------------------------------------------
+	// Return the module exports.
+	return {
+		_Schema: _Schema,
+		AsyncVisitFiles: AsyncVisitFiles,
+	};
+};
+
+
+/***/ }),
+
+/***/ "./src/800-System/810-System.VisitFiles.js":
+/*!*************************************************!*\
+  !*** ./src/800-System/810-System.VisitFiles.js ***!
+  \*************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+
+
+
+//---------------------------------------------------------------------
+let _Schema = {
+	id: '810',
+	member_of: 'System',
+	name: 'VisitFiles',
+	type: 'function',
+	returns: '*',
+	description: `
+Scans a folder and calls the Visitor callback function for each folder/file encountered.
+
+The \`FilePattern\` parameter is optional and can be a wildcard type string.
+For example, to visit all text files, you can pass '*.txt'.
+If \`FilePattern\` is not empty, then the callback will not be called for folders.
+
+The Visitor callback function takes two parameters \`Visitor( Path, Filename )\`.
+If the Visitor callback returns a value, then the visitation process is halted
+and that value is returned by the \`VisitFiles\` function.
+The Visitor callback is called for each file encountered and for each folder encountered.
+When called for a folder, the \`Filename\` parameter will be null.
+The Visitor callback function must be synchronous.
+`,
+	Parameters: {
+		StartFolder: {
+			name: 'StartFolder',
+			type: 'string',
+			required: true,
+		},
+		FilePattern: {
+			name: 'FilePattern',
+			type: 'string',
+			required: false,
+			default: '',
+		},
+		Recurse: {
+			name: 'Recurse',
+			type: 'boolean',
+			required: false,
+			default: false,
+		},
+		Visitor: {
+			name: 'Visitor',
+			type: 'function',
+			description: 'Function to be called for each folder and file: Visitor( Path, Filename )',
 			required: false,
 			default: null,
 		},
@@ -5934,14 +6436,27 @@ module.exports = function ( Liquicode )
 	/**
 	 * @public
 	 * @function VisitFiles
-	 * @returns {number}
+	 * @returns {*}
 	 * @description
-	 * Scans a folder and calls the Visitor callback function for each folder/file encountered.
-	 * Returns the number of folders/files visited.
+	 * 
+Scans a folder and calls the Visitor callback function for each folder/file encountered.
+
+The `FilePattern` parameter is optional and can be a wildcard type string.
+For example, to visit all text files, you can pass '*.txt'.
+If `FilePattern` is not empty, then the callback will not be called for folders.
+
+The Visitor callback function takes two parameters `Visitor( Path, Filename )`.
+If the Visitor callback returns a value, then the visitation process is halted
+and that value is returned by the `VisitFiles` function.
+The Visitor callback is called for each file encountered and for each folder encountered.
+When called for a folder, the `Filename` parameter will be null.
+The Visitor callback function must be synchronous.
+
 	 * @param {string} StartFolder
 	 * @param {string} [FilePattern]
 	 * @param {boolean} [Recurse]
 	 * @param {function} [Visitor]
+	 * Function to be called for each folder and file: Visitor( Path, Filename )
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 
@@ -5958,7 +6473,7 @@ module.exports = function ( Liquicode )
 		// Visitor = Liquicode.Types.Coerce( Visitor, Schema.Parameters.Visitor , { coerce_values: true, throw_errors: true });
 
 		if ( !LIB_FS.existsSync( StartFolder ) ) { return; }
-		let count = 0;
+		// let count = 0;
 		let elements = LIB_FS.readdirSync( StartFolder );
 		for ( let element_index = 0; element_index < elements.length; element_index++ )
 		{
@@ -5970,30 +6485,46 @@ module.exports = function ( Liquicode )
 				{
 					if ( Liquicode.Text.Matches( element, FilePattern ) )
 					{
-						if ( Visitor ) { Visitor( StartFolder, element ); }
-						count++;
+						// if ( Visitor ) { Visitor( StartFolder, element ); }
+						// count++;
+						if ( Visitor ) 
+						{
+							let value = Visitor( StartFolder, element );
+							if ( value !== undefined ) { return value; }
+						}
 					}
 				}
 				else
 				{
-					if ( Visitor ) { Visitor( StartFolder, element ); }
-					count++;
+					// if ( Visitor ) { Visitor( StartFolder, element ); }
+					// count++;
+					if ( Visitor ) 
+					{
+						let value = Visitor( StartFolder, element );
+						if ( value !== undefined ) { return value; }
+					}
 				}
 			}
 			else if ( LIB_FS.lstatSync( from_path ).isDirectory() )
 			{
 				if ( !FilePattern ) 
 				{
-					if ( Visitor ) { Visitor( from_path, null ); }
-					count++;
+					// if ( Visitor ) { Visitor( from_path, null ); }
+					// count++;
+					if ( Visitor ) 
+					{
+						let value = Visitor( from_path, null );
+						if ( value !== undefined ) { return value; }
+					}
 				}
 				if ( Recurse )
 				{
-					count += VisitFiles( from_path, FilePattern, Recurse, Visitor );
+					let value = VisitFiles( from_path, FilePattern, Recurse, Visitor );
+					if ( value !== undefined ) { return value; }
 				}
 			}
 		}
-		return count;
+		return;
 	}
 
 
@@ -6180,7 +6711,7 @@ module.exports = function ( Liquicode )
 /*!*************************************************!*\
   !*** ./src/800-System/813-System.CopyFolder.js ***!
   \*************************************************/
-/***/ ((module) => {
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 
 
@@ -6251,6 +6782,10 @@ module.exports = function ( Liquicode )
 	//-end-jsdoc-----------------------------------------------------------
 
 
+	const LIB_FS = __webpack_require__( /*! fs */ "fs" );
+	const LIB_PATH = __webpack_require__( /*! path */ "path" );
+
+
 	function CopyFolder( FromFolder, ToFolder, FilePattern, Overwrite, Recurse ) 
 	{
 		FromFolder = Liquicode.Types.Coerce( FromFolder ).ToString();
@@ -6300,7 +6835,7 @@ module.exports = function ( Liquicode )
 /*!***************************************************!*\
   !*** ./src/800-System/814-System.DeleteFolder.js ***!
   \***************************************************/
-/***/ ((module) => {
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 
 
@@ -6357,6 +6892,10 @@ module.exports = function ( Liquicode )
 	//-end-jsdoc-----------------------------------------------------------
 
 
+	const LIB_FS = __webpack_require__( /*! fs */ "fs" );
+	const LIB_PATH = __webpack_require__( /*! path */ "path" );
+
+
 	function DeleteFolder( Folder, Recurse ) 
 	{
 		Folder = Liquicode.Types.Coerce( Folder ).ToString();
@@ -6383,7 +6922,11 @@ module.exports = function ( Liquicode )
 		if ( Recurse )
 		{
 			let elements = LIB_FS.readdirSync( Folder );
-			if ( !elements.length ) { LIB_FS.rmdirSync( Folder ); }
+			if ( !elements.length ) 
+			{
+				LIB_FS.rmdirSync( Folder );
+				count++;
+			}
 		}
 		return count;
 	}
@@ -6394,6 +6937,122 @@ module.exports = function ( Liquicode )
 	return {
 		_Schema: _Schema,
 		DeleteFolder: DeleteFolder,
+	};
+};
+
+
+/***/ }),
+
+/***/ "./src/800-System/815-System.EmptyFolder.js":
+/*!**************************************************!*\
+  !*** ./src/800-System/815-System.EmptyFolder.js ***!
+  \**************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+
+
+
+//---------------------------------------------------------------------
+let _Schema = {
+	id: '815',
+	member_of: 'System',
+	name: 'EmptyFolder',
+	type: 'function',
+	returns: 'number',
+	description: [
+		'Empties a folder by removing all of its sub-folders and files.',
+		'Returns the number of folders and files deleted.',
+	],
+	Parameters: {
+		Folder: {
+			name: 'Folder',
+			type: 'string',
+			required: true,
+		},
+		// FilePattern: {
+		// 	name: 'FilePattern',
+		// 	type: 'string',
+		// 	required: false,
+		// 	default: '',
+		// },
+		// Recurse: {
+		// 	name: 'Recurse',
+		// 	type: 'boolean',
+		// 	required: false,
+		// 	default: false,
+		// },
+	},
+};
+
+
+//---------------------------------------------------------------------
+module.exports = function ( Liquicode )
+{
+
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function EmptyFolder
+	 * @returns {number}
+	 * @description
+	 * Empties a folder by removing all of its sub-folders and files.
+	 * Returns the number of folders and files deleted.
+	 * @param {string} Folder
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
+	const LIB_FS = __webpack_require__( /*! fs */ "fs" );
+	const LIB_PATH = __webpack_require__( /*! path */ "path" );
+
+
+	function _EmptyFolder( Folder, Depth ) 
+	{
+		let count = 0;
+		let elements = LIB_FS.readdirSync( Folder );
+		for ( let element_index = 0; element_index < elements.length; element_index++ )
+		{
+			let element = elements[ element_index ];
+			let from_path = LIB_PATH.join( Folder, element );
+			if ( LIB_FS.lstatSync( from_path ).isFile() )
+			{
+				LIB_FS.unlinkSync( from_path );
+				count++;
+			}
+			else if ( LIB_FS.lstatSync( from_path ).isDirectory() )
+			{
+				count += _EmptyFolder( from_path, ( Depth + 1 ) );
+			}
+		}
+		// Delete this folder.
+		if ( Depth > 0 )
+		{
+			let elements = LIB_FS.readdirSync( Folder );
+			if ( !elements.length ) 
+			{
+				LIB_FS.rmdirSync( Folder );
+				count++;
+			}
+		}
+		return count;
+	}
+
+
+	function EmptyFolder( Folder ) 
+	{
+		Folder = Liquicode.Types.Coerce( Folder ).ToString();
+		if ( !LIB_FS.existsSync( Folder ) ) { return 0; }
+		let count = _EmptyFolder( Folder, 0 );
+		return count;
+	}
+
+
+	//---------------------------------------------------------------------
+	// Return the module exports.
+	return {
+		_Schema: _Schema,
+		EmptyFolder: EmptyFolder,
 	};
 };
 
@@ -6461,11 +7120,11 @@ module.exports = function ( Liquicode )
 
 /***/ }),
 
-/***/ "./src/800-System/821-System.AsyncExecute.js":
-/*!***************************************************!*\
-  !*** ./src/800-System/821-System.AsyncExecute.js ***!
-  \***************************************************/
-/***/ ((module) => {
+/***/ "./src/800-System/821-System.ExecuteProcess.js":
+/*!*****************************************************!*\
+  !*** ./src/800-System/821-System.ExecuteProcess.js ***!
+  \*****************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 
 
@@ -6474,16 +7133,25 @@ module.exports = function ( Liquicode )
 let _Schema = {
 	id: '821',
 	member_of: 'System',
-	name: 'AsyncExecute',
+	name: 'ExecuteProcess',
 	type: 'function',
 	// returns: 'number',
 	description: ``,
 	Parameters: {
-		Milliseconds: {
-			name: 'Milliseconds',
-			type: 'number',
-			format: 'integer',
-			// required: true,
+		Command: {
+			name: 'Command',
+			type: 'string',
+			required: true,
+		},
+		Environment: {
+			name: 'Environment',
+			type: 'object',
+			required: false,
+		},
+		StartFolder: {
+			name: 'StartFolder',
+			type: 'string',
+			required: false,
 		},
 	},
 };
@@ -6497,42 +7165,50 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function AsyncExecute
-	 * @param {number} [Milliseconds]
+	 * @function ExecuteProcess
+	 * @param {string} Command
+	 * @param {object} [Environment]
+	 * @param {string} [StartFolder]
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 
 
-	function AsyncExecute( Command, Environment, StartFolder ) 
+	const LIB_FS = __webpack_require__( /*! fs */ "fs" );
+	const LIB_CHILD_PROCESS = __webpack_require__( /*! child_process */ "child_process" );
+
+
+	function ExecuteProcess( Command, Environment, StartFolder ) 
 	{
-		// Milliseconds = Liquicode.Types.Coerce( Milliseconds, _Schema.Parameters.Milliseconds, true );
+		let options = {
+			encoding: 'utf-8',
+		};
+		if ( Environment && Object.keys( Environment ) ) { options.env = Environment; }
+		if ( StartFolder && LIB_FS.existsSync( StartFolder ) ) { options.cwd = StartFolder; }
 
-
-		//---------------------------------------------------------------------
-		function execute( Command, Environment )
+		let result = {
+			result: '',
+			error: '',
+			stdout: '',
+			stderror: '',
+		};
+		try
 		{
-			console.log( `Executing: ${Command}` );
-			LIB_CHILD_PROCESS.execSync( Command, {
-				env: Environment,
-			},
-				( error, stdout, stderror ) =>
-				{
-					// if any error while executing
-					if ( error )
+			result.result =
+				LIB_CHILD_PROCESS.execSync( Command, options,
+					( error, stdout, stderror ) =>
 					{
-						console.error( "Error: ", error );
-						return;
+						result.error = error;
+						result.stdout = stdout;
+						result.stderror = stderror;
 					}
-
-					console.log( stdout ); // output from stdout
-					console.error( stderror ); // std errors
-				}
-			);
-			return;
+				);
+		}
+		catch ( error )
+		{
+			result.error = error.message;
 		}
 
-
-		// return new Promise( resolve => setTimeout( resolve, Milliseconds ) );
+		return result;
 	}
 
 
@@ -6540,7 +7216,504 @@ module.exports = function ( Liquicode )
 	// Return the module exports.
 	return {
 		_Schema: _Schema,
-		AsyncExecute: AsyncExecute,
+		ExecuteProcess: ExecuteProcess,
+	};
+};
+
+
+/***/ }),
+
+/***/ "./src/800-System/822-System.AsyncExecuteProcess.js":
+/*!**********************************************************!*\
+  !*** ./src/800-System/822-System.AsyncExecuteProcess.js ***!
+  \**********************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+
+
+
+//---------------------------------------------------------------------
+let _Schema = {
+	id: '822',
+	member_of: 'System',
+	name: 'AsyncExecuteProcess',
+	type: 'function',
+	// returns: 'number',
+	description: ``,
+	Parameters: {
+		Command: {
+			name: 'Command',
+			type: 'string',
+			required: true,
+		},
+		Environment: {
+			name: 'Environment',
+			type: 'object',
+			required: false,
+		},
+		StartFolder: {
+			name: 'StartFolder',
+			type: 'string',
+			required: false,
+		},
+	},
+};
+
+
+//---------------------------------------------------------------------
+module.exports = function ( Liquicode )
+{
+
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function AsyncExecuteProcess
+	 * @param {string} Command
+	 * @param {object} [Environment]
+	 * @param {string} [StartFolder]
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
+	const LIB_CHILD_PROCESS = __webpack_require__( /*! child_process */ "child_process" );
+
+
+	function AsyncExecuteProcess( Command, Environment, StartFolder ) 
+	{
+		return new Promise(
+			( resolve, reject ) =>
+			{
+				resolve( Liquicode.System.ExecuteProcess( Command, Environment, StartFolder ) );
+			} );
+	}
+
+
+	//---------------------------------------------------------------------
+	// Return the module exports.
+	return {
+		_Schema: _Schema,
+		AsyncExecuteProcess: AsyncExecuteProcess,
+	};
+};
+
+
+/***/ }),
+
+/***/ "./src/800-System/823-System.StartProcess.js":
+/*!***************************************************!*\
+  !*** ./src/800-System/823-System.StartProcess.js ***!
+  \***************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+
+
+
+//---------------------------------------------------------------------
+let _Schema = {
+	id: '823',
+	member_of: 'System',
+	name: 'StartProcess',
+	type: 'function',
+	returns: 'string',
+	description: `Starts a new process and returns the ProcessID.`,
+	Parameters: {
+		Command: {
+			name: 'Command',
+			type: 'string',
+			required: true,
+		},
+		Environment: {
+			name: 'Environment',
+			type: 'object',
+			required: false,
+		},
+		StartFolder: {
+			name: 'StartFolder',
+			type: 'string',
+			required: false,
+		},
+	},
+};
+
+
+//---------------------------------------------------------------------
+module.exports = function ( Liquicode )
+{
+
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function StartProcess
+	 * @returns {string}
+	 * @description
+	 * Starts a new process and returns the ProcessID.
+	 * @param {string} Command
+	 * @param {object} [Environment]
+	 * @param {string} [StartFolder]
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
+	const LIB_FS = __webpack_require__( /*! fs */ "fs" );
+	const LIB_CHILD_PROCESS = __webpack_require__( /*! child_process */ "child_process" );
+
+
+	function StartProcess( Command, Environment, StartFolder ) 
+	{
+		let options = {};
+		if ( Environment && Object.keys( Environment ) ) { options.env = Environment; }
+		if ( StartFolder && LIB_FS.existsSync( StartFolder ) ) { options.cwd = StartFolder; }
+		let child_process = LIB_CHILD_PROCESS.exec( Command, options );
+		return child_process.pid;
+	}
+
+
+	//---------------------------------------------------------------------
+	// Return the module exports.
+	return {
+		_Schema: _Schema,
+		StartProcess: StartProcess,
+	};
+};
+
+
+/***/ }),
+
+/***/ "./src/800-System/824-System.StopProcess.js":
+/*!**************************************************!*\
+  !*** ./src/800-System/824-System.StopProcess.js ***!
+  \**************************************************/
+/***/ ((module) => {
+
+
+
+
+//---------------------------------------------------------------------
+let _Schema = {
+	id: '824',
+	member_of: 'System',
+	name: 'StopProcess',
+	type: 'function',
+	returns: 'string',
+	description: `Stops a running process by its ProcessID.`,
+	Parameters: {
+		ProcessID: {
+			name: 'ProcessID',
+			type: 'string',
+			required: true,
+		},
+	},
+};
+
+
+//---------------------------------------------------------------------
+module.exports = function ( Liquicode )
+{
+
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function StopProcess
+	 * @returns {string}
+	 * @description
+	 * Stops a running process by its ProcessID.
+	 * @param {string} ProcessID
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
+	function StopProcess( ProcessID ) 
+	{
+		process.kill( ProcessID, 'SIGINT' );
+		return;
+	}
+
+
+	//---------------------------------------------------------------------
+	// Return the module exports.
+	return {
+		_Schema: _Schema,
+		StopProcess: StopProcess,
+	};
+};
+
+
+/***/ }),
+
+/***/ "./src/800-System/830-System.StartContainer.js":
+/*!*****************************************************!*\
+  !*** ./src/800-System/830-System.StartContainer.js ***!
+  \*****************************************************/
+/***/ ((module) => {
+
+
+
+
+//---------------------------------------------------------------------
+let _Schema = {
+	id: '830',
+	member_of: 'System',
+	name: 'StartContainer',
+	type: 'function',
+	returns: 'string',
+	description: `Starts a Docker Container.`,
+	Parameters: {
+		ImageName: {
+			name: 'ImageName',
+			type: 'string',
+			required: true,
+		},
+		Options: {
+			name: 'Options',
+			type: 'object',
+			required: false,
+		},
+	},
+};
+
+
+//---------------------------------------------------------------------
+module.exports = function ( Liquicode )
+{
+
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function StartContainer
+	 * @returns {string}
+	 * @description
+	 * Starts a Docker Container.
+	 * @param {string} ImageName
+	 * @param {object} [Options]
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
+	function StartContainer( ImageName, Options ) 
+	{
+		let command_line = `docker run --rm -d`;
+		if ( Options )
+		{
+			// Container Name
+			if ( Options.name )
+			{
+				if ( typeof Options.name !== 'string' ) { throw new Error( `Options.name must be a string.` ); }
+				command_line += ` --name ${Options.name}`;
+			}
+
+			// Hostname
+			if ( Options.hostname )
+			{
+				if ( typeof Options.hostname !== 'string' ) { throw new Error( `Options.hostname must be a string.` ); }
+				command_line += ` --hostname ${Options.hostname}`;
+			}
+
+			// Network
+			if ( Options.network )
+			{
+				if ( typeof Options.network !== 'string' ) { throw new Error( `Options.network must be a string.` ); }
+				command_line += ` --network="${Options.network}"`;
+			}
+
+			// Publish Ports
+			if ( Options.ports )
+			{
+				if ( !Array.isArray( Options.ports ) ) { throw new Error( `Options.ports must be an array of port definitions.` ); }
+				for ( let index = 0; index < Options.ports.length; index++ )
+				{
+					let port = Options.ports[ index ];
+					command_line += ` -p ${port.localhost}:${port.container}`;
+				}
+			}
+
+			// Shared Volumes
+			if ( Options.volumes )
+			{
+				if ( !Array.isArray( Options.volumes ) ) { throw new Error( `Options.volumes must be an array of volume definitions.` ); }
+				for ( let index = 0; index < Options.volumes.length; index++ )
+				{
+					let volume = Options.volumes[ index ];
+					command_line += ` -v ${volume.localhost}:${volume.container}`;
+					if ( volume.readonly ) { command_line += `:ro`; }
+				}
+			}
+
+			// Environment Variables
+			if ( Options.environment )
+			{
+				if ( typeof Options.environment !== 'object' ) { throw new Error( `Options.environment must be an object.` ); }
+				let keys = Object.keys( Options.environment );
+				for ( let index = 0; index < keys.length; index++ )
+				{
+					let name = keys[ index ];
+					command_line += ` -e "${name}=${Options.environment[ name ]}"`;
+				}
+			}
+
+		}
+
+		// Image Name
+		command_line += ` ${ImageName}`;
+		// Initial Command
+		if ( Options && ( typeof Options.command === 'string' ) )
+		{
+			command_line += ` ${Options.command}`;
+		}
+
+		let result = Liquicode.System.ExecuteProcess( command_line );
+		if ( result.error ) { throw new Error( result.error ); }
+		let container_id = result.result.trim();
+		return container_id;
+	}
+
+
+	//---------------------------------------------------------------------
+	// Return the module exports.
+	return {
+		_Schema: _Schema,
+		StartContainer: StartContainer,
+	};
+};
+
+
+/***/ }),
+
+/***/ "./src/800-System/831-System.StopContainer.js":
+/*!****************************************************!*\
+  !*** ./src/800-System/831-System.StopContainer.js ***!
+  \****************************************************/
+/***/ ((module) => {
+
+
+
+
+//---------------------------------------------------------------------
+let _Schema = {
+	id: '831',
+	member_of: 'System',
+	name: 'StopContainer',
+	type: 'function',
+	returns: 'string',
+	description: `Stops a running Docker Container.`,
+	Parameters: {
+		ContainerID: {
+			name: 'ContainerID',
+			type: 'string',
+			required: true,
+		},
+	},
+};
+
+
+//---------------------------------------------------------------------
+module.exports = function ( Liquicode )
+{
+
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function StopContainer
+	 * @returns {string}
+	 * @description
+	 * Stops a running Docker Container.
+	 * @param {string} ContainerID
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
+	function StopContainer( ContainerID ) 
+	{
+		let command_line = `docker kill ${ContainerID}`;
+		let result = Liquicode.System.ExecuteProcess( command_line );
+		if ( result.error ) { throw new Error( result.error ); }
+		return;
+	}
+
+
+	//---------------------------------------------------------------------
+	// Return the module exports.
+	return {
+		_Schema: _Schema,
+		StopContainer: StopContainer,
+	};
+};
+
+
+/***/ }),
+
+/***/ "./src/800-System/832-System.ContainerStatus.js":
+/*!******************************************************!*\
+  !*** ./src/800-System/832-System.ContainerStatus.js ***!
+  \******************************************************/
+/***/ ((module) => {
+
+
+
+
+//---------------------------------------------------------------------
+let _Schema = {
+	id: '832',
+	member_of: 'System',
+	name: 'ContainerStatus',
+	type: 'function',
+	returns: 'string',
+	description: `Gets the status of a running Docker Container.`,
+	Parameters: {
+		ContainerID: {
+			name: 'ContainerID',
+			type: 'string',
+			required: true,
+		},
+	},
+};
+
+
+//---------------------------------------------------------------------
+module.exports = function ( Liquicode )
+{
+
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function ContainerStatus
+	 * @returns {string}
+	 * @description
+	 * Gets the status of a running Docker Container.
+	 * @param {string} ContainerID
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
+	function ContainerStatus( ContainerID ) 
+	{
+		let command_line = `docker inspect ${ContainerID}`;
+		let result = Liquicode.System.ExecuteProcess( command_line );
+		if ( result.error ) 
+		{
+			// if ( result.error === `Command failed: docker inspect ${ContainerID}\nError: No such object: ${ContainerID}\n` ) { return null; }
+			if ( result.error.indexOf( 'Error: No such object' ) ) { return null; }
+			throw new Error( result.error );
+		}
+		let status = JSON.parse( result.result );
+		if ( Array.isArray( status ) && status.length )
+		{
+			status = status[ 0 ];
+		}
+		return status;
+	}
+
+
+	//---------------------------------------------------------------------
+	// Return the module exports.
+	return {
+		_Schema: _Schema,
+		ContainerStatus: ContainerStatus,
 	};
 };
 
@@ -6799,6 +7972,16 @@ delete Liquicode.Network._Schema;
 module.exports = Liquicode;
 
 
+
+/***/ }),
+
+/***/ "child_process":
+/*!********************************!*\
+  !*** external "child_process" ***!
+  \********************************/
+/***/ ((module) => {
+
+module.exports = require("child_process");
 
 /***/ }),
 

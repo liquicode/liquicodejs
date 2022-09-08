@@ -251,6 +251,7 @@ module.exports = function ( Liquicode )
 	 * @public
 	 * @function Matrix
 	 * @returns {object}
+	 * @summary Matrix stores a two-dimensional jagged array and exposes manipulation functions.
 	 * @description
 	 * 
 A Matrix object is essentially a two-dimensional array (an array of arrays).
@@ -273,8 +274,29 @@ The Options parameter is an options object:
 ~~~javascript
 Options = {
 	default_value: null,    // A default value to use when no other value exists.
-	clone_values: false,    // If true, any values read or written to the Matrix are cloned first.
+	clone_values: true,     // If true, any values read from or written to the Matrix are cloned first.
 }
+~~~
+
+The `clone_values` option is very important.
+It is initialliy set to true, providing the safest and most sensible operation.
+A performance improvement can be had by setting this to false;
+However, unintended consequences may occur if you are not careful.
+Alsa, this is a valid intended consequence if you want to use Matrix to quickly manipulate an existing array.
+
+For example:
+~~~javascript
+let test_array = [
+	[ 1, 2, 3, 4 ],
+	[ 5, 6, 7, 8 ],
+];
+// test_array.length == 2
+// Encapsulate the array in a matrix.
+let matrix = Liquicode.Shapes.Matrix( test_array, { clone_values: false } );
+// Append a row to the matrix.
+matrix.AppendRows( [ 'A', 'B', 'C' ] );
+// Since test_array was not cloned first, the new row also appears in test_array.
+// test_array.length == 3 !!!
 ~~~
 
 
@@ -307,7 +329,7 @@ You can change the value used to fill blank columns by changing `Option.default_
 ***Cell Addressing***
 
 When working with Matrix, you will usually need to identify a particular Row or Column to work with.
-Matrix supports three types addressing modes:
+Matrix supports three types of addressing modes:
 
 - 1) A zero-based index used as a row/column index.
 This index must be greater than or equal to zero and less than the extent (i.e. the RowCount or ColumnCount).
@@ -427,6 +449,20 @@ The Matrix object also has a number of functions which allow you to manipulate t
 
 	- `SetMatrix( Row, Column, Matrix )`:
 	Sets a matrix of values starting at Row and Column.
+
+- Table Functions:
+
+	- `Clone()`:
+	Return a clone of this matrix.
+	The clone will contain a copy of this matrix's data and options.
+
+	- `Transpose()`:
+	Return a copy of this matrix with its rows and column transposed.
+
+	- `Join( AtColumn, JoinType, JoinMatrix, MatrixColumn )`:
+	Return a new matrix by joining this matrix with another one.
+	The join is produced by matching column values between the two matrices.
+	The different supported join types are: 'inner', 'left', 'right', and 'full'.
 
 
 	 * @param {object} Values

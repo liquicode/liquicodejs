@@ -162,7 +162,7 @@
 			"internalConsoleOptions": "openOnSessionStart",
 		},
 		{
-			"name": "800) File Tests",
+			"name": "800) System Tests",
 			"type": "node",
 			"request": "launch",
 			"skipFiles": [
@@ -173,7 +173,7 @@
 			"args": [
 				"-u",
 				"bdd",
-				"src/800-File/*.Tests.js",
+				"src/800-System/*.Tests.js",
 				"--timeout",
 				"0",
 				"--slow",
