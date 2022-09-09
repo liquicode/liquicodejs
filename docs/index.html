@@ -1,0 +1,2394 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>LiquicodeJS (v0.0.1)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Righteous|Roboto">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular-sanitize.js"></script>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="components/PrismJS-v1.28.0/prism-okaidia.css">
+    <script type="text/javascript" src="components/PrismJS-v1.28.0/prism-okaidia.js"></script>
+    <script type="text/javascript" src="liquicodejs.html.js"></script>
+    <link rel="stylesheet" href="liquicodejs.html.css">
+  </head>
+</html>
+<body>
+  <script>window.Locals = {};
+window.Locals.VersionNumber = "0.0.1";
+window.Locals.Schemas = [{"id":"000","name":"Types","type":"namespace","summary":"Data Type Handling","description":["\nLiquicodeJS can classify and identify value types beyond the primitive data types supported by Javascript.\n\n\nWhen obtaining FieldSchema objects from `Schema.ValueSchema()` or `Schema.ObjectSchema()`,\n`FieldSchema.type` will contain the Javascript data type and `FieldSchema.format` will have a more specific type description.\n\nJavascript (and JSON) offers four data types for your variable values: `boolean`, `number`, `string`,\nand everything else is essentially an `object`.\nThis suits Javascript well for the types of things that Javascript needs to do like storing values in memory\nand executing program statements with those values.\nThis is not always great on an application level though.\nWhen you need to, for example, make sure that a variable contains an `array` of `string` or that value represents a floating point number.\nCases like these require additional progrma statements and type checking which can be consolidated into a set of functions.\n\nThe `Schema` module defines a few objects and functions to alleviate this burden from the application developer.\n\n**The FieldSchema Object**\n\nThis object describes a value (or field) with greater precision then Javascript's `typeof` statement.\nThe `FieldSchema.type` member will always contain a Javascript data type while the `FieldSchema.format` field contains a more\ndetailed data type.\n\n~~~javascript\nFieldSchema = {\n\ttype: '',\t\t\t\t// Javascript data type (boolean, number, string, or object).\n\tformat: '',\t\t\t\t// A data type specific designation.\n\tdefault: undefined,\t\t// A default value used for missing fields.\n\tname: '',\t\t\t\t// Name of the field.\n}\n~~~\n\nThese functions will generate a `FieldSchema` from a single value or an object.\nBe aware that only the top level members of an object are scrutinized as this is what we are typically interested in most cases.\nFunctions of the `Schema` module do not recurse into an object providing the schema for every single field in the object.\nRather, they inspect the top level of objects only and return an array of schema objects as a result.\nAgain, this handles most use cases with a consistent set of functions.\nAny further validation/coercion that may be required can also be perfomed by the same functions on an individual case basis.\n\n- `Schema.ValueSchema( FromValue )`\n- `Schema.ObjectSchema( FromObject )`\n\nPossible values for `FieldSchema.type` and `FieldSchema.format` are as follows:\n\n| Type    | Format        | Default Value | Examples                              |\n|---------|---------------|---------------|---------------------------------------|\n| boolean | boolean       | false         | `true`, or `false`                |\n| number  | integer       | 0             | `1`, `2`, or `3.0`              |\n| number  | float         | 0             | `1.1`, `2.071`, or `3.14`       |\n| string  | string        | \"\"            | `\"Hello\"`, or `\"\"`                |\n| object  | object        | {}            | `{ foo: 'bar' }`                    |\n| object  | array         | []            | `[ 1, 'two', 3.14, null ]`          |\n| object  | boolean-array | []            | `[ true, false, true ]`             |\n| object  | number-array  | []            | `[ 1, 2, 3.14 ]`                    |\n| object  | string-array  | []            | `[ 'one', 'two', 'three' ]`         |\n| object  | object-array  | []            | `[ { foo: 'bar' }, [1,2,3], null ]` |\n| object  | array-array   | []            | `[ [1,2,3], [], [4,5] ]`            |\n","\n\n**The ErrorValue Object**\n\nLiquicodeJS introduces an `ErrorValue` object that is used to indicate and convey errors.\nSome functions will return an `ErrorValue` object instead of throwing a Javascript `Error`.\nIn some cases, this can make code more efficient and legible when certain errors are tolerable\nand you want to avoid the expensive cost of a Javascript `Error` that includes a call stack.\n\nUse the `Schema.ErrorValue()` function to create an `ErrorValue` object and `Schema.IsErrorValue()` to test for errors.\nAn `ErrorValue` will always have `ErrorValue.ok = false` and `ErrorValue.error` will contain the error message.\n\n~~~javascript\nErrorValue = {\n\tok: false,\t\t// Always set to \"false\".\n\terror: '',\t\t// Error message.\n\tcontext: '',\t// Context for the error (e.g. a function name).\n}\n~~~\n","\n\n**Value Coercion**\n\nAs data gets shuttled around between memory, files, and network transmissions, the representation of the data might\nchange to suit to the medium.\nFor example, an integer value being stored in a file might be read back out later as a string.\nIt's actual value hasn't changed, but the way it is represented has changed.\nJavascript can be pretty forgiving in these cases by allowing a certain amount of type fluidity;\nHowever, this can also cause some difficult to spot errors like when `'2' + 2` equals the string `'22'` and not the integer `4`.\n\nUse these functions the validate that a value's type is of an expected type and to coerce the value, in a common sense way,\nto that expected type.\n\n- `Types.Coerce( Value, Schema, ThrowErrors )`\n- `Types.Coerce( Value, Schema, ThrowErrors )`\n- `Types.Coerces( Values, Schemas, ThrowErrors )`\n\nThis tables describes how values are converted from one data type to another during coercion:\n\n| From Type | To Boolean     | To Number      | To String        | To Object      |\n|-----------|----------------|----------------|------------------|----------------|\n| undefined | DefaultValue() | DefaultValue() | DefaultValue()   | DefaultValue() |\n| null      | DefaultValue() | DefaultValue() | DefaultValue()   | DefaultValue() |\n| Boolean   | Value          | Number()       | toString()       | ErrorValue     |\n| Number    | Boolean()      | Value          | toString()       | ErrorValue     |\n| String    | Boolean()      | Number()       | Value            | JSON.parse()   |\n| Object    | Boolean()      | Number()       | JSON.stringify() | Value          |\n","\n\n**Related Reading**\n\n- [You Don't Know JS: Types & Grammar - Chapter 4. Coercion](https://www.oreilly.com/library/view/you-dont-know/9781491905159/ch04.html)\n"],"examples":["Schema = { name: 'PersonName', type: 'string' }","Schema = { name: 'options', type: 'object', default: { hoist: true, swab: 'decks' } }","Schema = { name: 'max_tries', type: 'number', format: 'integer', required: true, default: 3 }"],"todo":["Support extended number formats: positive-integer, negative-integer, positive-float, negative-float","Support type: function","Support format plugin-ins. Must implement: get_default(), is_type_of(value), can_coerce(type), coerce(value)"],"source_filename":"000-Types\\000-Types.js"},{"id":"001","member_of":"Types","name":"HasValue","type":"function","returns":"boolean","returns_description":"True if Value actually contains a value.","summary":"Determine if a variable contains a value or or not.","description":"\nTests the provided Value parameter and returns false if it does not represent a value.\nMore specifically, if Value is undefined or null, then false is returned.\nif Value is a zero length string `\"\"` or an empty object `{}`, false is also returned.\nIn all other cases, this function returns true.\n","Parameters":{"Value":{"name":"Value","type":"*","required":true,"description":"The value to test."}},"todo":[],"source_filename":"000-Types\\001-Types.HasValue.js"},{"id":"010","member_of":"Types","name":"Coerce","type":"function","returns":"object","returns_description":"A `Coercion` object.","summary":"Returns a `Coercion` object which is used to coerce values to different types.","description":"\nThe returned `Coercion` object has a single member `Coercion.value` and a number of coercion functions:\n\n- `ToBoolean( Default = false )` :\n\tReturns the boolean value of `Coercion.value`.\n\tAnything can be coerced to a boolean.\n\tIf value is a string, then 'false' and '0' will return false while 'true' will return true.\n\n- `ToNumber( Default = 0 )` :\n\tReturns the numeric value of `Coercion.value`.\n\tBooleans, other numbers, and numeric strings can be coerced to a number.\n\n- `ToString( Default = '' )` :\n\tReturns the string value of `Coercion.value`.\n\tAnything can be coerced to a string.\n\tIf value is an object, then it is JSON stringified and returned.\n\n- `ToObject( Default = null )` :\n\tReturns the object value of `Coercion.value`.\n\tOnly JSON strings and other objects can be coerced to an object.\n\tIf value is a JSON string, then it is JSON parsed and returned.\n\n`Coercion.value` is set to the Value parameter.\n\n**Usage**\n\nThere are two ways to use the `Coercion` object.\n\nOne way is to immediately call one of the coercion functions after obtaining the `Coercion` object:\n~~~javascript\nlet number_42 = Liquicode.Types.Coerce( '42' ).ToNumber();\n~~~\n\nAnother way is to reuse the `Coercion` object and alter the `Coercion.value` property yourself:\n~~~javascript\nlet coercion = Liquicode.Types.Coerce();\ncoercion.value = '42';\nlet number_42 = coercion.ToNumber();\n~~~\n\n**Examples**\n\n~~~javascript\n// Coercing to boolean\nSchema.Coerce( null ).ToBoolean()           // = false\nSchema.Coerce( 0 ).ToBoolean()              // = false\nSchema.Coerce( 'true' ).ToBoolean()         // = true\n\n// Coercing to number\nSchema.Coerce( null ).ToNumber()            // = 0\nSchema.Coerce( '3.14' ).ToNumber()          // = 3.14\nSchema.Coerce( 'foo' ).ToNumber()           // = 0\n\n// Coercing to string\nSchema.Coerce( null ).ToString()            // = ''\nSchema.Coerce( '3.14' ).ToString()          // = '3.14'\nSchema.Coerce( { foo: 'bar' } ).ToString()  // = '{\"foo\":\"bar\"}'\n\n// Coercing to object\nSchema.Coerce( null ).ToObject()            // = null\nSchema.Coerce( 3.14 ).ToObject()            // = null\nSchema.Coerce( '{\"foo\":\"bar\"}' ).ToObject() // = { foo: 'bar' }\n\n// Coercing with a Default\nSchema.Coerce( 'Hello' ).ToNumber( -1 )     // = -1\nSchema.Coerce( true ).ToObject( {} )        // = {}\nSchema.Coerce( 1024 ).ToObject( {} )        // = {}\nSchema.Coerce( null ).ToObject( { a: 1 } )  // = { a: 1 }\nSchema.Coerce( null ).ToObject( [ 1, 2 ] )  // = [ 1, 2 ]\n~~~\n","Parameters":{"Value":{"name":"Value","type":"*","required":false,"description":"The value to coerce. This value is set to `Coercion.value`."},"Loud":{"name":"Loud","type":"boolean","required":false,"default":false,"description":"Throws errors when set to `true`."}},"todo":[],"source_filename":"000-Types\\010-Types.Coerce.js"},{"id":"020","member_of":"Types","name":"Formats","source_type":"function","returns":"object","returns_description":"An array of `SchemaFormat` objects.","summary":"Returns an array of `SchemaFormat` objects used to convert values between different formats.","description":"\nReturns the library's internal array of format objects, `Types.Formats`.\n\nEach format has a `type` and `format` string, and an `IsFormat( Value )` function.\nThis list of formats is used by the `Types.GetFormat()` and `Types.IsFormat()` functions.\n\nApplications can ammend this array in order to customize type processing or add new formats.\nThe structure of each format in the array is:\n~~~javascript\n{\n\ttype: '',    // The Javascript data type. e.g. 'boolean', 'number', 'string', 'object'\n\tformat: '',  // A type specific format. e.g. 'integer', 'date'. \n\tIsFormat: function ( Value )\n\t{\n\t\treturn true;  // Return true, if Value is of this format.\n\t}\n}\n~~~\n\nFor example, here is the format object for `\"string:string\"`:\n~~~javascript\n{\n\ttype: 'string',\n\tformat: 'string',\n\tIsFormat: function ( Value )\n\t{\n\t\tif ( typeof Value !== 'string' ) { return false; }\n\t\treturn true;\n\t},\n},\n~~~\n\nYou have the ability to directly modify the `Types.Formats` array.\n\nFor example, suppose you want to define two new formats to detect objects of 'object:person' and 'object:employee'.\n~~~javascript\nPerson = {\n\tfirst_name: '',\n\tlast_name: '',\n}\nEmployee = {\n\tfirst_name: '',\n\tlast_name: '',\n\ttitle: '',\n}\n~~~\n\nThe format objects might look something like this:\n~~~javascript\nobject_person = {\n\ttype: 'object',\n\tformat: 'person',\n\tIsFormat: function( Value )\n\t{\n\t\tif ( typeof Value !== 'object' ) { return false; }\n\t\tif ( !Value ) { return false; }\n\t\tif ( !Value.first_name ) { return false; }\n\t\tif ( !Value.last_name ) { return false; }\n\t\treturn true;\n\t},\n},\nobject_employee = {\n\ttype: 'object',\n\tformat: 'employee',\n\tIsFormat: function( Value )\n\t{\n\t\tif ( typeof Value !== 'object' ) { return false; }\n\t\tif ( !Value ) { return false; }\n\t\tif ( !Value.first_name ) { return false; }\n\t\tif ( !Value.last_name ) { return false; }\n\t\tif ( !Value.title ) { return false; }\n\t\treturn true;\n\t},\n},\n~~~\n\nAnd tou can add them to the `Types.Formats` array:\n~~~javascript\nlet formats = Liquicode.Types.Formats();\nformats.push( object_person );\nformats.push( object_employee );\n~~~\n\nThe `Types.GetFormat()` function reads the formats array in reverse order when matching a value to a format.\nThis is done so that more complex types will not get \"short-circuited\" by less complex types.\nThe more complex format in this case is \"object:employee\" and should appear after \"object:person\" in the array.\n\n","Parameters":{},"todo":[],"source_filename":"000-Types\\020-Types.Formats.js"},{"id":"021","member_of":"Types","name":"GetFormat","type":"function","returns":"string","returns_description":"An extended type description.","summary":"Determine the type and format of a value.","description":"\nIterates through `Types.Formats` in reverse order and calls each `Format.IsFormat()` function.\nWhen one of the formats returns `true`, then it's type and format are returned separated by `:`.\n\n**Examples**\n\n~~~javascript\nLiquicode.Types.GetFormat( '42' )         // = 'number:integer'\nLiquicode.Types.GetFormat( 'Hello' )      // = 'string:string'\nLiquicode.Types.GetFormat( new Date() )   // = 'object:datetime'\nLiquicode.Types.GetFormat( [ 1, 2, 3 ] )  // = 'object:number-array'\n~~~\n","Parameters":{"Value":{"name":"Value","type":"*","required":true,"description":"The value to get the format for."}},"todo":[],"source_filename":"000-Types\\021-Types.GetFormat.js"},{"id":"022","member_of":"Types","name":"IsFormat","type":"function","returns":"boolean","returns_description":"True if the value matches the format.","summary":"Determine if a value is of a particular format.","description":"\nLooks up the specified format in `Types.Formats` and calls the `Format.IsFormat()` function.\n\nThe `Format` parameter must specify both type and format to be tested for.\n\n**Examples**\n\n~~~javascript\nLiquicode.Types.IsFormat( 'Hello', 'string:string' )            // = true\nLiquicode.Types.IsFormat( 'Hello', 'string:json' )              // = false\nLiquicode.Types.IsFormat( [ 1, 2, 3 ], 'object:array' )         // = true\nLiquicode.Types.IsFormat( [ 1, 2, 3 ], 'object:number-array' )  // = true\nLiquicode.Types.IsFormat( [ 1, 2, 3 ], 'object:string-array' )  // = false\n~~~\n","Parameters":{"Value":{"name":"Value","type":"*","required":true,"description":"The value to test."},"Format":{"name":"Format","type":"string","required":true,"description":"The type and format to test for as: `\"type:format\"`.","examples":["string:string","string:json","object:datetime"]}},"todo":[],"source_filename":"000-Types\\022-Types.IsFormat.js"},{"id":"100","name":"Object","type":"namespace","summary":"Functions for manipulating Javascript objects.","source_filename":"100-Object\\100-Object.js"},{"id":"101","member_of":"Object","name":"Clone","type":"function","returns":"string","description":["Returns a clone of the given object.","This is equivalent to doing A = JSON.parse( JSON.stringify( B ) )."],"Parameters":{"From":{"name":"From","type":"object","default":{}}},"source_filename":"100-Object\\101-Object.Clone.js"},{"id":"103","member_of":"Object","name":"Merge","type":"function","returns":"object","description":"\nMerges the content of two objects and returns the composite result.\n\nSimilar to Clone, this function will remove any non-data fields (i.e. functions and symbols) from the objects.\n","Parameters":{"Original":{"name":"Original","type":"object","required":true},"Updates":{"name":"Updates","type":"object","required":false}},"source_filename":"100-Object\\103-Object.Merge.js"},{"id":"120","member_of":"Object","name":"FromJson","type":"function","returns":"object","description":"\nParse a Json string and return an object value.\nThis is identical Javascript's \"JSON.parse()\" function.\n\nThere are some significant differences from Javascript's version.\nThe parser is a bit more relaxed and allows:\n- Identifiers are not required to have quotes.\n- A comma can appear after the last element of an array or object.\n- String literals can use either single or double quotes.\n- Parsing automatically stops when the closing brace or bracket is found in the json string.\n\n","Parameters":{"JsonString":{"name":"JsonString","type":"string"}},"source_filename":"100-Object\\120-Object.FromJson.js"},{"id":"121","member_of":"Object","name":"ToJsonOptions","type":"function","returns":"object","description":"\n","Parameters":{"PresetName":{"name":"PresetName","type":"string"}},"source_filename":"100-Object\\121-Object.ToJsonOptions.js"},{"id":"122","member_of":"Object","name":"ToJson","type":"function","returns":"object","description":"\n","Parameters":{"Value":{"name":"Value","type":"*","description":"The value to convert to a json string."},"JsonOptions":{"name":"JsonOptions","type":"object|string","description":"Can be an options object or the name of an options preset (\"default\", \"pretty\", or \"pretty-2\")"}},"source_filename":"100-Object\\122-Object.ToJson.js"},{"id":"125","member_of":"Object","name":"FromIni","type":"function","returns":"object","description":"\nParse an Ini string and return an object value.\n\n","Parameters":{"IniString":{"name":"IniString","type":"string"}},"source_filename":"100-Object\\125-Object.FromIni.js"},{"id":"126","member_of":"Object","name":"ToIni","type":"function","returns":"object","description":"\nParse an Ini string and return an object value.\n\n","Parameters":{"Value":{"name":"Value","type":"object"}},"source_filename":"100-Object\\126-Object.ToIni.js"},{"id":"130","member_of":"Object","name":"ValueArrayOf","type":"function","returns":"array","description":"\nReturns an array of values.\nIf the Value parameter is missing or null, then an empty array `[]` is returned.\nIf Value is an object, its values are returned in the array.\nIf Value is already an array, it is returned unmodified.\nOtherwise, an array is returned containing Value as its only member.\n","Parameters":{"Value":{"name":"Value","type":"any"}},"source_filename":"100-Object\\130-Object.ValueArrayOf.js"},{"id":"200","name":"Text","type":"namespace","summary":"Functions for text parsing and manipulation.","source_filename":"200-Text\\200-Text.js"},{"id":"201","member_of":"Text","name":"Compare","type":"function","returns":"string","description":["Compares two strings.","Returns a `-1` if `StringA` is less than `StringB`.","Returns a `1` if `StringA` is greater than than `StringB`.","Returns a `0` if `StringA` and `StringB` are the same."],"Parameters":{"StringA":{"name":"StringA","type":"string","default":""},"StringB":{"name":"StringB","type":"string","default":""},"CaseSensitive":{"name":"CaseSensitive","type":"boolean","default":true}},"source_filename":"200-Text\\202-Text.Compare.js"},{"id":"203","member_of":"Text","name":"Matches","type":"function","returns":"string","description":["Matches the text against a wildcard-lik pattern.","Returns true If the match succeeds, otherwise false."],"Parameters":{"Text":{"name":"Text","type":"string","required":true,"default":""},"Pattern":{"name":"Pattern","type":"string","required":true,"default":""}},"source_filename":"200-Text\\203-Text.Matches.js"},{"id":"210","member_of":"Text","name":"ReplaceCharacters","type":"function","returns":"string","description":["Replaces characters within a string.","Returns the modified string."],"Parameters":{"Text":{"name":"Text","type":"string","required":true,"default":""},"SearchCharacters":{"name":"SearchCharacters","type":"string","required":true,"default":""},"ReplacementText":{"name":"ReplacementText","type":"string","required":true,"default":""},"MaxTimes":{"name":"MaxTimes","type":"number","format":"integer","required":false,"default":-1}},"source_filename":"200-Text\\210-Text.ReplaceCharacters.js"},{"id":"211","member_of":"Text","name":"ReplaceText","type":"function","returns":"string","description":"","Parameters":{"Text":{"name":"Text","type":"string","required":true,"default":""},"SearchText":{"name":"SearchText","type":"string","required":true,"default":""},"ReplacementText":{"name":"ReplacementText","type":"string","required":true,"default":""}},"source_filename":"200-Text\\211-Text.ReplaceText.js"},{"id":"220","member_of":"Text","name":"FirstWord","type":"function","returns":"string","description":["Returns the first word of a text phrase."],"Parameters":{"Phrase":{"name":"Phrase","type":"string","required":false,"default":"","description":"A text phrase containing words separated by delimiters."},"Delimiters":{"name":"Delimiters","type":"string","required":false,"default":" ","description":"A string of whitespace and punctuation characters that break the phrase into words."}},"source_filename":"200-Text\\220-Text.FirstWord.js"},{"id":"221","member_of":"Text","name":"AfterFirstWord","type":"function","returns":"string","description":["Returns the remainder of a text phrase occurring after the first word."],"Parameters":{"Phrase":{"name":"Phrase","type":"string","required":false,"default":"","description":"A text phrase containing words separated by delimiters."},"Delimiters":{"name":"Delimiters","type":"string","required":false,"default":" ","description":"A string of characters that break the phrase into words."}},"source_filename":"200-Text\\221-Text.AfterFirstWord.js"},{"id":"222","member_of":"Text","name":"LastWord","type":"function","returns":"string","description":["Returns the last word of a text phrase."],"Parameters":{"Phrase":{"name":"Phrase","type":"string","required":false,"default":"","description":"A text phrase containing words separated by delimiters."},"Delimiters":{"name":"Delimiters","type":"string","required":false,"default":" ","description":"A string of characters that break the phrase into words."}},"source_filename":"200-Text\\222-Text.LastWord.js"},{"id":"223","member_of":"Text","name":"BeforeLastWord","type":"function","returns":"string","description":["Returns the remainder of a text phrase occurring befiore the last word."],"Parameters":{"Phrase":{"name":"Phrase","type":"string","required":false,"default":"","description":"A text phrase containing words separated by delimiters."},"Delimiters":{"name":"Delimiters","type":"string","required":false,"default":" ","description":"A string of characters that break the phrase into words."}},"source_filename":"200-Text\\223-Text.BeforeLastWord.js"},{"id":"300","name":"Shapes","type":"namespace","summary":"Functions for manipulating data in different shapes.","source_filename":"300-Shapes\\300-Shapes.js"},{"id":"310","member_of":"Shapes","name":"Matrix","type":"function","returns":"object","returns_summary":"Returns a new Matrix object.","summary":"Matrix stores a two-dimensional jagged array and exposes manipulation functions.","description":"\nA Matrix object is essentially a two-dimensional array (an array of arrays).\nThis function will create and return a new Matrix object.\n\n\n***Values Parameter***\n\nYou can specify the initial contents of the Matrix with the Values parameter.\nIf Values is an array of arrays, then Matrix will contain those values.\nIf Values is a one-dimensional array, then Matrix will have a single row reflecting those values.\nIf Values is an integer, then Matrix will be created with that number of blank rows.\n\nNote that the only way to create a new Matrix with no rows in it is: `Shapes.Matrix( 0, Options )`\n\n\n***Options Parameter***\n\nThe Options parameter is an options object:\n~~~javascript\nOptions = {\n\tdefault_value: null,    // A default value to use when no other value exists.\n\tclone_values: true,     // If true, any values read from or written to the Matrix are cloned first.\n}\n~~~\n\nThe `clone_values` option is very important.\nIt is initialliy set to true, providing the safest and most sensible operation.\nA performance improvement can be had by setting this to false;\nHowever, unintended consequences may occur if you are not careful.\nAlsa, this is a valid intended consequence if you want to use Matrix to quickly manipulate an existing array.\n\nFor example:\n~~~javascript\nlet test_array = [\n\t[ 1, 2, 3, 4 ],\n\t[ 5, 6, 7, 8 ],\n];\n// test_array.length == 2\n// Encapsulate the array in a matrix.\nlet matrix = Liquicode.Shapes.Matrix( test_array, { clone_values: false } );\n// Append a row to the matrix.\nmatrix.AppendRows( [ 'A', 'B', 'C' ] );\n// Since test_array was not cloned first, the new row also appears in test_array.\n// test_array.length == 3 !!!\n~~~\n\n\n***How It Works***\n\nThe Matrix object contains a `RowData` member which is an array of arrays that contains the values for the matrix.\nThis is maintained as a jagged array, meaning that each row of the matrix may be of different lengths.\n~~~javascript\n[\t// Matrix maintains values in a jagged array:\n\t[ 1, 2, 3, 4 ],\n\t[ 1, 2, 3 ],\n\t[ 1, 2, 3, 4, 5 ],\n]\n~~~\n\nWhen calling the `AppendColumns`, `InsertColumns`, `SetColumn`, or `SetValue` functions,\nit may be necessary for the matrix to fill out the columns of shorter rows so that the target column exists.\nFor example, appending a blank column (`AppendColumns()`) to the matrix above would yield:\n~~~javascript\n[\t// Matrix fills columns with\n\t// default values as needed:\n\t[ 1, 2, 3, 4,    null, null ],\n\t[ 1, 2, 3, null, null, null ],\n\t[ 1, 2, 3, 4,    5,    null ],\n]\n~~~\nYou can change the value used to fill blank columns by changing `Option.default_value`.\n\n\n***Cell Addressing***\n\nWhen working with Matrix, you will usually need to identify a particular Row or Column to work with.\nMatrix supports three types of addressing modes:\n\n- 1) A zero-based index used as a row/column index.\nThis index must be greater than or equal to zero and less than the extent (i.e. the RowCount or ColumnCount).\n\n- 2) A negative index that serves as an offset from the extent (e.g. -1 = RowCount - 1).\nThis type of index must be between -extent and -1, inclusive.\n\n- 3) A spreadsheet style address (e.g. 'A1', 'B2', etc.).\nThis type of address has letters component which indicates a column.\nThis is followed by a digits component that is a one-based row number.\n\n\n***Matrix Functions***\n\nThe Matrix object also has a number of functions which allow you to manipulate the Matrix object.\n\n- Addressing Functions:\n\tThese are utility functions that assist when working with the spreadsheet style of addressing.\n\tThese functions are used internally by Matrix.\n\tThey do not consider the validity of any particular address or index within the current Matrix.\n\n\t- `IsValidAddress( Address )`:\n\t\tReturns `true` if Address is a valid address, otherwise `false`.\n\t\tA valid address must contain a column component in letters ('AB') and a row component in digits ('12').\n\t\tThis function determines only if the Address parameter is a properly formatted address,\n\t\tregardless if the address lies outside the bounds of this particular Matrix.\n\n\t- `NumberToLetters( Number )`:\n\t\tReturns the letters component of an address for any positive number (e.g. 1='A', 2='B', 28='AB', etc.).\n\n\t- `LettersToNumber( Address )`:\n\t\tConverts the letters component of an address to a positive number.\n\t\tAddress is a string that starts with, or is entirely composed of, letters.\n\n- Row Functions:\n\t\n\t- `RowIndexOf( Address )`:\n\tWill return a valid row index for this Matrix from the given Address.\n\tAddress can represent any of the three addressing styles.\n\n\t- `RowCount()`:\n\tReturns the number of rows within the Matrix.\n\n\t- `AppendRows( Values )`:\n\tAppends one or more rows to the end of the Matrix.\n\tIf Values is not supplied, then a blank row is appended.\n\tIf Values is a one-dimensional array, then a single row is appended.\n\tIf Values is a two-dimensional array, then multiple rows are appended.\n\n\t- `InsertRows( Row, Values )`:\n\tInserts one or more rows within the Matrix, starting at the given Row address.\n\tIf Values is not supplied, then a blank row is appended.\n\tIf Values is a one-dimensional array, then a single row is appended.\n\tIf Values is a two-dimensional array, then multiple rows are appended.\n\tNote that it is not possible to append a row to a Matrix by using this function.\n\n\t- `DeleteRows( Row, Count )`:\n\tDeletes one or more rows within the Matrix, starting at the given Row address.\n\tIf Count is not supplied, then a single row is deleted.\n\n\t- `GetRow( Row )`:\n\tReturns a single row of values from the Matrix, at the given Row address.\n\n\t- `SetRow( Row, Values )`:\n\tReplaces a single row of values (a one-dimensional array) within the Matrix, at the given Row address.\n\tIf Values is not supplied, then a blank row is set at that location.\n\n- Column Functions:\n\n\t- `ColumnIndexOf( Address )`:\n\tWill return a valid column index for this Matrix from the given Address.\n\tAddress can represent any of the three addressing styles.\n\n\t- `ColumnCount()`:\n\tReturns the number of columns within the Matrix.\n\n\t- `AppendColumns( Values )`:\n\tAppends one or more columns to the end of the Matrix.\n\tIf Values is not supplied, then a blank column is appended.\n\tIf Values is a one-dimensional array, then a single column is appended.\n\tIf Values is a two-dimensional array, then multiple columns are appended.\n\n\t- `InsertColumns( Column, Values )`:\n\tInserts one or more columns within the Matrix, starting at the given Column address.\n\tIf Values is not supplied, then a blank column is appended.\n\tIf Values is a one-dimensional array, then a single column is appended.\n\tIf Values is a two-dimensional array, then multiple columns are appended.\n\tNote that it is not possible to append a column to a Matrix by using this function.\n\n\t- `DeleteColumns( Column, Count )`:\n\tDeletes one or more columns within the Matrix, starting at the given Column address.\n\tIf Count is not supplied, then a single column is deleted.\n\n\t- `GetColumn( Column )`:\n\tReturns a single column of values from the Matrix, at the given Column address.\n\n\t- `SetColumn( Column, Values )`:\n\tReplaces a single column of values (a one-dimensional array) within the Matrix, at the given Column address.\n\tIf Values is not supplied, then a blank column is set at that location.\n\n- Value Functions:\n\n\t- `GetValue( Row, Column )`:\n\tReturns a single value located at Row and Column within the Matrix.\n\tRow can be a string address, in which case the Column parameter is omitted.\n\n\t- `SetValue( Row, Column, Value )`:\n\tSets a single value located at Row and Column within the Matrix.\n\tRow can be a string address, in which case the Column parameter is omitted.\n\t\n\t- `GetMatrix( Row, Column, RowCount, ColumnCount )`:\n\tConstructs a new Matrix of values from within the called Matrix.\n\tValues are taken starting at the location described by Row and Column and extending for RowCount rows and ColumnCount columns.\n\t\t- You can call this using four parameters: `GetMatrix( Row, Column, RowCount, ColumnCount )`\n\t\t- You can call this using three parameters: `GetMatrix( Address, RowCount, ColumnCount )`\n\t\t- You can call this using two parameters: `GetMatrix( Address, Size )`\n\n\t- `SetMatrix( Row, Column, Matrix )`:\n\tSets a matrix of values starting at Row and Column.\n\n- Table Functions:\n\n\t- `Clone()`:\n\tReturn a clone of this matrix.\n\tThe clone will contain a copy of this matrix's data and options.\n\n\t- `Transpose()`:\n\tReturn a copy of this matrix with its rows and column transposed.\n\n\t- `Join( AtColumn, JoinType, JoinMatrix, MatrixColumn )`:\n\tReturn a new matrix by joining this matrix with another one.\n\tThe join is produced by matching column values between the two matrices.\n\tThe different supported join types are: 'inner', 'left', 'right', and 'full'.\n\n","Parameters":{"Values":{"name":"Values","type":"object","required":true,"default":[[]],"description":"One of: a two-dimensional array of arrays, a one-dimensional array of values, or an integer."},"Options":{"name":"Options","type":"object","required":false,"default":{},"description":"Set of options controlling Matrix operation."}},"source_filename":"300-Shapes\\310-Shapes.Matrix.js"},{"id":"500","name":"Parse","type":"namespace","summary":"Functions for tokenizing text strings.","source_filename":"500-Parse\\500-Parse.js"},{"id":"501","member_of":"Parse","name":"TokenizeOptions","type":"function","returns":"object","description":["Returns a set of options for calling Tokenize().","Throws an error if an invalid value for PresetName is given."],"Parameters":{"Text":{"name":"PresetName","type":"string","required":false,"default":"","description":["To retrieve an options preset, use one of: 'csv', or 'cli'","You can leave this empty or 'default' for the default options."]}},"source_filename":"500-Parse\\501-Parse.TokenizeOptions.js"},{"id":"502","member_of":"Parse","name":"Tokenize","type":"function","returns":"object","description":["Returns the parsed tokens."],"Parameters":{"Text":{"name":"PresetName","type":"string","required":false,"default":"","description":["To retrieve an options preset, use one of: 'csv', or 'cli'","You can leave this empty for the default options."]}},"source_filename":"500-Parse\\502-Parse.Tokenize.js"},{"id":"011","member_of":"Parse","name":"DateParse","type":"function","returns":"object","returns_summary":"Returns a `DateParts` object containing Date/Time detail.","description":["\nDates and times are funny little creatures.\n"],"Parameters":{"Value":{"name":"Value","type":"string","required":true},"TimeZoneOffset":{"name":"TimeZoneOffset","type":"string","required":false,"default":"+0000"}},"source_filename":"500-Parse\\510-Parse.DateParse.js"},{"id":"800","name":"System","type":"namespace","summary":"File system and process functions. (nodejs only)","source_filename":"800-System\\800-System.js"},{"id":"810","member_of":"System","name":"AsyncVisitFiles","type":"function","returns":"*","description":"\nScans a folder and calls the Visitor callback function for each folder/file encountered.\n\nThe `FilePattern` parameter is optional and can be a wildcard type string.\nFor example, to visit all text files, you can pass '*.txt'.\nIf `FilePattern` is not empty, then the callback will not be called for folders.\n\nThe Visitor callback function takes two parameters `Visitor( Path, Filename )`.\nIf the Visitor callback returns a value, then the visitation process is halted\nand that value is returned by the `VisitFiles` function.\nThe Visitor callback is called for each file encountered and for each folder encountered.\nWhen called for a folder, the `Filename` parameter will be null.\nThe Visitor callback function can be either synchronous or asymchronous.\n","Parameters":{"StartFolder":{"name":"StartFolder","type":"string","required":true},"FilePattern":{"name":"FilePattern","type":"string","required":false,"default":""},"Recurse":{"name":"Recurse","type":"boolean","required":false,"default":false},"Visitor":{"name":"Visitor","type":"function","description":"Function to be called for each folder and file: Visitor( Path, Filename )","required":false,"default":null}},"source_filename":"800-System\\810-System.AsyncVisitFiles.js"},{"id":"810","member_of":"System","name":"VisitFiles","type":"function","returns":"*","description":"\nScans a folder and calls the Visitor callback function for each folder/file encountered.\n\nThe `FilePattern` parameter is optional and can be a wildcard type string.\nFor example, to visit all text files, you can pass '*.txt'.\nIf `FilePattern` is not empty, then the callback will not be called for folders.\n\nThe Visitor callback function takes two parameters `Visitor( Path, Filename )`.\nIf the Visitor callback returns a value, then the visitation process is halted\nand that value is returned by the `VisitFiles` function.\nThe Visitor callback is called for each file encountered and for each folder encountered.\nWhen called for a folder, the `Filename` parameter will be null.\nThe Visitor callback function must be synchronous.\n","Parameters":{"StartFolder":{"name":"StartFolder","type":"string","required":true},"FilePattern":{"name":"FilePattern","type":"string","required":false,"default":""},"Recurse":{"name":"Recurse","type":"boolean","required":false,"default":false},"Visitor":{"name":"Visitor","type":"function","description":"Function to be called for each folder and file: Visitor( Path, Filename )","required":false,"default":null}},"source_filename":"800-System\\810-System.VisitFiles.js"},{"id":"811","member_of":"System","name":"CountFiles","type":"function","returns":"number","description":["Scans a folder and calls the Visitor callback function for each folder/file encountered.","Returns the number of folders/files visited."],"Parameters":{"StartFolder":{"name":"StartFolder","type":"string","required":true},"FilePattern":{"name":"FilePattern","type":"string","required":false,"default":"*"},"Recurse":{"name":"Recurse","type":"boolean","required":false,"default":false}},"source_filename":"800-System\\811-System.CountFiles.js"},{"id":"812","member_of":"System","name":"CountFolders","type":"function","returns":"number","description":["Scans a folder and calls the Visitor callback function for each folder/file encountered.","Returns the number of folders/files visited."],"Parameters":{"StartFolder":{"name":"StartFolder","type":"string","required":true},"Recurse":{"name":"Recurse","type":"boolean","required":false,"default":false}},"source_filename":"800-System\\812-System.CountFolders.js"},{"id":"813","member_of":"System","name":"CopyFolder","type":"function","returns":"number","description":["Copies files from one folder to another.","Returns the number of files copied."],"Parameters":{"FromFolder":{"name":"FromFolder","type":"string","required":true},"ToFolder":{"name":"ToFolder","type":"string","required":true},"FilePattern":{"name":"FilePattern","type":"string","required":false,"default":"*"},"Overwrite":{"name":"Overwrite","type":"boolean","required":false,"default":false},"Recurse":{"name":"Recurse","type":"boolean","required":false,"default":false}},"source_filename":"800-System\\813-System.CopyFolder.js"},{"id":"814","member_of":"System","name":"DeleteFolder","type":"function","returns":"number","description":["Deletes a folder and all of its sub-folders and files.","Returns the number of folders and files deleted."],"Parameters":{"Folder":{"name":"Folder","type":"string","required":true},"Recurse":{"name":"Recurse","type":"boolean","required":false,"default":false}},"source_filename":"800-System\\814-System.DeleteFolder.js"},{"id":"815","member_of":"System","name":"EmptyFolder","type":"function","returns":"number","description":["Empties a folder by removing all of its sub-folders and files.","Returns the number of folders and files deleted."],"Parameters":{"Folder":{"name":"Folder","type":"string","required":true}},"source_filename":"800-System\\815-System.EmptyFolder.js"},{"id":"820","member_of":"System","name":"AsyncSleep","type":"function","description":"","Parameters":{"Milliseconds":{"name":"Milliseconds","type":"number","format":"integer"}},"source_filename":"800-System\\820-System.AsyncSleep.js"},{"id":"821","member_of":"System","name":"ExecuteProcess","type":"function","description":"","Parameters":{"Command":{"name":"Command","type":"string","required":true},"Environment":{"name":"Environment","type":"object","required":false},"StartFolder":{"name":"StartFolder","type":"string","required":false}},"source_filename":"800-System\\821-System.ExecuteProcess.js"},{"id":"822","member_of":"System","name":"AsyncExecuteProcess","type":"function","description":"","Parameters":{"Command":{"name":"Command","type":"string","required":true},"Environment":{"name":"Environment","type":"object","required":false},"StartFolder":{"name":"StartFolder","type":"string","required":false}},"source_filename":"800-System\\822-System.AsyncExecuteProcess.js"},{"id":"823","member_of":"System","name":"StartProcess","type":"function","returns":"string","description":"Starts a new process and returns the ProcessID.","Parameters":{"Command":{"name":"Command","type":"string","required":true},"Environment":{"name":"Environment","type":"object","required":false},"StartFolder":{"name":"StartFolder","type":"string","required":false}},"source_filename":"800-System\\823-System.StartProcess.js"},{"id":"824","member_of":"System","name":"StopProcess","type":"function","returns":"string","description":"Stops a running process by its ProcessID.","Parameters":{"ProcessID":{"name":"ProcessID","type":"string","required":true}},"source_filename":"800-System\\824-System.StopProcess.js"},{"id":"830","member_of":"System","name":"StartContainer","type":"function","returns":"string","description":"Starts a Docker Container.","Parameters":{"ImageName":{"name":"ImageName","type":"string","required":true},"Options":{"name":"Options","type":"object","required":false}},"source_filename":"800-System\\830-System.StartContainer.js"},{"id":"831","member_of":"System","name":"StopContainer","type":"function","returns":"string","description":"Stops a running Docker Container.","Parameters":{"ContainerID":{"name":"ContainerID","type":"string","required":true}},"source_filename":"800-System\\831-System.StopContainer.js"},{"id":"832","member_of":"System","name":"ContainerStatus","type":"function","returns":"string","description":"Gets the status of a running Docker Container.","Parameters":{"ContainerID":{"name":"ContainerID","type":"string","required":true}},"source_filename":"800-System\\832-System.ContainerStatus.js"},{"id":"900","name":"Network","type":"namespace","summary":"Functions for working with networks. (nodejs only)","source_filename":"900-Network\\900-Network.js"},{"id":"910","member_of":"Network","name":"AsyncDownloadFile","type":"function","returns":"string","description":"Download a file from an url.","Parameters":{},"source_filename":"900-Network\\910-Network.AsyncDownloadFile.js"},{"id":"920","member_of":"Network","name":"AsyncGetRequest","type":"function","returns":"string","description":"Make an http get request for a an url.","Parameters":{"Url":{"name":"Url","type":"string","required":true}},"source_filename":"900-Network\\920-Network.AsyncGetRequest.js"}];
+
+  </script>
+  <div ng-app="Application_Module" ng-cloak>
+    <nav class="w3-bar w3-border w3-light-grey" role="navigation">
+      <div class="w3-bar-item w3-text-grey">LiquicodeJS (v0.0.1)</div>
+    </nav>
+    <div ng-controller="Home_Controller">
+      <div class="w3-container w3-margin">
+        <div class="w3-panel w3-border w3-round-large w3-sand w3-center">
+          <h3>Welcome to LiquicodeJS!</h3>
+          <p>A General Purpose Toolkit Library for Javascript</p>
+        </div><br>
+<br>
+
+<h2 id="types-data-type-handling"><em><strong>Types</strong></em>: Data Type Handling</h2>
+<details>
+<summary>
+<strong>
+Types Details
+</strong>
+</summary>
+
+
+<p>LiquicodeJS can classify and identify value types beyond the primitive data types supported by Javascript.</p>
+<p>When obtaining FieldSchema objects from <code class="language-markdown">Schema.ValueSchema()</code> or <code class="language-markdown">Schema.ObjectSchema()</code>,
+<code class="language-markdown">FieldSchema.type</code> will contain the Javascript data type and <code class="language-markdown">FieldSchema.format</code> will have a more specific type description.</p>
+<p>Javascript (and JSON) offers four data types for your variable values: <code class="language-markdown">boolean</code>, <code class="language-markdown">number</code>, <code class="language-markdown">string</code>,
+and everything else is essentially an <code class="language-markdown">object</code>.
+This suits Javascript well for the types of things that Javascript needs to do like storing values in memory
+and executing program statements with those values.
+This is not always great on an application level though.
+When you need to, for example, make sure that a variable contains an <code class="language-markdown">array</code> of <code class="language-markdown">string</code> or that value represents a floating point number.
+Cases like these require additional progrma statements and type checking which can be consolidated into a set of functions.</p>
+<p>The <code class="language-markdown">Schema</code> module defines a few objects and functions to alleviate this burden from the application developer.</p>
+<p><strong>The FieldSchema Object</strong></p>
+<p>This object describes a value (or field) with greater precision then Javascript&#39;s <code class="language-markdown">typeof</code> statement.
+The <code class="language-markdown">FieldSchema.type</code> member will always contain a Javascript data type while the <code class="language-markdown">FieldSchema.format</code> field contains a more
+detailed data type.</p>
+<pre><code class="language-javascript">FieldSchema = {
+    type: &#39;&#39;,				// Javascript data type (boolean, number, string, or object).
+    format: &#39;&#39;,				// A data type specific designation.
+    default: undefined,		// A default value used for missing fields.
+    name: &#39;&#39;,				// Name of the field.
+}
+</code></pre>
+<p>These functions will generate a <code class="language-markdown">FieldSchema</code> from a single value or an object.
+Be aware that only the top level members of an object are scrutinized as this is what we are typically interested in most cases.
+Functions of the <code class="language-markdown">Schema</code> module do not recurse into an object providing the schema for every single field in the object.
+Rather, they inspect the top level of objects only and return an array of schema objects as a result.
+Again, this handles most use cases with a consistent set of functions.
+Any further validation/coercion that may be required can also be perfomed by the same functions on an individual case basis.</p>
+<ul>
+<li><code class="language-markdown">Schema.ValueSchema( FromValue )</code></li>
+<li><code class="language-markdown">Schema.ObjectSchema( FromObject )</code></li>
+</ul>
+<p>Possible values for <code class="language-markdown">FieldSchema.type</code> and <code class="language-markdown">FieldSchema.format</code> are as follows:</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Format</th>
+<th>Default Value</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>boolean</td>
+<td>boolean</td>
+<td>false</td>
+<td><code class="language-markdown">true</code>, or <code class="language-markdown">false</code></td>
+</tr>
+<tr>
+<td>number</td>
+<td>integer</td>
+<td>0</td>
+<td><code class="language-markdown">1</code>, <code class="language-markdown">2</code>, or <code class="language-markdown">3.0</code></td>
+</tr>
+<tr>
+<td>number</td>
+<td>float</td>
+<td>0</td>
+<td><code class="language-markdown">1.1</code>, <code class="language-markdown">2.071</code>, or <code class="language-markdown">3.14</code></td>
+</tr>
+<tr>
+<td>string</td>
+<td>string</td>
+<td>&quot;&quot;</td>
+<td><code class="language-markdown">&quot;Hello&quot;</code>, or <code class="language-markdown">&quot;&quot;</code></td>
+</tr>
+<tr>
+<td>object</td>
+<td>object</td>
+<td>{}</td>
+<td><code class="language-markdown">{ foo: &#39;bar&#39; }</code></td>
+</tr>
+<tr>
+<td>object</td>
+<td>array</td>
+<td>[]</td>
+<td><code class="language-markdown">[ 1, &#39;two&#39;, 3.14, null ]</code></td>
+</tr>
+<tr>
+<td>object</td>
+<td>boolean-array</td>
+<td>[]</td>
+<td><code class="language-markdown">[ true, false, true ]</code></td>
+</tr>
+<tr>
+<td>object</td>
+<td>number-array</td>
+<td>[]</td>
+<td><code class="language-markdown">[ 1, 2, 3.14 ]</code></td>
+</tr>
+<tr>
+<td>object</td>
+<td>string-array</td>
+<td>[]</td>
+<td><code class="language-markdown">[ &#39;one&#39;, &#39;two&#39;, &#39;three&#39; ]</code></td>
+</tr>
+<tr>
+<td>object</td>
+<td>object-array</td>
+<td>[]</td>
+<td><code class="language-markdown">[ { foo: &#39;bar&#39; }, [1,2,3], null ]</code></td>
+</tr>
+<tr>
+<td>object</td>
+<td>array-array</td>
+<td>[]</td>
+<td><code class="language-markdown">[ [1,2,3], [], [4,5] ]</code></td>
+</tr>
+</tbody></table>
+<p><strong>The ErrorValue Object</strong></p>
+<p>LiquicodeJS introduces an <code class="language-markdown">ErrorValue</code> object that is used to indicate and convey errors.
+Some functions will return an <code class="language-markdown">ErrorValue</code> object instead of throwing a Javascript <code class="language-markdown">Error</code>.
+In some cases, this can make code more efficient and legible when certain errors are tolerable
+and you want to avoid the expensive cost of a Javascript <code class="language-markdown">Error</code> that includes a call stack.</p>
+<p>Use the <code class="language-markdown">Schema.ErrorValue()</code> function to create an <code class="language-markdown">ErrorValue</code> object and <code class="language-markdown">Schema.IsErrorValue()</code> to test for errors.
+An <code class="language-markdown">ErrorValue</code> will always have <code class="language-markdown">ErrorValue.ok = false</code> and <code class="language-markdown">ErrorValue.error</code> will contain the error message.</p>
+<pre><code class="language-javascript">ErrorValue = {
+    ok: false,		// Always set to &quot;false&quot;.
+    error: &#39;&#39;,		// Error message.
+    context: &#39;&#39;,	// Context for the error (e.g. a function name).
+}
+</code></pre>
+<p><strong>Value Coercion</strong></p>
+<p>As data gets shuttled around between memory, files, and network transmissions, the representation of the data might
+change to suit to the medium.
+For example, an integer value being stored in a file might be read back out later as a string.
+It&#39;s actual value hasn&#39;t changed, but the way it is represented has changed.
+Javascript can be pretty forgiving in these cases by allowing a certain amount of type fluidity;
+However, this can also cause some difficult to spot errors like when <code class="language-markdown">&#39;2&#39; + 2</code> equals the string <code class="language-markdown">&#39;22&#39;</code> and not the integer <code class="language-markdown">4</code>.</p>
+<p>Use these functions the validate that a value&#39;s type is of an expected type and to coerce the value, in a common sense way,
+to that expected type.</p>
+<ul>
+<li><code class="language-markdown">Types.Coerce( Value, Schema, ThrowErrors )</code></li>
+<li><code class="language-markdown">Types.Coerce( Value, Schema, ThrowErrors )</code></li>
+<li><code class="language-markdown">Types.Coerces( Values, Schemas, ThrowErrors )</code></li>
+</ul>
+<p>This tables describes how values are converted from one data type to another during coercion:</p>
+<table>
+<thead>
+<tr>
+<th>From Type</th>
+<th>To Boolean</th>
+<th>To Number</th>
+<th>To String</th>
+<th>To Object</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>undefined</td>
+<td>DefaultValue()</td>
+<td>DefaultValue()</td>
+<td>DefaultValue()</td>
+<td>DefaultValue()</td>
+</tr>
+<tr>
+<td>null</td>
+<td>DefaultValue()</td>
+<td>DefaultValue()</td>
+<td>DefaultValue()</td>
+<td>DefaultValue()</td>
+</tr>
+<tr>
+<td>Boolean</td>
+<td>Value</td>
+<td>Number()</td>
+<td>toString()</td>
+<td>ErrorValue</td>
+</tr>
+<tr>
+<td>Number</td>
+<td>Boolean()</td>
+<td>Value</td>
+<td>toString()</td>
+<td>ErrorValue</td>
+</tr>
+<tr>
+<td>String</td>
+<td>Boolean()</td>
+<td>Number()</td>
+<td>Value</td>
+<td>JSON.parse()</td>
+</tr>
+<tr>
+<td>Object</td>
+<td>Boolean()</td>
+<td>Number()</td>
+<td>JSON.stringify()</td>
+<td>Value</td>
+</tr>
+</tbody></table>
+<p><strong>Related Reading</strong></p>
+<ul>
+<li><a href="https://www.oreilly.com/library/view/you-dont-know/9781491905159/ch04.html">You Don&#39;t Know JS: Types &amp; Grammar - Chapter 4. Coercion</a></li>
+</ul>
+</details>
+
+<br>
+
+<h3 id="types-functions"><em><strong>Types</strong></em> Functions</h3>
+<br>
+
+<details>
+<summary>
+<strong>
+HasValue( Value )
+</strong>
+<small>
+- Determine if a variable contains a value or or not.
+</small>
+</summary>
+
+<blockquote>
+<h3 id="typeshasvalue-value-">Types.<em><strong>HasValue</strong></em>( Value )</h3>
+<p>Determine if a variable contains a value or or not.</p>
+<p><strong>Returns</strong>: <code class="language-markdown">boolean</code> - True if Value actually contains a value.</p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Value</td>
+<td><code class="language-markdown">*</code></td>
+<td>required</td>
+<td></td>
+<td>The value to test.</td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Tests the provided Value parameter and returns false if it does not represent a value.
+More specifically, if Value is undefined or null, then false is returned.
+if Value is a zero length string <code class="language-markdown">&quot;&quot;</code> or an empty object <code class="language-markdown">{}</code>, false is also returned.
+In all other cases, this function returns true.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+Coerce( Value, Loud )
+</strong>
+<small>
+- Returns a `Coercion` object which is used to coerce values to different types.
+</small>
+</summary>
+
+<blockquote>
+<h3 id="typescoerce-value-loud-">Types.<em><strong>Coerce</strong></em>( Value, Loud )</h3>
+<p>Returns a <code class="language-markdown">Coercion</code> object which is used to coerce values to different types.</p>
+<p><strong>Returns</strong>: <code class="language-markdown">object</code> - A <code class="language-markdown">Coercion</code> object.</p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Value</td>
+<td><code class="language-markdown">*</code></td>
+<td>-</td>
+<td></td>
+<td>The value to coerce. This value is set to <code class="language-markdown">Coercion.value</code>.</td>
+</tr>
+<tr>
+<td>Loud</td>
+<td><code class="language-markdown">boolean</code></td>
+<td>-</td>
+<td></td>
+<td>Throws errors when set to <code class="language-markdown">true</code>.</td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>The returned <code class="language-markdown">Coercion</code> object has a single member <code class="language-markdown">Coercion.value</code> and a number of coercion functions:</p>
+<ul>
+<li><p><code class="language-markdown">ToBoolean( Default = false )</code> :
+  Returns the boolean value of <code class="language-markdown">Coercion.value</code>.
+  Anything can be coerced to a boolean.
+  If value is a string, then &#39;false&#39; and &#39;0&#39; will return false while &#39;true&#39; will return true.</p>
+</li>
+<li><p><code class="language-markdown">ToNumber( Default = 0 )</code> :
+  Returns the numeric value of <code class="language-markdown">Coercion.value</code>.
+  Booleans, other numbers, and numeric strings can be coerced to a number.</p>
+</li>
+<li><p><code class="language-markdown">ToString( Default = &#39;&#39; )</code> :
+  Returns the string value of <code class="language-markdown">Coercion.value</code>.
+  Anything can be coerced to a string.
+  If value is an object, then it is JSON stringified and returned.</p>
+</li>
+<li><p><code class="language-markdown">ToObject( Default = null )</code> :
+  Returns the object value of <code class="language-markdown">Coercion.value</code>.
+  Only JSON strings and other objects can be coerced to an object.
+  If value is a JSON string, then it is JSON parsed and returned.</p>
+</li>
+</ul>
+<p><code class="language-markdown">Coercion.value</code> is set to the Value parameter.</p>
+<p><strong>Usage</strong></p>
+<p>There are two ways to use the <code class="language-markdown">Coercion</code> object.</p>
+<p>One way is to immediately call one of the coercion functions after obtaining the <code class="language-markdown">Coercion</code> object:</p>
+<pre><code class="language-javascript">let number_42 = Liquicode.Types.Coerce( &#39;42&#39; ).ToNumber();
+</code></pre>
+<p>Another way is to reuse the <code class="language-markdown">Coercion</code> object and alter the <code class="language-markdown">Coercion.value</code> property yourself:</p>
+<pre><code class="language-javascript">let coercion = Liquicode.Types.Coerce();
+coercion.value = &#39;42&#39;;
+let number_42 = coercion.ToNumber();
+</code></pre>
+<p><strong>Examples</strong></p>
+<pre><code class="language-javascript">// Coercing to boolean
+Schema.Coerce( null ).ToBoolean()           // = false
+Schema.Coerce( 0 ).ToBoolean()              // = false
+Schema.Coerce( &#39;true&#39; ).ToBoolean()         // = true
+
+// Coercing to number
+Schema.Coerce( null ).ToNumber()            // = 0
+Schema.Coerce( &#39;3.14&#39; ).ToNumber()          // = 3.14
+Schema.Coerce( &#39;foo&#39; ).ToNumber()           // = 0
+
+// Coercing to string
+Schema.Coerce( null ).ToString()            // = &#39;&#39;
+Schema.Coerce( &#39;3.14&#39; ).ToString()          // = &#39;3.14&#39;
+Schema.Coerce( { foo: &#39;bar&#39; } ).ToString()  // = &#39;{&quot;foo&quot;:&quot;bar&quot;}&#39;
+
+// Coercing to object
+Schema.Coerce( null ).ToObject()            // = null
+Schema.Coerce( 3.14 ).ToObject()            // = null
+Schema.Coerce( &#39;{&quot;foo&quot;:&quot;bar&quot;}&#39; ).ToObject() // = { foo: &#39;bar&#39; }
+
+// Coercing with a Default
+Schema.Coerce( &#39;Hello&#39; ).ToNumber( -1 )     // = -1
+Schema.Coerce( true ).ToObject( {} )        // = {}
+Schema.Coerce( 1024 ).ToObject( {} )        // = {}
+Schema.Coerce( null ).ToObject( { a: 1 } )  // = { a: 1 }
+Schema.Coerce( null ).ToObject( [ 1, 2 ] )  // = [ 1, 2 ]
+</code></pre>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+GetFormat( Value )
+</strong>
+<small>
+- Determine the type and format of a value.
+</small>
+</summary>
+
+<blockquote>
+<h3 id="typesgetformat-value-">Types.<em><strong>GetFormat</strong></em>( Value )</h3>
+<p>Determine the type and format of a value.</p>
+<p><strong>Returns</strong>: <code class="language-markdown">string</code> - An extended type description.</p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Value</td>
+<td><code class="language-markdown">*</code></td>
+<td>required</td>
+<td></td>
+<td>The value to get the format for.</td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Iterates through <code class="language-markdown">Types.Formats</code> in reverse order and calls each <code class="language-markdown">Format.IsFormat()</code> function.
+When one of the formats returns <code class="language-markdown">true</code>, then it&#39;s type and format are returned separated by <code class="language-markdown">:</code>.</p>
+<p><strong>Examples</strong></p>
+<pre><code class="language-javascript">Liquicode.Types.GetFormat( &#39;42&#39; )         // = &#39;number:integer&#39;
+Liquicode.Types.GetFormat( &#39;Hello&#39; )      // = &#39;string:string&#39;
+Liquicode.Types.GetFormat( new Date() )   // = &#39;object:datetime&#39;
+Liquicode.Types.GetFormat( [ 1, 2, 3 ] )  // = &#39;object:number-array&#39;
+</code></pre>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+IsFormat( Value, Format )
+</strong>
+<small>
+- Determine if a value is of a particular format.
+</small>
+</summary>
+
+<blockquote>
+<h3 id="typesisformat-value-format-">Types.<em><strong>IsFormat</strong></em>( Value, Format )</h3>
+<p>Determine if a value is of a particular format.</p>
+<p><strong>Returns</strong>: <code class="language-markdown">boolean</code> - True if the value matches the format.</p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Value</td>
+<td><code class="language-markdown">*</code></td>
+<td>required</td>
+<td></td>
+<td>The value to test.</td>
+</tr>
+<tr>
+<td>Format</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td>The type and format to test for as: <code class="language-markdown">&quot;type:format&quot;</code>.</td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Looks up the specified format in <code class="language-markdown">Types.Formats</code> and calls the <code class="language-markdown">Format.IsFormat()</code> function.</p>
+<p>The <code class="language-markdown">Format</code> parameter must specify both type and format to be tested for.</p>
+<p><strong>Examples</strong></p>
+<pre><code class="language-javascript">Liquicode.Types.IsFormat( &#39;Hello&#39;, &#39;string:string&#39; )            // = true
+Liquicode.Types.IsFormat( &#39;Hello&#39;, &#39;string:json&#39; )              // = false
+Liquicode.Types.IsFormat( [ 1, 2, 3 ], &#39;object:array&#39; )         // = true
+Liquicode.Types.IsFormat( [ 1, 2, 3 ], &#39;object:number-array&#39; )  // = true
+Liquicode.Types.IsFormat( [ 1, 2, 3 ], &#39;object:string-array&#39; )  // = false
+</code></pre>
+<hr>
+</details>
+<br>
+<br>
+
+<h2 id="object-functions-for-manipulating-javascript-objects"><em><strong>Object</strong></em>: Functions for manipulating Javascript objects.</h2>
+<br>
+
+<h3 id="object-functions"><em><strong>Object</strong></em> Functions</h3>
+<br>
+
+<details>
+<summary>
+<strong>
+Clone( From )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="objectclone-from-">Object.<em><strong>Clone</strong></em>( From )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>From</td>
+<td><code class="language-markdown">object</code></td>
+<td>-</td>
+<td>{}</td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Returns a clone of the given object.
+This is equivalent to doing A = JSON.parse( JSON.stringify( B ) ).</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+Merge( Original, Updates )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="objectmerge-original-updates-">Object.<em><strong>Merge</strong></em>( Original, Updates )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">object</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Original</td>
+<td><code class="language-markdown">object</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Updates</td>
+<td><code class="language-markdown">object</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Merges the content of two objects and returns the composite result.</p>
+<p>Similar to Clone, this function will remove any non-data fields (i.e. functions and symbols) from the objects.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+FromJson( JsonString )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="objectfromjson-jsonstring-">Object.<em><strong>FromJson</strong></em>( JsonString )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">object</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>JsonString</td>
+<td><code class="language-markdown">string</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Parse a Json string and return an object value.
+This is identical Javascript&#39;s &quot;JSON.parse()&quot; function.</p>
+<p>There are some significant differences from Javascript&#39;s version.
+The parser is a bit more relaxed and allows:</p>
+<ul>
+<li>Identifiers are not required to have quotes.</li>
+<li>A comma can appear after the last element of an array or object.</li>
+<li>String literals can use either single or double quotes.</li>
+<li>Parsing automatically stops when the closing brace or bracket is found in the json string.</li>
+</ul>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+ToJsonOptions( PresetName )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="objecttojsonoptions-presetname-">Object.<em><strong>ToJsonOptions</strong></em>( PresetName )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">object</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PresetName</td>
+<td><code class="language-markdown">string</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+ToJson( Value, JsonOptions )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="objecttojson-value-jsonoptions-">Object.<em><strong>ToJson</strong></em>( Value, JsonOptions )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">object</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Value</td>
+<td><code class="language-markdown">*</code></td>
+<td>-</td>
+<td></td>
+<td>The value to convert to a json string.</td>
+</tr>
+<tr>
+<td>JsonOptions</td>
+<td>`object</td>
+<td>string`</td>
+<td>-</td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+FromIni( IniString )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="objectfromini-inistring-">Object.<em><strong>FromIni</strong></em>( IniString )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">object</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>IniString</td>
+<td><code class="language-markdown">string</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Parse an Ini string and return an object value.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+ToIni( Value )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="objecttoini-value-">Object.<em><strong>ToIni</strong></em>( Value )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">object</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Value</td>
+<td><code class="language-markdown">object</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Parse an Ini string and return an object value.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+ValueArrayOf( Value )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="objectvaluearrayof-value-">Object.<em><strong>ValueArrayOf</strong></em>( Value )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">array</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Value</td>
+<td><code class="language-markdown">any</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Returns an array of values.
+If the Value parameter is missing or null, then an empty array <code class="language-markdown">[]</code> is returned.
+If Value is an object, its values are returned in the array.
+If Value is already an array, it is returned unmodified.
+Otherwise, an array is returned containing Value as its only member.</p>
+<hr>
+</details>
+<br>
+<br>
+
+<h2 id="text-functions-for-text-parsing-and-manipulation"><em><strong>Text</strong></em>: Functions for text parsing and manipulation.</h2>
+<br>
+
+<h3 id="text-functions"><em><strong>Text</strong></em> Functions</h3>
+<br>
+
+<details>
+<summary>
+<strong>
+Compare( StringA, StringB, CaseSensitive )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="textcompare-stringa-stringb-casesensitive-">Text.<em><strong>Compare</strong></em>( StringA, StringB, CaseSensitive )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>StringA</td>
+<td><code class="language-markdown">string</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>StringB</td>
+<td><code class="language-markdown">string</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>CaseSensitive</td>
+<td><code class="language-markdown">boolean</code></td>
+<td>-</td>
+<td>true</td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Compares two strings.
+Returns a <code class="language-markdown">-1</code> if <code class="language-markdown">StringA</code> is less than <code class="language-markdown">StringB</code>.
+Returns a <code class="language-markdown">1</code> if <code class="language-markdown">StringA</code> is greater than than <code class="language-markdown">StringB</code>.
+Returns a <code class="language-markdown">0</code> if <code class="language-markdown">StringA</code> and <code class="language-markdown">StringB</code> are the same.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+Matches( Text, Pattern )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="textmatches-text-pattern-">Text.<em><strong>Matches</strong></em>( Text, Pattern )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Text</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Pattern</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Matches the text against a wildcard-lik pattern.
+Returns true If the match succeeds, otherwise false.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+ReplaceCharacters( Text, SearchCharacters, ReplacementText, MaxTimes )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="textreplacecharacters-text-searchcharacters-replacementtext-maxtimes-">Text.<em><strong>ReplaceCharacters</strong></em>( Text, SearchCharacters, ReplacementText, MaxTimes )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Text</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>SearchCharacters</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>ReplacementText</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>MaxTimes</td>
+<td><code class="language-markdown">number</code></td>
+<td>-</td>
+<td>-1</td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Replaces characters within a string.
+Returns the modified string.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+ReplaceText( Text, SearchText, ReplacementText )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="textreplacetext-text-searchtext-replacementtext-">Text.<em><strong>ReplaceText</strong></em>( Text, SearchText, ReplacementText )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Text</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>SearchText</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>ReplacementText</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+FirstWord( Phrase, Delimiters )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="textfirstword-phrase-delimiters-">Text.<em><strong>FirstWord</strong></em>( Phrase, Delimiters )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Phrase</td>
+<td><code class="language-markdown">string</code></td>
+<td>-</td>
+<td></td>
+<td>A text phrase containing words separated by delimiters.</td>
+</tr>
+<tr>
+<td>Delimiters</td>
+<td><code class="language-markdown">string</code></td>
+<td>-</td>
+<td>&quot; &quot;</td>
+<td>A string of whitespace and punctuation characters that break the phrase into words.</td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Returns the first word of a text phrase.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+AfterFirstWord( Phrase, Delimiters )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="textafterfirstword-phrase-delimiters-">Text.<em><strong>AfterFirstWord</strong></em>( Phrase, Delimiters )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Phrase</td>
+<td><code class="language-markdown">string</code></td>
+<td>-</td>
+<td></td>
+<td>A text phrase containing words separated by delimiters.</td>
+</tr>
+<tr>
+<td>Delimiters</td>
+<td><code class="language-markdown">string</code></td>
+<td>-</td>
+<td>&quot; &quot;</td>
+<td>A string of characters that break the phrase into words.</td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Returns the remainder of a text phrase occurring after the first word.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+LastWord( Phrase, Delimiters )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="textlastword-phrase-delimiters-">Text.<em><strong>LastWord</strong></em>( Phrase, Delimiters )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Phrase</td>
+<td><code class="language-markdown">string</code></td>
+<td>-</td>
+<td></td>
+<td>A text phrase containing words separated by delimiters.</td>
+</tr>
+<tr>
+<td>Delimiters</td>
+<td><code class="language-markdown">string</code></td>
+<td>-</td>
+<td>&quot; &quot;</td>
+<td>A string of characters that break the phrase into words.</td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Returns the last word of a text phrase.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+BeforeLastWord( Phrase, Delimiters )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="textbeforelastword-phrase-delimiters-">Text.<em><strong>BeforeLastWord</strong></em>( Phrase, Delimiters )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Phrase</td>
+<td><code class="language-markdown">string</code></td>
+<td>-</td>
+<td></td>
+<td>A text phrase containing words separated by delimiters.</td>
+</tr>
+<tr>
+<td>Delimiters</td>
+<td><code class="language-markdown">string</code></td>
+<td>-</td>
+<td>&quot; &quot;</td>
+<td>A string of characters that break the phrase into words.</td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Returns the remainder of a text phrase occurring befiore the last word.</p>
+<hr>
+</details>
+<br>
+<br>
+
+<h2 id="shapes-functions-for-manipulating-data-in-different-shapes"><em><strong>Shapes</strong></em>: Functions for manipulating data in different shapes.</h2>
+<br>
+
+<h3 id="shapes-functions"><em><strong>Shapes</strong></em> Functions</h3>
+<br>
+
+<details>
+<summary>
+<strong>
+Matrix( Values, Options )
+</strong>
+<small>
+- Matrix stores a two-dimensional jagged array and exposes manipulation functions.
+</small>
+</summary>
+
+<blockquote>
+<h3 id="shapesmatrix-values-options-">Shapes.<em><strong>Matrix</strong></em>( Values, Options )</h3>
+<p>Matrix stores a two-dimensional jagged array and exposes manipulation functions.</p>
+<p><strong>Returns</strong>: <code class="language-markdown">object</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Values</td>
+<td><code class="language-markdown">object</code></td>
+<td>required</td>
+<td>[[]]</td>
+<td>One of: a two-dimensional array of arrays, a one-dimensional array of values, or an integer.</td>
+</tr>
+<tr>
+<td>Options</td>
+<td><code class="language-markdown">object</code></td>
+<td>-</td>
+<td>{}</td>
+<td>Set of options controlling Matrix operation.</td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>A Matrix object is essentially a two-dimensional array (an array of arrays).
+This function will create and return a new Matrix object.</p>
+<p><em><strong>Values Parameter</strong></em></p>
+<p>You can specify the initial contents of the Matrix with the Values parameter.
+If Values is an array of arrays, then Matrix will contain those values.
+If Values is a one-dimensional array, then Matrix will have a single row reflecting those values.
+If Values is an integer, then Matrix will be created with that number of blank rows.</p>
+<p>Note that the only way to create a new Matrix with no rows in it is: <code class="language-markdown">Shapes.Matrix( 0, Options )</code></p>
+<p><em><strong>Options Parameter</strong></em></p>
+<p>The Options parameter is an options object:</p>
+<pre><code class="language-javascript">Options = {
+    default_value: null,    // A default value to use when no other value exists.
+    clone_values: true,     // If true, any values read from or written to the Matrix are cloned first.
+}
+</code></pre>
+<p>The <code class="language-markdown">clone_values</code> option is very important.
+It is initialliy set to true, providing the safest and most sensible operation.
+A performance improvement can be had by setting this to false;
+However, unintended consequences may occur if you are not careful.
+Alsa, this is a valid intended consequence if you want to use Matrix to quickly manipulate an existing array.</p>
+<p>For example:</p>
+<pre><code class="language-javascript">let test_array = [
+    [ 1, 2, 3, 4 ],
+    [ 5, 6, 7, 8 ],
+];
+// test_array.length == 2
+// Encapsulate the array in a matrix.
+let matrix = Liquicode.Shapes.Matrix( test_array, { clone_values: false } );
+// Append a row to the matrix.
+matrix.AppendRows( [ &#39;A&#39;, &#39;B&#39;, &#39;C&#39; ] );
+// Since test_array was not cloned first, the new row also appears in test_array.
+// test_array.length == 3 !!!
+</code></pre>
+<p><em><strong>How It Works</strong></em></p>
+<p>The Matrix object contains a <code class="language-markdown">RowData</code> member which is an array of arrays that contains the values for the matrix.
+This is maintained as a jagged array, meaning that each row of the matrix may be of different lengths.</p>
+<pre><code class="language-javascript">[	// Matrix maintains values in a jagged array:
+    [ 1, 2, 3, 4 ],
+    [ 1, 2, 3 ],
+    [ 1, 2, 3, 4, 5 ],
+]
+</code></pre>
+<p>When calling the <code class="language-markdown">AppendColumns</code>, <code class="language-markdown">InsertColumns</code>, <code class="language-markdown">SetColumn</code>, or <code class="language-markdown">SetValue</code> functions,
+it may be necessary for the matrix to fill out the columns of shorter rows so that the target column exists.
+For example, appending a blank column (<code class="language-markdown">AppendColumns()</code>) to the matrix above would yield:</p>
+<pre><code class="language-javascript">[	// Matrix fills columns with
+    // default values as needed:
+    [ 1, 2, 3, 4,    null, null ],
+    [ 1, 2, 3, null, null, null ],
+    [ 1, 2, 3, 4,    5,    null ],
+]
+</code></pre>
+<p>You can change the value used to fill blank columns by changing <code class="language-markdown">Option.default_value</code>.</p>
+<p><em><strong>Cell Addressing</strong></em></p>
+<p>When working with Matrix, you will usually need to identify a particular Row or Column to work with.
+Matrix supports three types of addressing modes:</p>
+<ul>
+<li><ol>
+<li>A zero-based index used as a row/column index.
+This index must be greater than or equal to zero and less than the extent (i.e. the RowCount or ColumnCount).</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>A negative index that serves as an offset from the extent (e.g. -1 = RowCount - 1).
+This type of index must be between -extent and -1, inclusive.</li>
+</ol>
+</li>
+<li><ol start="3">
+<li>A spreadsheet style address (e.g. &#39;A1&#39;, &#39;B2&#39;, etc.).
+This type of address has letters component which indicates a column.
+This is followed by a digits component that is a one-based row number.</li>
+</ol>
+</li>
+</ul>
+<p><em><strong>Matrix Functions</strong></em></p>
+<p>The Matrix object also has a number of functions which allow you to manipulate the Matrix object.</p>
+<ul>
+<li><p>Addressing Functions:
+  These are utility functions that assist when working with the spreadsheet style of addressing.
+  These functions are used internally by Matrix.
+  They do not consider the validity of any particular address or index within the current Matrix.</p>
+<ul>
+<li><p><code class="language-markdown">IsValidAddress( Address )</code>:
+  Returns <code class="language-markdown">true</code> if Address is a valid address, otherwise <code class="language-markdown">false</code>.
+  A valid address must contain a column component in letters (&#39;AB&#39;) and a row component in digits (&#39;12&#39;).
+  This function determines only if the Address parameter is a properly formatted address,
+  regardless if the address lies outside the bounds of this particular Matrix.</p>
+</li>
+<li><p><code class="language-markdown">NumberToLetters( Number )</code>:
+  Returns the letters component of an address for any positive number (e.g. 1=&#39;A&#39;, 2=&#39;B&#39;, 28=&#39;AB&#39;, etc.).</p>
+</li>
+<li><p><code class="language-markdown">LettersToNumber( Address )</code>:
+  Converts the letters component of an address to a positive number.
+  Address is a string that starts with, or is entirely composed of, letters.</p>
+</li>
+</ul>
+</li>
+<li><p>Row Functions:</p>
+<ul>
+<li><p><code class="language-markdown">RowIndexOf( Address )</code>:
+  Will return a valid row index for this Matrix from the given Address.
+  Address can represent any of the three addressing styles.</p>
+</li>
+<li><p><code class="language-markdown">RowCount()</code>:
+  Returns the number of rows within the Matrix.</p>
+</li>
+<li><p><code class="language-markdown">AppendRows( Values )</code>:
+  Appends one or more rows to the end of the Matrix.
+  If Values is not supplied, then a blank row is appended.
+  If Values is a one-dimensional array, then a single row is appended.
+  If Values is a two-dimensional array, then multiple rows are appended.</p>
+</li>
+<li><p><code class="language-markdown">InsertRows( Row, Values )</code>:
+  Inserts one or more rows within the Matrix, starting at the given Row address.
+  If Values is not supplied, then a blank row is appended.
+  If Values is a one-dimensional array, then a single row is appended.
+  If Values is a two-dimensional array, then multiple rows are appended.
+  Note that it is not possible to append a row to a Matrix by using this function.</p>
+</li>
+<li><p><code class="language-markdown">DeleteRows( Row, Count )</code>:
+  Deletes one or more rows within the Matrix, starting at the given Row address.
+  If Count is not supplied, then a single row is deleted.</p>
+</li>
+<li><p><code class="language-markdown">GetRow( Row )</code>:
+  Returns a single row of values from the Matrix, at the given Row address.</p>
+</li>
+<li><p><code class="language-markdown">SetRow( Row, Values )</code>:
+  Replaces a single row of values (a one-dimensional array) within the Matrix, at the given Row address.
+  If Values is not supplied, then a blank row is set at that location.</p>
+</li>
+</ul>
+</li>
+<li><p>Column Functions:</p>
+<ul>
+<li><p><code class="language-markdown">ColumnIndexOf( Address )</code>:
+  Will return a valid column index for this Matrix from the given Address.
+  Address can represent any of the three addressing styles.</p>
+</li>
+<li><p><code class="language-markdown">ColumnCount()</code>:
+  Returns the number of columns within the Matrix.</p>
+</li>
+<li><p><code class="language-markdown">AppendColumns( Values )</code>:
+  Appends one or more columns to the end of the Matrix.
+  If Values is not supplied, then a blank column is appended.
+  If Values is a one-dimensional array, then a single column is appended.
+  If Values is a two-dimensional array, then multiple columns are appended.</p>
+</li>
+<li><p><code class="language-markdown">InsertColumns( Column, Values )</code>:
+  Inserts one or more columns within the Matrix, starting at the given Column address.
+  If Values is not supplied, then a blank column is appended.
+  If Values is a one-dimensional array, then a single column is appended.
+  If Values is a two-dimensional array, then multiple columns are appended.
+  Note that it is not possible to append a column to a Matrix by using this function.</p>
+</li>
+<li><p><code class="language-markdown">DeleteColumns( Column, Count )</code>:
+  Deletes one or more columns within the Matrix, starting at the given Column address.
+  If Count is not supplied, then a single column is deleted.</p>
+</li>
+<li><p><code class="language-markdown">GetColumn( Column )</code>:
+  Returns a single column of values from the Matrix, at the given Column address.</p>
+</li>
+<li><p><code class="language-markdown">SetColumn( Column, Values )</code>:
+  Replaces a single column of values (a one-dimensional array) within the Matrix, at the given Column address.
+  If Values is not supplied, then a blank column is set at that location.</p>
+</li>
+</ul>
+</li>
+<li><p>Value Functions:</p>
+<ul>
+<li><p><code class="language-markdown">GetValue( Row, Column )</code>:
+  Returns a single value located at Row and Column within the Matrix.
+  Row can be a string address, in which case the Column parameter is omitted.</p>
+</li>
+<li><p><code class="language-markdown">SetValue( Row, Column, Value )</code>:
+  Sets a single value located at Row and Column within the Matrix.
+  Row can be a string address, in which case the Column parameter is omitted.</p>
+</li>
+<li><p><code class="language-markdown">GetMatrix( Row, Column, RowCount, ColumnCount )</code>:
+  Constructs a new Matrix of values from within the called Matrix.
+  Values are taken starting at the location described by Row and Column and extending for RowCount rows and ColumnCount columns.</p>
+<ul>
+<li>You can call this using four parameters: <code class="language-markdown">GetMatrix( Row, Column, RowCount, ColumnCount )</code></li>
+<li>You can call this using three parameters: <code class="language-markdown">GetMatrix( Address, RowCount, ColumnCount )</code></li>
+<li>You can call this using two parameters: <code class="language-markdown">GetMatrix( Address, Size )</code></li>
+</ul>
+</li>
+<li><p><code class="language-markdown">SetMatrix( Row, Column, Matrix )</code>:
+  Sets a matrix of values starting at Row and Column.</p>
+</li>
+</ul>
+</li>
+<li><p>Table Functions:</p>
+<ul>
+<li><p><code class="language-markdown">Clone()</code>:
+  Return a clone of this matrix.
+  The clone will contain a copy of this matrix&#39;s data and options.</p>
+</li>
+<li><p><code class="language-markdown">Transpose()</code>:
+  Return a copy of this matrix with its rows and column transposed.</p>
+</li>
+<li><p><code class="language-markdown">Join( AtColumn, JoinType, JoinMatrix, MatrixColumn )</code>:
+  Return a new matrix by joining this matrix with another one.
+  The join is produced by matching column values between the two matrices.
+  The different supported join types are: &#39;inner&#39;, &#39;left&#39;, &#39;right&#39;, and &#39;full&#39;.</p>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+</details>
+<br>
+<br>
+
+<h2 id="parse-functions-for-tokenizing-text-strings"><em><strong>Parse</strong></em>: Functions for tokenizing text strings.</h2>
+<br>
+
+<h3 id="parse-functions"><em><strong>Parse</strong></em> Functions</h3>
+<br>
+
+<details>
+<summary>
+<strong>
+TokenizeOptions( PresetName )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="parsetokenizeoptions-presetname-">Parse.<em><strong>TokenizeOptions</strong></em>( PresetName )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">object</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PresetName</td>
+<td><code class="language-markdown">string</code></td>
+<td>-</td>
+<td></td>
+<td>To retrieve an options preset, use one of: &#39;csv&#39;, or &#39;cli&#39; You can leave this empty or &#39;default&#39; for the default options.</td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Returns a set of options for calling Tokenize().
+Throws an error if an invalid value for PresetName is given.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+Tokenize( PresetName )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="parsetokenize-presetname-">Parse.<em><strong>Tokenize</strong></em>( PresetName )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">object</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PresetName</td>
+<td><code class="language-markdown">string</code></td>
+<td>-</td>
+<td></td>
+<td>To retrieve an options preset, use one of: &#39;csv&#39;, or &#39;cli&#39; You can leave this empty for the default options.</td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Returns the parsed tokens.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+DateParse( Value, TimeZoneOffset )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="parsedateparse-value-timezoneoffset-">Parse.<em><strong>DateParse</strong></em>( Value, TimeZoneOffset )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">object</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Value</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>TimeZoneOffset</td>
+<td><code class="language-markdown">string</code></td>
+<td>-</td>
+<td>&quot;+0000&quot;</td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Dates and times are funny little creatures.</p>
+<hr>
+</details>
+<br>
+<br>
+
+<h2 id="system-file-system-and-process-functions-nodejs-only"><em><strong>System</strong></em>: File system and process functions. (nodejs only)</h2>
+<br>
+
+<h3 id="system-functions"><em><strong>System</strong></em> Functions</h3>
+<br>
+
+<details>
+<summary>
+<strong>
+AsyncVisitFiles( StartFolder, FilePattern, Recurse, Visitor )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systemasyncvisitfiles-startfolder-filepattern-recurse-visitor-">System.<em><strong>AsyncVisitFiles</strong></em>( StartFolder, FilePattern, Recurse, Visitor )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">*</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>StartFolder</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>FilePattern</td>
+<td><code class="language-markdown">string</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Recurse</td>
+<td><code class="language-markdown">boolean</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Visitor</td>
+<td><code class="language-markdown">function</code></td>
+<td>-</td>
+<td></td>
+<td>Function to be called for each folder and file: Visitor( Path, Filename )</td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Scans a folder and calls the Visitor callback function for each folder/file encountered.</p>
+<p>The <code class="language-markdown">FilePattern</code> parameter is optional and can be a wildcard type string.
+For example, to visit all text files, you can pass &#39;*.txt&#39;.
+If <code class="language-markdown">FilePattern</code> is not empty, then the callback will not be called for folders.</p>
+<p>The Visitor callback function takes two parameters <code class="language-markdown">Visitor( Path, Filename )</code>.
+If the Visitor callback returns a value, then the visitation process is halted
+and that value is returned by the <code class="language-markdown">VisitFiles</code> function.
+The Visitor callback is called for each file encountered and for each folder encountered.
+When called for a folder, the <code class="language-markdown">Filename</code> parameter will be null.
+The Visitor callback function can be either synchronous or asymchronous.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+VisitFiles( StartFolder, FilePattern, Recurse, Visitor )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systemvisitfiles-startfolder-filepattern-recurse-visitor-">System.<em><strong>VisitFiles</strong></em>( StartFolder, FilePattern, Recurse, Visitor )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">*</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>StartFolder</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>FilePattern</td>
+<td><code class="language-markdown">string</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Recurse</td>
+<td><code class="language-markdown">boolean</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Visitor</td>
+<td><code class="language-markdown">function</code></td>
+<td>-</td>
+<td></td>
+<td>Function to be called for each folder and file: Visitor( Path, Filename )</td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Scans a folder and calls the Visitor callback function for each folder/file encountered.</p>
+<p>The <code class="language-markdown">FilePattern</code> parameter is optional and can be a wildcard type string.
+For example, to visit all text files, you can pass &#39;*.txt&#39;.
+If <code class="language-markdown">FilePattern</code> is not empty, then the callback will not be called for folders.</p>
+<p>The Visitor callback function takes two parameters <code class="language-markdown">Visitor( Path, Filename )</code>.
+If the Visitor callback returns a value, then the visitation process is halted
+and that value is returned by the <code class="language-markdown">VisitFiles</code> function.
+The Visitor callback is called for each file encountered and for each folder encountered.
+When called for a folder, the <code class="language-markdown">Filename</code> parameter will be null.
+The Visitor callback function must be synchronous.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+CountFiles( StartFolder, FilePattern, Recurse )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systemcountfiles-startfolder-filepattern-recurse-">System.<em><strong>CountFiles</strong></em>( StartFolder, FilePattern, Recurse )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">number</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>StartFolder</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>FilePattern</td>
+<td><code class="language-markdown">string</code></td>
+<td>-</td>
+<td>&quot;*&quot;</td>
+<td></td>
+</tr>
+<tr>
+<td>Recurse</td>
+<td><code class="language-markdown">boolean</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Scans a folder and calls the Visitor callback function for each folder/file encountered.
+Returns the number of folders/files visited.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+CountFolders( StartFolder, Recurse )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systemcountfolders-startfolder-recurse-">System.<em><strong>CountFolders</strong></em>( StartFolder, Recurse )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">number</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>StartFolder</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Recurse</td>
+<td><code class="language-markdown">boolean</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Scans a folder and calls the Visitor callback function for each folder/file encountered.
+Returns the number of folders/files visited.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+CopyFolder( FromFolder, ToFolder, FilePattern, Overwrite, Recurse )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systemcopyfolder-fromfolder-tofolder-filepattern-overwrite-recurse-">System.<em><strong>CopyFolder</strong></em>( FromFolder, ToFolder, FilePattern, Overwrite, Recurse )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">number</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>FromFolder</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>ToFolder</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>FilePattern</td>
+<td><code class="language-markdown">string</code></td>
+<td>-</td>
+<td>&quot;*&quot;</td>
+<td></td>
+</tr>
+<tr>
+<td>Overwrite</td>
+<td><code class="language-markdown">boolean</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Recurse</td>
+<td><code class="language-markdown">boolean</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Copies files from one folder to another.
+Returns the number of files copied.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+DeleteFolder( Folder, Recurse )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systemdeletefolder-folder-recurse-">System.<em><strong>DeleteFolder</strong></em>( Folder, Recurse )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">number</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Folder</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Recurse</td>
+<td><code class="language-markdown">boolean</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Deletes a folder and all of its sub-folders and files.
+Returns the number of folders and files deleted.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+EmptyFolder( Folder )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systememptyfolder-folder-">System.<em><strong>EmptyFolder</strong></em>( Folder )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">number</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Folder</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Empties a folder by removing all of its sub-folders and files.
+Returns the number of folders and files deleted.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+AsyncSleep( Milliseconds )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systemasyncsleep-milliseconds-">System.<em><strong>AsyncSleep</strong></em>( Milliseconds )</h3>
+<p>undefined</p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Milliseconds</td>
+<td><code class="language-markdown">number</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+ExecuteProcess( Command, Environment, StartFolder )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systemexecuteprocess-command-environment-startfolder-">System.<em><strong>ExecuteProcess</strong></em>( Command, Environment, StartFolder )</h3>
+<p>undefined</p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Command</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Environment</td>
+<td><code class="language-markdown">object</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>StartFolder</td>
+<td><code class="language-markdown">string</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+AsyncExecuteProcess( Command, Environment, StartFolder )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systemasyncexecuteprocess-command-environment-startfolder-">System.<em><strong>AsyncExecuteProcess</strong></em>( Command, Environment, StartFolder )</h3>
+<p>undefined</p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Command</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Environment</td>
+<td><code class="language-markdown">object</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>StartFolder</td>
+<td><code class="language-markdown">string</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+StartProcess( Command, Environment, StartFolder )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systemstartprocess-command-environment-startfolder-">System.<em><strong>StartProcess</strong></em>( Command, Environment, StartFolder )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Command</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Environment</td>
+<td><code class="language-markdown">object</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>StartFolder</td>
+<td><code class="language-markdown">string</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Starts a new process and returns the ProcessID.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+StopProcess( ProcessID )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systemstopprocess-processid-">System.<em><strong>StopProcess</strong></em>( ProcessID )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ProcessID</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Stops a running process by its ProcessID.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+StartContainer( ImageName, Options )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systemstartcontainer-imagename-options-">System.<em><strong>StartContainer</strong></em>( ImageName, Options )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ImageName</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Options</td>
+<td><code class="language-markdown">object</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Starts a Docker Container.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+StopContainer( ContainerID )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systemstopcontainer-containerid-">System.<em><strong>StopContainer</strong></em>( ContainerID )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ContainerID</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Stops a running Docker Container.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+ContainerStatus( ContainerID )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systemcontainerstatus-containerid-">System.<em><strong>ContainerStatus</strong></em>( ContainerID )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ContainerID</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Gets the status of a running Docker Container.</p>
+<hr>
+</details>
+<br>
+<br>
+
+<h2 id="network-functions-for-working-with-networks-nodejs-only"><em><strong>Network</strong></em>: Functions for working with networks. (nodejs only)</h2>
+<br>
+
+<h3 id="network-functions"><em><strong>Network</strong></em> Functions</h3>
+<br>
+
+<details>
+<summary>
+<strong>
+AsyncDownloadFile(  )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="networkasyncdownloadfile--">Network.<em><strong>AsyncDownloadFile</strong></em>(  )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+</blockquote>
+<p><em><strong>Description</strong></em></p>
+<p>Download a file from an url.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+AsyncGetRequest( Url )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="networkasyncgetrequest-url-">Network.<em><strong>AsyncGetRequest</strong></em>( Url )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code class="language-markdown">string</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Url</td>
+<td><code class="language-markdown">string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Make an http get request for a an url.</p>
+<hr>
+</details>
+
+      </div>
+    </div>
+  </div>
+</body>

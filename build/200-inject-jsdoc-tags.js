@@ -1,5 +1,7 @@
 "use strict";
-
+/*
+	Compiles the schema found in the source code and updates the JSDoc comments for each function.
+*/
 
 const LIB_FS = require( 'fs' );
 const LIB_PATH = require( 'path' );

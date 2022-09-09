@@ -30,6 +30,7 @@
 		"~*",
 		"bower_components",
 		"node_modules",
+		"experimental",
 		"build"
 	],
 	"keywords": [

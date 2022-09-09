@@ -209,27 +209,14 @@
 			"name": "--- BUILD ---------------------------------------",
 		},
 		{
-			"name": "100) Build Schema Docs",
+			"name": "100) Build Docs",
 			"type": "node",
 			"request": "launch",
 			"skipFiles": [
 				"<node_internals>/**"
 			],
 			"cwd": "${workspaceFolder}",
-			"program": "${workspaceFolder}/build/100-build-schema-docs.js",
-			"args": [],
-			"outputCapture": "std",
-			"internalConsoleOptions": "openOnSessionStart",
-		},
-		{
-			"name": "110) Compile Html Docs",
-			"type": "node",
-			"request": "launch",
-			"skipFiles": [
-				"<node_internals>/**"
-			],
-			"cwd": "${workspaceFolder}",
-			"program": "${workspaceFolder}/build/110-compile-html-docs.js",
+			"program": "${workspaceFolder}/build/100-build-docs.js",
 			"args": [],
 			"outputCapture": "std",
 			"internalConsoleOptions": "openOnSessionStart",
@@ -248,6 +235,32 @@
 			"internalConsoleOptions": "openOnSessionStart",
 		},
 		{
+			"name": "300) Build Testing Docs",
+			"type": "node",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"cwd": "${workspaceFolder}",
+			"program": "${workspaceFolder}/build/300-build-testing-docs.js",
+			"args": [],
+			"outputCapture": "std",
+			"internalConsoleOptions": "openOnSessionStart",
+		},
+		{
+			"name": "400) Publish AWS Docs",
+			"type": "node",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"cwd": "${workspaceFolder}",
+			"program": "${workspaceFolder}/build/400-publish-aws-docs.js",
+			"args": [],
+			"outputCapture": "std",
+			"internalConsoleOptions": "openOnSessionStart",
+		},
+		{
 			"name": "900) Build Dist",
 			"type": "node",
 			"request": "launch",
@@ -256,6 +269,19 @@
 			],
 			"cwd": "${workspaceFolder}",
 			"program": "${workspaceFolder}/build/900-build-dist.js",
+			"args": [],
+			"outputCapture": "std",
+			"internalConsoleOptions": "openOnSessionStart",
+		},
+		{
+			"name": "910) Release Version",
+			"type": "node",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"cwd": "${workspaceFolder}",
+			"program": "${workspaceFolder}/build/910-release-version.js",
 			"args": [],
 			"outputCapture": "std",
 			"internalConsoleOptions": "openOnSessionStart",

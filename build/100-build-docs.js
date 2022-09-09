@@ -1,15 +1,25 @@
 "use strict";
-
+/*
+	Compiles the schema from the source code and writes it to a number of files:
+		/docs/schema/liquicode.schema.json
+		/docs/schema/liquicode.schema.js
+		/docs/schema/liquicode.schema.md
+		/docs/schema/liquicode.schema.html
+*/
 
 const LIB_FS = require( 'fs' );
 const LIB_PATH = require( 'path' );
+const LIB_CHILD_PROCESS = require( 'child_process' );
 
 const LIB_MARKED = require( 'marked' );
 const LIB_PUG = require( 'pug' );
 
 const BASE_FOLDER = LIB_PATH.resolve( __dirname, '..' );
 const SOURCE_FOLDER = LIB_PATH.join( BASE_FOLDER, 'src' );
+const DOCS_FOLDER = LIB_PATH.join( BASE_FOLDER, 'docs' );
+const EXTERNAL_FOLDER = LIB_PATH.join( BASE_FOLDER, 'docs', 'external' );
 const SCHEMA_FOLDER = LIB_PATH.join( BASE_FOLDER, 'docs', 'schema' );
+const TEMPLATE_FOLDER = LIB_PATH.join( BASE_FOLDER, 'docs', 'templates' );
 
 const LQC = require( LIB_PATH.join( SOURCE_FOLDER, 'liquicode-node.js' ) );
 
@@ -205,7 +215,11 @@ The output of this script will be these files containing Schema data for the pro
 */
 console.log( `Build Schema Docs:` );
 
+
 //---------------------------------------------------------------------
+// Load schema from the source code files.
+//---------------------------------------------------------------------
+
 let schema_json_content =
 {
 	version: VERSION,
@@ -220,6 +234,8 @@ LQC.System.VisitFiles( SOURCE_FOLDER, '*.js', true,
 	function ( Folder, Filename )
 	{
 		if ( !Filename ) { return; }
+		if ( Folder.endsWith( '/src' ) ) { return; }			// Ignore top-level files.
+		if ( Folder.endsWith( '\\src' ) ) { return; }			// Ignore top-level files.
 		if ( Filename.startsWith( '~' ) ) { return; }			// Ignore hidden files.
 		if ( Filename.startsWith( '_' ) ) { return; }			// Ignore private files.
 		if ( Filename.endsWith( '.Tests.js' ) ) { return; }		// Ignore testing files.
@@ -260,12 +276,21 @@ LQC.System.VisitFiles( SOURCE_FOLDER, '*.js', true,
 		return;
 	} );
 
+
+//---------------------------------------------------------------------
 // Report number of files processed.
+//---------------------------------------------------------------------
+
+console.log( `---------------------------------------------------------------------` );
 console.log( `Total Files        : ${count_total_files}` );
 console.log( `Files with Errors  : ${count_files_with_errors}` );
 console.log( `Files Processed    : ${count_files_processed}` );
+console.log( `---------------------------------------------------------------------` );
 
+
+//---------------------------------------------------------------------
 // Save the Json and JS Schema documents.
+//---------------------------------------------------------------------
 {
 	let json = JSON.stringify( schema_json_content, null, '    ' );
 	let filename = LIB_PATH.join( SCHEMA_FOLDER, 'liquicodejs.schema.json' );
@@ -278,18 +303,77 @@ console.log( `Files Processed    : ${count_files_processed}` );
 	console.log( `Wrote schema file [${filename}].` );
 }
 
+
+//---------------------------------------------------------------------
 // Save the Markdown Schema document.
+//---------------------------------------------------------------------
 {
 	let filename = LIB_PATH.join( SCHEMA_FOLDER, 'liquicodejs.schema.md' );
 	LIB_FS.writeFileSync( filename, schema_markdown_content );
 	console.log( `Wrote schema file [${filename}].` );
 }
 
+
+//---------------------------------------------------------------------
 // Save the Html Schema document.
+//---------------------------------------------------------------------
 {
 	let filename = LIB_PATH.join( SCHEMA_FOLDER, 'liquicodejs.schema.html' );
 	LIB_FS.writeFileSync( filename, schema_html_content );
 	console.log( `Wrote schema file [${filename}].` );
 }
 
+
+//---------------------------------------------------------------------
+// Compile Html Docs
+//---------------------------------------------------------------------
+{
+	// Load the Schema Document
+	let schema_filename = LIB_PATH.join( SCHEMA_FOLDER, 'liquicodejs.schema.json' );
+	let schema_document = JSON.parse( LIB_FS.readFileSync( schema_filename, 'utf-8' ) );
+	// Load the PUG Template
+	let template_filename = LIB_PATH.join( TEMPLATE_FOLDER, 'liquicodejs.pug' );
+	// Render the PUG Template
+	schema_document.pretty = true;
+	let html_content = LIB_PUG.renderFile( template_filename, schema_document );
+	html_content = LQC.Text.ReplaceText( html_content, '<code>', '<code class="language-markdown">' );
+	// Save the Html file.
+	let html_filename = LIB_PATH.join( DOCS_FOLDER, 'liquicodejs.html' );
+	LIB_FS.writeFileSync( html_filename, html_content );
+	// Report.
+	console.log( `Generated html file [${html_filename}].` );
+	// Generate index.html
+	html_filename = LIB_PATH.join( DOCS_FOLDER, 'index.html' );
+	LIB_FS.writeFileSync( html_filename, html_content );
+	// Report.
+	console.log( `Generated html file [${html_filename}].` );
+}
+
+
+//---------------------------------------------------------------------
+// Copy external files.
+//---------------------------------------------------------------------
+
+console.log( `Copying [LICENSE] ...` );
+{
+	let from = LIB_PATH.join( BASE_FOLDER, 'LICENSE' );
+	let to = LIB_PATH.join( EXTERNAL_FOLDER, 'LICENSE' );
+	LIB_FS.copyFileSync( from, to );
+}
+
+console.log( `Copying [VERSION] ...` );
+{
+	let from = LIB_PATH.join( BASE_FOLDER, 'VERSION' );
+	let to = LIB_PATH.join( EXTERNAL_FOLDER, 'VERSION' );
+	LIB_FS.copyFileSync( from, to );
+}
+
+console.log( `Setting [TIMESTAMP] ...` );
+{
+	let to = LIB_PATH.join( EXTERNAL_FOLDER, 'TIMESTAMP' );
+	LIB_FS.writeFileSync( to, ( new Date() ).toISOString() );
+}
+
+
+//---------------------------------------------------------------------
 console.log( `Build complete.` );
