@@ -1,3 +1,3 @@
 
-# LiquicodeJS ***(v0.0.1)***
+# LiquicodeJS ***(v0.0.2)***
 
