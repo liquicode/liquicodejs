@@ -30,12 +30,16 @@ html
 		//- script( type='text/javascript' src='https://www.w3schools.com/lib/w3codecolor.js' )
 
 		//- PrismJS
-		link( rel='stylesheet' href='components/PrismJS-v1.28.0/prism-okaidia.css' )
-		script( type='text/javascript' src='components/PrismJS-v1.28.0/prism-okaidia.js' )
+		//- link( rel='stylesheet' href='components/PrismJS-v1.28.0/prism-default.css' )
+		//- script( type='text/javascript' src='components/PrismJS-v1.28.0/prism-default.js' )
+		link( rel='stylesheet' href='components/PrismJS-v1.28.0/prism-dark.css' )
+		script( type='text/javascript' src='components/PrismJS-v1.28.0/prism-dark.js' )
+		//- link( rel='stylesheet' href='components/PrismJS-v1.28.0/prism-okaidia.css' )
+		//- script( type='text/javascript' src='components/PrismJS-v1.28.0/prism-okaidia.js' )
 
 		//- Application Source
-		script( type='text/javascript' src='liquicodejs.html.js' )
-		link( rel='stylesheet' href='liquicodejs.html.css' )
+		script( type='text/javascript' src='site.js' )
+		link( rel='stylesheet' href='site.css' )
 
 body
 
@@ -49,19 +53,26 @@ body
 		//- Build top navigation bar.
 		nav.w3-bar.w3-border.w3-light-grey( role="navigation" )
 
-			//- Application Logo
-			//- img.w3-bar-item.w3-image.w3-responsive.w3-opacity( src='/public/images/logo-24x24.png' )
-			
-			//- Application Name
-			.w3-bar-item.w3-text-grey= `LiquicodeJS (v${locals.version})`
-			
-		//- Main Document Area
-		div( ng-controller='Home_Controller' )
+			.w3-cell-row 
 
-			.w3-container.w3-margin
+				//- Application Logo
+				.w3-cell.w3-cell-middle
+					img.w3-image.w3-responsive.w3-padding-small( src='components/Slimey/images/slimey-100.png' style='width:auto;height:48px' )
 
-				.w3-panel.w3-border.w3-round-large.w3-sand.w3-center
-					h3= "Welcome to LiquicodeJS!"
-					p= "A General Purpose Toolkit Library for Javascript"
+				//- Application Name
+				.w3-cell.w3-cell-middle
+					a.w3-button( href='index.html' )= `LiquicodeJS (v${locals.version})`
+					//- .w3-text-grey= `LiquicodeJS (v${locals.version})`
 
-				include ../schema/liquicodejs.schema.html
+				.w3-cell.w3-cell-middle
+					a.w3-button( href='reference.html' ) Library Reference
+
+				.w3-cell.w3-cell-middle
+					a.w3-button( href='https://www.npmjs.com/package/@liquicode/liquicodejs' ) NPM
+
+				.w3-cell.w3-cell-middle
+					a.w3-button( href='https://github.com/liquicode/liquicodejs' ) Source
+
+		block content
+
+	include _footer.pug

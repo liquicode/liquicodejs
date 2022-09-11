@@ -36,7 +36,16 @@ app.controller(
 		};
 
 
-		console.log( "Using LiquicodeJS (v" + Page.VersionNumber + ")" );
+		//---------------------------------------------------------------------
+		Page.GetSlimey = function ()
+		{
+			let image_name = Math.floor( Math.random() * 125 ) + 1;
+			image_name = 'slimey-' + ( '' + image_name ).padStart( 3, '0' ) + '.png';
+			return 'components/Slimey/images/' + image_name;
+		};
+
+
+		console.log( "Loading LiquicodeJS (v" + Page.VersionNumber + ")" );
 		console.log( "Loaded " + Page.Schemas.length + " schemas." );
 
 		$( 'table' ).addClass( 'w3-table w3-border w3-bordered w3-centered' );
