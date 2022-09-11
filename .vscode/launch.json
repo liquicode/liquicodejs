@@ -209,6 +209,19 @@
 			"name": "--- BUILD ---------------------------------------",
 		},
 		{
+			"name": "Rename Images",
+			"type": "node",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"cwd": "${workspaceFolder}",
+			"program": "${workspaceFolder}/docs/components/Slimey/rename-images.js",
+			"args": [],
+			"outputCapture": "std",
+			"internalConsoleOptions": "openOnSessionStart",
+		},
+		{
 			"name": "100) Build Docs",
 			"type": "node",
 			"request": "launch",
