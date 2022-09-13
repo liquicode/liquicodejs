@@ -73,7 +73,7 @@
 		"webpack-node-externals": "^3.0.0"
 	},
 	"scripts": {
-		"run-tests": "mocha -u bdd tests/String/*.js --timeout 0 --slow 10 --colors",
+		"run-tests": "mocha -u bdd src/*/*.Tests.js --timeout 0 --slow 10 --colors",
 		"build-docs": "node build/100-build-schema-docs.js && node build/110-compile-html-docs.js",
 		"run-docs-web-server": "npx here --directory docs --port 4200 --watch 1 --silent",
 		"webpack-es5": "cross-env WEBPACK_ENV=es5 webpack",

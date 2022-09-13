@@ -42,7 +42,7 @@ function get_function_parameter_list( Schema )
 
 
 //---------------------------------------------------------------------
-function generate_schema_markdown( Schema )
+function generate_schema_detail_markdown( Schema )
 {
 	let content_lines = [];
 	function add_content( Text )
@@ -196,6 +196,56 @@ function generate_schema_markdown( Schema )
 }
 
 
+//---------------------------------------------------------------------
+function generate_schema_summary_markdown( Schema )
+{
+	let content_lines = [];
+	function add_content( Text )
+	{
+		if ( Array.isArray( Text ) ) { content_lines.push( ...Text ); }
+		else { content_lines.push( Text ); }
+	}
+
+	switch ( Schema.type )
+	{
+		case 'namespace':
+		case 'module':
+		case 'class':
+			add_content( '' );
+			add_content( `### ***${Schema.name}***: ${Schema.summary}` );
+			add_content( '' );
+			add_content( '<br>' );
+			add_content( '' );
+			break;
+
+		case 'function':
+			add_content( '' );
+			add_content( `#### ${Schema.member_of}.***${Schema.name}***( ${get_function_parameter_list( Schema )} )` );
+			if ( Schema.summary && Schema.summary.length )
+			{
+				add_content( `- ${Schema.summary}` );
+			}
+			if ( Schema.returns )
+			{
+				if ( Schema.returns_description )
+				{
+					add_content( '- Returns: `' + Schema.returns + '` - ' + Schema.returns_description );
+				}
+				else
+				{
+					add_content( '- Returns: `' + Schema.returns + '`' );
+				}
+			}
+			add_content( '' );
+			add_content( '<br>' );
+			add_content( '' );
+			break;
+	}
+
+	return content_lines.join( `\n` );
+}
+
+
 //=====================================================================
 //=====================================================================
 //
@@ -225,7 +275,8 @@ let schema_json_content =
 	version: VERSION,
 	Schemas: []
 };
-let schema_markdown_content = '';
+let schema_markdown_detailed = '';
+let schema_markdown_summary = '';
 let schema_html_content = '';
 let count_total_files = 0;
 let count_files_with_errors = 0;
@@ -256,8 +307,9 @@ LQC.System.VisitFiles( SOURCE_FOLDER, '*.js', true,
 			schema_json_content.Schemas.push( schema );
 
 			// Save Markdown Content
-			let schema_markdown = generate_schema_markdown( schema );
-			schema_markdown_content += schema_markdown;
+			let schema_markdown = generate_schema_detail_markdown( schema );
+			schema_markdown_detailed += schema_markdown;
+			schema_markdown_summary += generate_schema_summary_markdown( schema );
 
 			// Save Html Content
 			let schema_html = LIB_MARKED.parse( schema_markdown );
@@ -305,21 +357,42 @@ console.log( `------------------------------------------------------------------
 
 
 //---------------------------------------------------------------------
-// Save the Markdown Schema document.
+// Save the Markdown Schema Detail document.
 //---------------------------------------------------------------------
 {
 	let filename = LIB_PATH.join( SCHEMA_FOLDER, 'liquicodejs.schema.md' );
-	LIB_FS.writeFileSync( filename, schema_markdown_content );
+	LIB_FS.writeFileSync( filename, schema_markdown_detailed );
 	console.log( `Wrote schema file [${filename}].` );
 }
 
 
 //---------------------------------------------------------------------
-// Save the Html Schema document.
+// Save the Markdown Schema Summary document.
+//---------------------------------------------------------------------
+{
+	let filename = LIB_PATH.join( SCHEMA_FOLDER, 'liquicodejs.schema.summary.md' );
+	LIB_FS.writeFileSync( filename, schema_markdown_summary );
+	console.log( `Wrote schema file [${filename}].` );
+}
+
+
+//---------------------------------------------------------------------
+// Save the Html Schema Detail document.
 //---------------------------------------------------------------------
 {
 	let filename = LIB_PATH.join( SCHEMA_FOLDER, 'liquicodejs.schema.html' );
 	LIB_FS.writeFileSync( filename, schema_html_content );
+	console.log( `Wrote schema file [${filename}].` );
+}
+
+
+//---------------------------------------------------------------------
+// Save the Html Schema Summary document.
+//---------------------------------------------------------------------
+{
+	let filename = LIB_PATH.join( SCHEMA_FOLDER, 'liquicodejs.schema.summary.html' );
+	let html = LIB_MARKED.parse( schema_markdown_summary );
+	LIB_FS.writeFileSync( filename, html );
 	console.log( `Wrote schema file [${filename}].` );
 }
 

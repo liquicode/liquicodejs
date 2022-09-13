@@ -338,7 +338,7 @@
     √ should start and stop a container
 
 
-  254 passing (3s)
+  254 passing (2s)
 
 
 ```

@@ -11,8 +11,8 @@
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular-sanitize.js"></script>
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    <link rel="stylesheet" href="components/PrismJS-v1.28.0/prism-dark.css">
-    <script type="text/javascript" src="components/PrismJS-v1.28.0/prism-dark.js"></script>
+    <link rel="stylesheet" href="components/PrismJS-v1.28.0/prism-coy.css">
+    <script type="text/javascript" src="components/PrismJS-v1.28.0/prism-coy.js"></script>
     <script type="text/javascript" src="site.js"></script>
     <link rel="stylesheet" href="site.css">
   </head>
@@ -44,6 +44,270 @@ window.Locals.Schemas = [{"id":"000","name":"Types","type":"namespace","summary"
             </div>
             <div class="w3-cell w3-cell-middle"><img class="w3-image w3-responsive w3-circle w3-border" ng-src="{{Page.GetSlimey()}}" style="width:auto;height:100px"></div>
           </div>
+        </div>
+        <div class="w3-container w3-margin"><h3 id="types-data-type-handling"><em><strong>Types</strong></em>: Data Type Handling</h3>
+<br>
+
+<h4 id="typeshasvalue-value-">Types.<em><strong>HasValue</strong></em>( Value )</h4>
+<ul>
+<li>Determine if a variable contains a value or or not.</li>
+<li>Returns: <code class="language-markdown">boolean</code> - True if Value actually contains a value.</li>
+</ul>
+<br>
+
+<h4 id="typescoerce-value-loud-">Types.<em><strong>Coerce</strong></em>( Value, Loud )</h4>
+<ul>
+<li>Returns a <code class="language-markdown">Coercion</code> object which is used to coerce values to different types.</li>
+<li>Returns: <code class="language-markdown">object</code> - A <code class="language-markdown">Coercion</code> object.</li>
+</ul>
+<br>
+
+<h4 id="typesgetformat-value-">Types.<em><strong>GetFormat</strong></em>( Value )</h4>
+<ul>
+<li>Determine the type and format of a value.</li>
+<li>Returns: <code class="language-markdown">string</code> - An extended type description.</li>
+</ul>
+<br>
+
+<h4 id="typesisformat-value-format-">Types.<em><strong>IsFormat</strong></em>( Value, Format )</h4>
+<ul>
+<li>Determine if a value is of a particular format.</li>
+<li>Returns: <code class="language-markdown">boolean</code> - True if the value matches the format.</li>
+</ul>
+<br>
+
+<h3 id="object-functions-for-manipulating-javascript-objects"><em><strong>Object</strong></em>: Functions for manipulating Javascript objects.</h3>
+<br>
+
+<h4 id="objectclone-from-">Object.<em><strong>Clone</strong></em>( From )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">string</code></li>
+</ul>
+<br>
+
+<h4 id="objectmerge-original-updates-">Object.<em><strong>Merge</strong></em>( Original, Updates )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">object</code></li>
+</ul>
+<br>
+
+<h4 id="objectfromjson-jsonstring-">Object.<em><strong>FromJson</strong></em>( JsonString )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">object</code></li>
+</ul>
+<br>
+
+<h4 id="objecttojsonoptions-presetname-">Object.<em><strong>ToJsonOptions</strong></em>( PresetName )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">object</code></li>
+</ul>
+<br>
+
+<h4 id="objecttojson-value-jsonoptions-">Object.<em><strong>ToJson</strong></em>( Value, JsonOptions )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">object</code></li>
+</ul>
+<br>
+
+<h4 id="objectfromini-inistring-">Object.<em><strong>FromIni</strong></em>( IniString )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">object</code></li>
+</ul>
+<br>
+
+<h4 id="objecttoini-value-">Object.<em><strong>ToIni</strong></em>( Value )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">object</code></li>
+</ul>
+<br>
+
+<h4 id="objectvaluearrayof-value-">Object.<em><strong>ValueArrayOf</strong></em>( Value )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">array</code></li>
+</ul>
+<br>
+
+<h3 id="text-functions-for-text-parsing-and-manipulation"><em><strong>Text</strong></em>: Functions for text parsing and manipulation.</h3>
+<br>
+
+<h4 id="textcompare-stringa-stringb-casesensitive-">Text.<em><strong>Compare</strong></em>( StringA, StringB, CaseSensitive )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">string</code></li>
+</ul>
+<br>
+
+<h4 id="textmatches-text-pattern-">Text.<em><strong>Matches</strong></em>( Text, Pattern )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">string</code></li>
+</ul>
+<br>
+
+<h4 id="textreplacecharacters-text-searchcharacters-replacementtext-maxtimes-">Text.<em><strong>ReplaceCharacters</strong></em>( Text, SearchCharacters, ReplacementText, MaxTimes )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">string</code></li>
+</ul>
+<br>
+
+<h4 id="textreplacetext-text-searchtext-replacementtext-">Text.<em><strong>ReplaceText</strong></em>( Text, SearchText, ReplacementText )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">string</code></li>
+</ul>
+<br>
+
+<h4 id="textfirstword-phrase-delimiters-">Text.<em><strong>FirstWord</strong></em>( Phrase, Delimiters )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">string</code></li>
+</ul>
+<br>
+
+<h4 id="textafterfirstword-phrase-delimiters-">Text.<em><strong>AfterFirstWord</strong></em>( Phrase, Delimiters )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">string</code></li>
+</ul>
+<br>
+
+<h4 id="textlastword-phrase-delimiters-">Text.<em><strong>LastWord</strong></em>( Phrase, Delimiters )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">string</code></li>
+</ul>
+<br>
+
+<h4 id="textbeforelastword-phrase-delimiters-">Text.<em><strong>BeforeLastWord</strong></em>( Phrase, Delimiters )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">string</code></li>
+</ul>
+<br>
+
+<h3 id="shapes-functions-for-manipulating-data-in-different-shapes"><em><strong>Shapes</strong></em>: Functions for manipulating data in different shapes.</h3>
+<br>
+
+<h4 id="shapesmatrix-values-options-">Shapes.<em><strong>Matrix</strong></em>( Values, Options )</h4>
+<ul>
+<li>Matrix stores a two-dimensional jagged array and exposes manipulation functions.</li>
+<li>Returns: <code class="language-markdown">object</code></li>
+</ul>
+<br>
+
+<h3 id="parse-functions-for-tokenizing-text-strings"><em><strong>Parse</strong></em>: Functions for tokenizing text strings.</h3>
+<br>
+
+<h4 id="parsetokenizeoptions-presetname-">Parse.<em><strong>TokenizeOptions</strong></em>( PresetName )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">object</code></li>
+</ul>
+<br>
+
+<h4 id="parsetokenize-presetname-">Parse.<em><strong>Tokenize</strong></em>( PresetName )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">object</code></li>
+</ul>
+<br>
+
+<h4 id="parsedateparse-value-timezoneoffset-">Parse.<em><strong>DateParse</strong></em>( Value, TimeZoneOffset )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">object</code></li>
+</ul>
+<br>
+
+<h3 id="system-file-system-and-process-functions-nodejs-only"><em><strong>System</strong></em>: File system and process functions. (nodejs only)</h3>
+<br>
+
+<h4 id="systemasyncvisitfiles-startfolder-filepattern-recurse-visitor-">System.<em><strong>AsyncVisitFiles</strong></em>( StartFolder, FilePattern, Recurse, Visitor )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">*</code></li>
+</ul>
+<br>
+
+<h4 id="systemvisitfiles-startfolder-filepattern-recurse-visitor-">System.<em><strong>VisitFiles</strong></em>( StartFolder, FilePattern, Recurse, Visitor )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">*</code></li>
+</ul>
+<br>
+
+<h4 id="systemcountfiles-startfolder-filepattern-recurse-">System.<em><strong>CountFiles</strong></em>( StartFolder, FilePattern, Recurse )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">number</code></li>
+</ul>
+<br>
+
+<h4 id="systemcountfolders-startfolder-recurse-">System.<em><strong>CountFolders</strong></em>( StartFolder, Recurse )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">number</code></li>
+</ul>
+<br>
+
+<h4 id="systemcopyfolder-fromfolder-tofolder-filepattern-overwrite-recurse-">System.<em><strong>CopyFolder</strong></em>( FromFolder, ToFolder, FilePattern, Overwrite, Recurse )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">number</code></li>
+</ul>
+<br>
+
+<h4 id="systemdeletefolder-folder-recurse-">System.<em><strong>DeleteFolder</strong></em>( Folder, Recurse )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">number</code></li>
+</ul>
+<br>
+
+<h4 id="systememptyfolder-folder-">System.<em><strong>EmptyFolder</strong></em>( Folder )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">number</code></li>
+</ul>
+<br>
+
+<h4 id="systemasyncsleep-milliseconds-">System.<em><strong>AsyncSleep</strong></em>( Milliseconds )</h4>
+<br>
+
+<h4 id="systemexecuteprocess-command-environment-startfolder-">System.<em><strong>ExecuteProcess</strong></em>( Command, Environment, StartFolder )</h4>
+<br>
+
+<h4 id="systemasyncexecuteprocess-command-environment-startfolder-">System.<em><strong>AsyncExecuteProcess</strong></em>( Command, Environment, StartFolder )</h4>
+<br>
+
+<h4 id="systemstartprocess-command-environment-startfolder-">System.<em><strong>StartProcess</strong></em>( Command, Environment, StartFolder )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">string</code></li>
+</ul>
+<br>
+
+<h4 id="systemstopprocess-processid-">System.<em><strong>StopProcess</strong></em>( ProcessID )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">string</code></li>
+</ul>
+<br>
+
+<h4 id="systemstartcontainer-imagename-options-">System.<em><strong>StartContainer</strong></em>( ImageName, Options )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">string</code></li>
+</ul>
+<br>
+
+<h4 id="systemstopcontainer-containerid-">System.<em><strong>StopContainer</strong></em>( ContainerID )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">string</code></li>
+</ul>
+<br>
+
+<h4 id="systemcontainerstatus-containerid-">System.<em><strong>ContainerStatus</strong></em>( ContainerID )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">string</code></li>
+</ul>
+<br>
+
+<h3 id="network-functions-for-working-with-networks-nodejs-only"><em><strong>Network</strong></em>: Functions for working with networks. (nodejs only)</h3>
+<br>
+
+<h4 id="networkasyncdownloadfile--">Network.<em><strong>AsyncDownloadFile</strong></em>(  )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">string</code></li>
+</ul>
+<br>
+
+<h4 id="networkasyncgetrequest-url-">Network.<em><strong>AsyncGetRequest</strong></em>( Url )</h4>
+<ul>
+<li>Returns: <code class="language-markdown">string</code></li>
+</ul>
+<br>
+
         </div>
       </div>
     </div>
