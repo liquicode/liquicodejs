@@ -1,10 +1,11 @@
+
 # Testing Output
 
+- Project: @liquicode/liquicodejs
+- Timestamp: 2022-09-14T08:44:34.658Z
 
-```
-
-
-  000) Types Module
+~~~
+000) Types Module
     √ should load the Types module
 
   010) Types.Coerce Tests
@@ -339,8 +340,4 @@
 
 
   254 passing (2s)
-
-
-```
-
-
+~~~
