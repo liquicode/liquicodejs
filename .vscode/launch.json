@@ -248,66 +248,14 @@
 			"internalConsoleOptions": "openOnSessionStart",
 		},
 		{
-			"name": "300) Build Testing Docs",
+			"name": "Build - Release",
 			"type": "node",
 			"request": "launch",
 			"skipFiles": [
 				"<node_internals>/**"
 			],
 			"cwd": "${workspaceFolder}",
-			"program": "${workspaceFolder}/build/300-build-testing-docs.js",
-			"args": [],
-			"outputCapture": "std",
-			"internalConsoleOptions": "openOnSessionStart",
-		},
-		{
-			"name": "400) Publish AWS Docs",
-			"type": "node",
-			"request": "launch",
-			"skipFiles": [
-				"<node_internals>/**"
-			],
-			"cwd": "${workspaceFolder}",
-			"program": "${workspaceFolder}/build/400-publish-aws-docs.js",
-			"args": [],
-			"outputCapture": "std",
-			"internalConsoleOptions": "openOnSessionStart",
-		},
-		{
-			"name": "900) Build Dist",
-			"type": "node",
-			"request": "launch",
-			"skipFiles": [
-				"<node_internals>/**"
-			],
-			"cwd": "${workspaceFolder}",
-			"program": "${workspaceFolder}/build/900-build-dist.js",
-			"args": [],
-			"outputCapture": "std",
-			"internalConsoleOptions": "openOnSessionStart",
-		},
-		{
-			"name": "910) Release Version",
-			"type": "node",
-			"request": "launch",
-			"skipFiles": [
-				"<node_internals>/**"
-			],
-			"cwd": "${workspaceFolder}",
-			"program": "${workspaceFolder}/build/910-release-version.js",
-			"args": [],
-			"outputCapture": "std",
-			"internalConsoleOptions": "openOnSessionStart",
-		},
-		{
-			"name": "Build",
-			"type": "node",
-			"request": "launch",
-			"skipFiles": [
-				"<node_internals>/**"
-			],
-			"cwd": "${workspaceFolder}",
-			"program": "${workspaceFolder}/build/build.js",
+			"program": "${workspaceFolder}/build/build-release.js",
 			"args": [],
 			"outputCapture": "std",
 			"internalConsoleOptions": "openOnSessionStart",

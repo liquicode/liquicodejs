@@ -5,7 +5,7 @@ const LIB_FS = require( 'fs' );
 const LIB_PATH = require( 'path' );
 
 const Liquicode = require( LIB_PATH.resolve( __dirname, '..', 'src', 'liquicode-node.js' ) );
-const Builder = require( './builder.js' );
+const Builder = require( './builder-2022-09-14.js' );
 
 const TIMESTAMP = ( new Date() ).toISOString();
 const AWS_BUCKET = 'liquicodejs.liquicode.com';
@@ -212,7 +212,7 @@ LIB_FS.writeFileSync( LIB_PATH.join( package_folder, 'VERSION' ), PACKAGE.versio
 // Update 'readme.md'
 Liquicode.System.WithFileText(
 	LIB_PATH.join( package_folder, 'readme.md' ),
-	function ( Text )
+	function ( Filename, Text )
 	{
 		return Liquicode.Text.ReplaceBetween( Text, '(v', ')', PACKAGE.version );
 	} );

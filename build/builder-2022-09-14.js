@@ -20,10 +20,6 @@ exports.Execute = execute;
 exports.StringToSemver = string_to_semver;
 exports.SemverToString = semver_to_string;
 
-// exports.UpdateVersionInFiles = update_version_in_files;
-// exports.ReplaceTextInFile = replace_text_in_file;
-// exports.WithFileContent = with_file_content;
-
 exports.Git_FinalizeAndMarkVersion = git_finalize_and_mark_version;
 exports.Git_PrepareNewVersion = git_prepare_new_version;
 
@@ -173,24 +169,6 @@ function execute( Command, Environment = {}, ShowOutput = true )
 		log_muted( `| output:` );
 		console.log( output );
 	}
-	// if ( output.stdout )
-	// {
-	// 	result_text = output.stdout.trim();
-	// 	if ( result_text && ShowOutput )
-	// 	{
-	// 		log_muted( `| stdout:` );
-	// 		log_error( result_text );
-	// 	}
-	// }
-	// if ( output.stderr )
-	// {
-	// 	let text = output.stderr.trim();
-	// 	if ( text )
-	// 	{
-	// 		log_muted( `| stderr:` );
-	// 		log_error( text );
-	// 	}
-	// }
 	log_muted( '+-----------------------------------------' );
 	return output;
 }
@@ -222,43 +200,6 @@ function semver_to_string( Semver )
 	if ( Semver.extra ) { version += `-${Semver.extra}`; }
 	return version;
 }
-
-
-// //---------------------------------------------------------------------
-// function update_version_in_files( Filenames, Version )
-// {
-// 	//FROM: semver.org
-// 	const semver_regex = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/gm;
-// 	for ( let index = 0; index < Filenames.length; index++ )
-// 	{
-// 		let filename = Filenames[ index ];
-// 		let text = LIB_FS.readFileSync( filename, 'utf-8' );
-// 		text = text.replaceAll( semver_regex, Version );
-// 		LIB_FS.writeFileSync( filename, text );
-// 	}
-// 	return;
-// }
-
-
-// //---------------------------------------------------------------------
-// function replace_text_in_file( Filename, SearchText, ReplaceText )
-// {
-// 	let text = LIB_FS.readFileSync( Filename, 'utf-8' );
-// 	// text = ( new String( text ) ).replaceAll( SearchText, ReplaceText );
-// 	text = text.replace( SearchText, ReplaceText );
-// 	LIB_FS.writeFileSync( Filename, text );
-// 	return;
-// }
-
-
-// //---------------------------------------------------------------------
-// function with_file_content( Filename, ContentProcessor )
-// {
-// 	let text = LIB_FS.readFileSync( Filename, 'utf-8' );
-// 	text = ContentProcessor( text );
-// 	LIB_FS.writeFileSync( Filename, text );
-// 	return;
-// }
 
 
 //---------------------------------------------------------------------
