@@ -2,7 +2,7 @@
 # Testing Output
 
 - Project: @liquicode/liquicodejs
-- Timestamp: 2022-09-14T09:06:49.676Z
+- Timestamp: 2022-09-14T22:27:13.354Z
 
 ~~~
 000) Types Module
@@ -108,6 +108,33 @@
       √ should replace a single character with a string, one instance
       √ should replace a single character with a string, two instances
       √ should replace a single character with a string, all instances
+
+  211) Text.ReplaceText Tests
+    √ should return the original text when SearchText is not found
+    √ should replace text in the middle of a string
+    √ should replace text at the beginning of a string
+    √ should replace text at the end of a string
+    √ should replace only the first instance when MaxTimes is 1
+    √ should replace all instances when MaxTimes is -1
+
+  213) Text.FindBetween Tests
+    √ should find all text when StartText and EndText are missing
+    √ should find all text when StartText and EndText are empty strings
+    √ should find all text from StartText when EndText is empty
+    √ should find all text up to EndText when StartText is empty
+    √ should find text between StartText and EndText
+    √ should find text between StartText and EndText when the found text is empty
+    √ should return null when StartText or EndText is not found
+
+  214) Text.ReplaceBetween Tests
+    √ should replace all text when StartText and EndText are missing
+    √ should replace all text when StartText and EndText are empty strings
+    √ should replace all text from StartText when EndText is empty
+    √ should replace all text up to EndText when StartText is empty
+    √ should replace text between StartText and EndText
+    √ should not replace any text when StartText or EndText are not found
+    √ should insert text between StartText and EndText when the found text is empty
+    √ should return the original text when StartText and EndText are not found
 
   220) Text.FirstWord Tests
     √ should get an empty word from empty text
@@ -339,5 +366,5 @@
     √ should start and stop a container
 
 
-  254 passing (2s)
+  275 passing (2s)
 ~~~

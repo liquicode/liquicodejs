@@ -2479,11 +2479,15 @@ module.exports = function ( Liquicode )
 {
 	return {
 		_Schema: Schema,
-		// TextBuffer: require( './201-Text.TextBuffer.js' )( Liquicode ).TextBuffer,
+
 		Compare: __webpack_require__( /*! ./202-Text.Compare.js */ "./src/200-Text/202-Text.Compare.js" )( Liquicode ).Compare,
 		Matches: __webpack_require__( /*! ./203-Text.Matches.js */ "./src/200-Text/203-Text.Matches.js" )( Liquicode ).Matches,
+
 		ReplaceCharacters: __webpack_require__( /*! ./210-Text.ReplaceCharacters.js */ "./src/200-Text/210-Text.ReplaceCharacters.js" )( Liquicode ).ReplaceCharacters,
 		ReplaceText: __webpack_require__( /*! ./211-Text.ReplaceText.js */ "./src/200-Text/211-Text.ReplaceText.js" )( Liquicode ).ReplaceText,
+		FindBetween: __webpack_require__( /*! ./213-Text.FindBetween.js */ "./src/200-Text/213-Text.FindBetween.js" )( Liquicode ).FindBetween,
+		ReplaceBetween: __webpack_require__( /*! ./214-Text.ReplaceBetween.js */ "./src/200-Text/214-Text.ReplaceBetween.js" )( Liquicode ).ReplaceBetween,
+
 		FirstWord: __webpack_require__( /*! ./220-Text.FirstWord.js */ "./src/200-Text/220-Text.FirstWord.js" )( Liquicode ).FirstWord,
 		AfterFirstWord: __webpack_require__( /*! ./221-Text.AfterFirstWord.js */ "./src/200-Text/221-Text.AfterFirstWord.js" )( Liquicode ).AfterFirstWord,
 		LastWord: __webpack_require__( /*! ./222-Text.LastWord.js */ "./src/200-Text/222-Text.LastWord.js" )( Liquicode ).LastWord,
@@ -2824,13 +2828,12 @@ let _Schema = {
 			required: true,
 			default: '',
 		},
-		// MaxTimes: {
-		// 	name: 'MaxTimes',
-		// 	type: 'number',
-		// 	// format: 'positive-integer',
-		// 	required: false,
-		// 	default: 1,
-		// },
+		MaxTimes: {
+			name: 'MaxTimes',
+			type: 'number',
+			required: false,
+			default: 1,
+		},
 	},
 };
 
@@ -2852,14 +2855,32 @@ module.exports = function ( Liquicode )
 	//-end-jsdoc-----------------------------------------------------------
 
 
-	function ReplaceText( Text, SearchText, ReplacementText ) 
+	function ReplaceText( Text, SearchText, ReplacementText, MaxTimes ) 
 	{
-		// Validate Parameters
-		Text = Liquicode.Types.Coerce( Text ).ToString();
-		SearchText = Liquicode.Types.Coerce( SearchText ).ToString();
-		ReplacementText = Liquicode.Types.Coerce( ReplacementText ).ToString();
+		// // Validate Parameters
+		// Text = Liquicode.Types.Coerce( Text ).ToString();
+		// SearchText = Liquicode.Types.Coerce( SearchText ).ToString();
+		// ReplacementText = Liquicode.Types.Coerce( ReplacementText ).ToString();
+		// return Text.split( SearchText ).join( ReplacementText );
 
-		return Text.split( SearchText ).join( ReplacementText );
+		if ( typeof Text !== 'string' ) { throw new Error( `The parameter [Text] is required and must be a string.` ); }
+		if ( typeof SearchText !== 'string' ) { throw new Error( `The parameter [SearchText] is required and must be a string.` ); }
+		if ( typeof ReplacementText !== 'string' ) { throw new Error( `The parameter [ReplacementText] is required and must be a string.` ); }
+		if ( MaxTimes === undefined ) { MaxTimes = 1; }
+		if ( typeof MaxTimes !== 'number' ) { throw new Error( `The parameter [MaxTimes] is optional but must be a number.` ); }
+
+		let text = Text;
+		let replacement_count = 0;
+		while ( true )
+		{
+			if ( ( MaxTimes >= 0 ) && ( replacement_count >= MaxTimes ) ) { break; }
+			let found_index = text.indexOf( SearchText );
+			if ( found_index < 0 ) { break; }
+			text = `${text.substring( 0, found_index )}${ReplacementText}${text.substring( found_index + SearchText.length )}`;
+			replacement_count++;
+		}
+
+		return text;
 	}
 
 	//---------------------------------------------------------------------
@@ -2867,6 +2888,231 @@ module.exports = function ( Liquicode )
 	return {
 		_Schema: _Schema,
 		ReplaceText: ReplaceText,
+	};
+};
+
+
+/***/ }),
+
+/***/ "./src/200-Text/213-Text.FindBetween.js":
+/*!**********************************************!*\
+  !*** ./src/200-Text/213-Text.FindBetween.js ***!
+  \**********************************************/
+/***/ ((module) => {
+
+
+
+
+//---------------------------------------------------------------------
+let _Schema = {
+	id: '213',
+	member_of: 'Text',
+	name: 'FindBetween',
+	type: 'function',
+	returns: 'string',
+	returns_description: 'The text found between StartText and EndText.',
+	summary: 'Search a string and return the text found between StartText and EndText.',
+	description: `
+This function searches a string for StartText and EndText and returns all text found between the two.
+
+If StartText is missing, then the search will return all text up to the found EndText.
+
+If EndText is missing, then the search will return all text found after StartText.
+
+If both StartText and EndText are missing, then the entire Text string will be returned.
+
+If StartText or EndText are not found within Text, then a \`null\` is returned.
+
+`,
+	Parameters: {
+		Text: {
+			name: 'Text',
+			type: 'string',
+			required: true,
+			default: '',
+		},
+		StartText: {
+			name: 'StartText',
+			type: 'string',
+			required: false,
+			default: '',
+		},
+		EndText: {
+			name: 'EndText',
+			type: 'string',
+			required: false,
+			default: '',
+		},
+	},
+};
+
+
+//---------------------------------------------------------------------
+module.exports = function ( Liquicode )
+{
+
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function ReplaceText
+	 * @returns {string}
+	 * @param {string} Text
+	 * @param {string} SearchText
+	 * @param {string} ReplacementText
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
+	function FindBetween( Text, StartText, EndText ) 
+	{
+		if ( typeof Text !== 'string' ) { throw new Error( `The parameter [Text] is required and must be a string.` ); }
+		if ( ( StartText === undefined ) || ( StartText === null ) ) { StartText = ''; }
+		if ( ( EndText === undefined ) || ( EndText === null ) ) { EndText = ''; }
+		if ( typeof StartText !== 'string' ) { throw new Error( `The parameter [StartText] is optional but must be a string.` ); }
+		if ( typeof EndText !== 'string' ) { throw new Error( `The parameter [EndText] is optional but must be a string.` ); }
+
+		// Find StartText
+		let start_text_begin = 0;
+		if ( StartText.length ) { start_text_begin = Text.indexOf( StartText ); }
+		if ( start_text_begin < 0 ) { return null; }
+
+		// Find EndText
+		let end_text_begin = Text.length;
+		if ( EndText.length ) { end_text_begin = Text.indexOf( EndText, start_text_begin + StartText.length ); }
+		if ( end_text_begin < 0 ) { return null; }
+
+		let found_text = Text.substring( start_text_begin + StartText.length, end_text_begin );
+		return found_text;
+	}
+
+
+	//---------------------------------------------------------------------
+	// Return the module exports.
+	return {
+		_Schema: _Schema,
+		FindBetween: FindBetween,
+	};
+};
+
+
+/***/ }),
+
+/***/ "./src/200-Text/214-Text.ReplaceBetween.js":
+/*!*************************************************!*\
+  !*** ./src/200-Text/214-Text.ReplaceBetween.js ***!
+  \*************************************************/
+/***/ ((module) => {
+
+
+
+
+//---------------------------------------------------------------------
+let _Schema = {
+	id: '214',
+	member_of: 'Text',
+	name: 'ReplaceBetween',
+	type: 'function',
+	returns: 'integer',
+	returns_description: 'The new string with replacements performed.',
+	summary: 'Search a string for StartText and EndText and replace the text found between the two.',
+	description: `
+This function searches a string for StartText and EndText and replaces all text found between the two.
+
+If StartText is missing, then all text found up to EndText will be replaced.
+
+If EndText is missing, then all text found after StartText will be replaced.
+
+If both StartText and EndText are missing, then the entire Text string will be replaced.
+
+If StartText or EndText are not found within Text, then this function returns \`0\` to indicate that no replacements were performed.
+
+The MaxTimes parameter specifies the maximum number of replacements to perform.
+If MaxTimes is \`-1\`, then all possible replacements will be made throughout Text.
+`,
+	Parameters: {
+		Text: {
+			name: 'Text',
+			type: 'string',
+			required: true,
+			default: '',
+		},
+		ReplacementText: {
+			name: 'ReplacementText',
+			type: 'string',
+			required: true,
+			default: '',
+		},
+		StartText: {
+			name: 'StartText',
+			type: 'string',
+			required: false,
+			default: '',
+		},
+		EndText: {
+			name: 'EndText',
+			type: 'string',
+			required: false,
+			default: '',
+		},
+		MaxTimes: {
+			name: 'MaxTimes',
+			type: 'number',
+			required: false,
+			default: 1,
+		},
+	},
+};
+
+
+//---------------------------------------------------------------------
+module.exports = function ( Liquicode )
+{
+
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function ReplaceText
+	 * @returns {string}
+	 * @param {string} Text
+	 * @param {string} SearchText
+	 * @param {string} ReplacementText
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
+	function ReplaceBetween( Text, ReplacementText, StartText, EndText, MaxTimes ) 
+	{
+		if ( typeof Text !== 'string' ) { throw new Error( `The parameter [Text] is required and must be a string.` ); }
+		if ( typeof ReplacementText !== 'string' ) { throw new Error( `The parameter [ReplacementText] is required and must be a string.` ); }
+		if ( ( StartText === undefined ) || ( StartText === null ) ) { StartText = ''; }
+		if ( ( EndText === undefined ) || ( EndText === null ) ) { EndText = ''; }
+		if ( typeof StartText !== 'string' ) { throw new Error( `The parameter [StartText] is optional but must be a string.` ); }
+		if ( typeof EndText !== 'string' ) { throw new Error( `The parameter [EndText] is optional but must be a string.` ); }
+		if ( MaxTimes === undefined ) { MaxTimes = 1; }
+		if ( typeof MaxTimes !== 'number' ) { throw new Error( `The parameter [MaxTimes] is optional but must be a number.` ); }
+
+		let text = Text;
+		let replacement_count = 0;
+		while ( true )
+		{
+			if ( ( MaxTimes >= 0 ) && ( replacement_count >= MaxTimes ) ) { break; }
+			let found_text = Liquicode.Text.FindBetween( text, StartText, EndText );
+			if ( found_text === null ) { break; }
+			text = Liquicode.Text.ReplaceText( text, `${StartText}${found_text}${EndText}`, `${StartText}${ReplacementText}${EndText}`, 1 );
+			replacement_count++;
+		}
+
+		return text;
+	}
+
+
+	//---------------------------------------------------------------------
+	// Return the module exports.
+	return {
+		_Schema: _Schema,
+		ReplaceBetween: ReplaceBetween,
 	};
 };
 
@@ -5584,6 +5830,7 @@ module.exports = function ( Liquicode )
 		CopyFolder: __webpack_require__( /*! ./813-System.CopyFolder.js */ "./src/800-System/813-System.CopyFolder.js" )( Liquicode ).CopyFolder,
 		DeleteFolder: __webpack_require__( /*! ./814-System.DeleteFolder.js */ "./src/800-System/814-System.DeleteFolder.js" )( Liquicode ).DeleteFolder,
 		EmptyFolder: __webpack_require__( /*! ./815-System.EmptyFolder.js */ "./src/800-System/815-System.EmptyFolder.js" )( Liquicode ).EmptyFolder,
+		WithFileText: __webpack_require__( /*! ./816-System.WithFileText.js */ "./src/800-System/816-System.WithFileText.js" )( Liquicode ).WithFileText,
 
 		// Process
 		AsyncSleep: __webpack_require__( /*! ./820-System.AsyncSleep.js */ "./src/800-System/820-System.AsyncSleep.js" )( Liquicode ).AsyncSleep,
@@ -6366,28 +6613,18 @@ let _Schema = {
 	name: 'EmptyFolder',
 	type: 'function',
 	returns: 'number',
-	description: [
-		'Empties a folder by removing all of its sub-folders and files.',
-		'Returns the number of folders and files deleted.',
-	],
+	return_description: 'Number of folders and files removed.',
+	description: `
+Empties a folder by removing all of its sub-folders and files.
+
+Returns the number of folders and files removed.
+`,
 	Parameters: {
 		Folder: {
 			name: 'Folder',
 			type: 'string',
 			required: true,
 		},
-		// FilePattern: {
-		// 	name: 'FilePattern',
-		// 	type: 'string',
-		// 	required: false,
-		// 	default: '',
-		// },
-		// Recurse: {
-		// 	name: 'Recurse',
-		// 	type: 'boolean',
-		// 	required: false,
-		// 	default: false,
-		// },
 	},
 };
 
@@ -6460,6 +6697,92 @@ module.exports = function ( Liquicode )
 	return {
 		_Schema: _Schema,
 		EmptyFolder: EmptyFolder,
+	};
+};
+
+
+/***/ }),
+
+/***/ "./src/800-System/816-System.WithFileText.js":
+/*!***************************************************!*\
+  !*** ./src/800-System/816-System.WithFileText.js ***!
+  \***************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+
+
+
+//---------------------------------------------------------------------
+let _Schema = {
+	id: '816',
+	member_of: 'System',
+	name: 'WithFileText',
+	type: 'function',
+	returns: 'boolean',
+	returns_description: 'False if no changes were made or True if changes were saved.',
+	description: `
+Loads content from a file and passes it to a callback function for processing.
+
+The callback function takes two parameters: Filename and Text.
+Filename is the Filename passed to \`WithFileText\` and Text is the content of that file.
+The callback function is expected to return either \`undefined\` or \`null\` if no changes are made to the text.
+If changes are made, the callback function can return the new text which will be saved back to Filename.
+
+If the file content is changed during callback processing, then \`WithFileText\` will return True.
+`,
+	Parameters: {
+		Filename: {
+			name: 'Filename',
+			type: 'string',
+			required: true,
+		},
+		FileTextCallback: {
+			name: 'FileTextCallback',
+			type: 'function',
+			required: true,
+		},
+	},
+};
+
+
+//---------------------------------------------------------------------
+module.exports = function ( Liquicode )
+{
+
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function EmptyFolder
+	 * @returns {number}
+	 * @description
+	 * Empties a folder by removing all of its sub-folders and files.
+	 * Returns the number of folders and files deleted.
+	 * @param {string} Folder
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
+	const LIB_FS = __webpack_require__( /*! fs */ "fs" );
+
+
+	function WithFileText( Filename, FileTextCallback ) 
+	{
+		let text = LIB_FS.readFileSync( Filename, 'utf-8' );
+		let processed_text = FileTextCallback( Filename, text );
+		if ( ( processed_text === undefined ) || ( processed_text === null ) ) { return false; }
+		if ( typeof processed_text !== 'string' ) { throw new Error( `The return value from [FileTextCallback] must be either undefined, null, or a text string.` ); }
+		if ( processed_text === text ) { return false; }
+		LIB_FS.writeFileSync( Filename, processed_text );
+		return true;
+	}
+
+
+	//---------------------------------------------------------------------
+	// Return the module exports.
+	return {
+		_Schema: _Schema,
+		WithFileText: WithFileText,
 	};
 };
 

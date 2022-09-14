@@ -33,6 +33,7 @@ module.exports = function ( Liquicode )
 		CopyFolder: require( './813-System.CopyFolder.js' )( Liquicode ).CopyFolder,
 		DeleteFolder: require( './814-System.DeleteFolder.js' )( Liquicode ).DeleteFolder,
 		EmptyFolder: require( './815-System.EmptyFolder.js' )( Liquicode ).EmptyFolder,
+		WithFileText: require( './816-System.WithFileText.js' )( Liquicode ).WithFileText,
 
 		// Process
 		AsyncSleep: require( './820-System.AsyncSleep.js' )( Liquicode ).AsyncSleep,

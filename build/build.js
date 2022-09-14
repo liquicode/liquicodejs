@@ -53,6 +53,12 @@ Builder.LogHeading( `Run Tests and Update Docs Externals ...` );
 	let source_folder = LIB_PATH.join( package_folder, 'src' );
 
 	let testing_output = Builder.Execute( `npx mocha -u bdd ${source_folder}/*/*.Tests.js --no-timeout --slow 1000000` );
+	{
+		let output_lines = testing_output.split( '\n' );
+		if ( output_lines.length === 0 ) { throw new Error( 'Unable to capture testing output.' ); }
+		let last_line = output_lines[ output_lines.length - 1 ];
+		if ( last_line.indexOf( ' passing' ) < 0 ) { throw new Error( 'Detected an error in the testing output.' ); }
+	}
 
 	//---------------------------------------------------------------------
 	// Update Docs Externals
@@ -190,6 +196,7 @@ Builder.Aws_S3_Sync( LIB_PATH.join( package_folder, 'docs' ), AWS_BUCKET, AWS_PR
 //=====================================================================
 //=====================================================================
 
+
 Builder.LogHeading( `Incrementing Package Version Number` );
 let previous_version = PACKAGE.version;
 let semver = Builder.StringToSemver( PACKAGE.version );
@@ -203,10 +210,23 @@ LIB_FS.writeFileSync( LIB_PATH.join( package_folder, 'package.json' ), JSON.stri
 LIB_FS.writeFileSync( LIB_PATH.join( package_folder, 'VERSION' ), PACKAGE.version );
 
 // Update 'readme.md'
-const semver_regex = /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)/gm;
-Builder.ReplaceTextInFile( LIB_PATH.join( package_folder, 'readme.md' ), semver_regex, `(v${PACKAGE.version})` );
+Liquicode.System.WithFileText(
+	LIB_PATH.join( package_folder, 'readme.md' ),
+	function ( Text )
+	{
+		return Liquicode.Text.ReplaceBetween( Text, '(v', ')', PACKAGE.version );
+	} );
 
 Builder.Git_PrepareNewVersion( PACKAGE.version );
+
+
+//=====================================================================
+//=====================================================================
+//
+//		End of Build
+//
+//=====================================================================
+//=====================================================================
 
 
 Builder.LogHeading( `Published version [${previous_version}], you are now at version [${PACKAGE.version}].` );

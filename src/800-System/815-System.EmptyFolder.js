@@ -8,28 +8,18 @@ let _Schema = {
 	name: 'EmptyFolder',
 	type: 'function',
 	returns: 'number',
-	description: [
-		'Empties a folder by removing all of its sub-folders and files.',
-		'Returns the number of folders and files deleted.',
-	],
+	return_description: 'Number of folders and files removed.',
+	description: `
+Empties a folder by removing all of its sub-folders and files.
+
+Returns the number of folders and files removed.
+`,
 	Parameters: {
 		Folder: {
 			name: 'Folder',
 			type: 'string',
 			required: true,
 		},
-		// FilePattern: {
-		// 	name: 'FilePattern',
-		// 	type: 'string',
-		// 	required: false,
-		// 	default: '',
-		// },
-		// Recurse: {
-		// 	name: 'Recurse',
-		// 	type: 'boolean',
-		// 	required: false,
-		// 	default: false,
-		// },
 	},
 };
 
