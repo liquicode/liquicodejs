@@ -121,16 +121,16 @@ Builder.LogHeading( `Build Distributables ...` );
 
 	let webpack_filename = LIB_PATH.join( __dirname, 'webpack.config.js' );
 
-	Builder.LogMuted( `Building es5 ...` );
+	Builder.LogHeading( `Building es5 ...` );
 	Builder.Execute( `npx webpack-cli --config ${webpack_filename}`, { WEBPACK_ENV: 'es5' } );
 
-	Builder.LogMuted( `Building es6 ...` );
+	Builder.LogHeading( `Building es6 ...` );
 	Builder.Execute( `npx webpack-cli --config ${webpack_filename}`, { WEBPACK_ENV: 'es6' } );
 
-	Builder.LogMuted( `Building node-min ...` );
+	Builder.LogHeading( `Building node-min ...` );
 	Builder.Execute( `npx webpack-cli --config ${webpack_filename}`, { WEBPACK_ENV: 'node-min' } );
 
-	Builder.LogMuted( `Building node ...` );
+	Builder.LogHeading( `Building node ...` );
 	Builder.Execute( `npx webpack-cli --config ${webpack_filename}`, { WEBPACK_ENV: 'node' } );
 
 	//---------------------------------------------------------------------

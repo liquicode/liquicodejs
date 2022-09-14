@@ -2,7 +2,7 @@
 # Testing Output
 
 - Project: @liquicode/liquicodejs
-- Timestamp: 2022-09-14T08:44:34.658Z
+- Timestamp: 2022-09-14T08:47:06.500Z
 
 ~~~
 000) Types Module

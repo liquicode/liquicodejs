@@ -5,6 +5,8 @@ const LIB_FS = require( 'fs' );
 const LIB_PATH = require( 'path' );
 const LIB_CHILD_PROCESS = require( 'child_process' );
 
+const Liquicode = require( LIB_PATH.resolve( __dirname, '..', 'src', 'liquicode-node.js' ) );
+
 
 exports.ShellText = ShellText;
 
