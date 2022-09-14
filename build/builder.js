@@ -208,8 +208,8 @@ function string_to_semver( Version )
 	if ( parts.length !== 3 ) { throw new Error( `Invalid semver [${Version}].` ); }
 	semver.major = parseInt( parts[ 0 ] );
 	semver.minor = parseInt( parts[ 1 ] );
-	semver.patch = parseInt( Liquicode.Text.GetFirstWord( parts[ 2 ], '-' ) );
-	semver.extra = Liquicode.Text.GetAfterFirstWord( parts[ 2 ], '-' );
+	semver.patch = parseInt( Liquicode.Text.FirstWord( parts[ 2 ], '-' ) );
+	semver.extra = Liquicode.Text.AfterFirstWord( parts[ 2 ], '-' );
 	return semver;
 }
 

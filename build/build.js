@@ -190,11 +190,11 @@ Builder.Aws_S3_Sync( LIB_PATH.join( package_folder, 'docs' ), AWS_BUCKET, AWS_PR
 //=====================================================================
 //=====================================================================
 
-{
-	let semver = Builder.StringToSemver( PACKAGE.version );
-	semver.patch++;
-	PACKAGE.version = Builder.SemverToString( semver );
-}
+Builder.LogHeading( `Incrementing Package Version Number` );
+let previous_version = PACKAGE.version;
+let semver = Builder.StringToSemver( PACKAGE.version );
+semver.patch++;
+PACKAGE.version = Builder.SemverToString( semver );
 
 // Update 'package.json'
 LIB_FS.writeFileSync( LIB_PATH.join( package_folder, 'package.json' ), JSON.stringify( PACKAGE, null, '\t' ) );
@@ -207,3 +207,7 @@ const semver_regex = /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)/gm;
 Builder.ReplaceTextInFile( LIB_PATH.join( package_folder, 'readme.md' ), semver_regexp, `(v${PACKAGE.version})` );
 
 Builder.Git_PrepareNewVersion( PACKAGE.version );
+
+
+Builder.LogHeading( `Published version [${previous_version}], you are now at version [${PACKAGE.version}].` );
+
