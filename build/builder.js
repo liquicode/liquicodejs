@@ -243,7 +243,7 @@ function update_version_in_files( Filenames, Version )
 function replace_text_in_file( Filename, SearchText, ReplaceText )
 {
 	let text = LIB_FS.readFileSync( Filename, 'utf-8' );
-	text = text.replaceAll( SearchText, ReplaceText );
+	text = ( new String( text ) ).replaceAll( SearchText, ReplaceText );
 	LIB_FS.writeFileSync( Filename, text );
 	return;
 }
