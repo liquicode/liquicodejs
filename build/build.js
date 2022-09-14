@@ -204,7 +204,7 @@ LIB_FS.writeFileSync( LIB_PATH.join( package_folder, 'VERSION' ), PACKAGE.versio
 
 // Update 'readme.md'
 const semver_regex = /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)/gm;
-Builder.ReplaceTextInFile( LIB_PATH.join( package_folder, 'readme.md' ), semver_regexp, `(v${PACKAGE.version})` );
+Builder.ReplaceTextInFile( LIB_PATH.join( package_folder, 'readme.md' ), semver_regex, `(v${PACKAGE.version})` );
 
 Builder.Git_PrepareNewVersion( PACKAGE.version );
 
