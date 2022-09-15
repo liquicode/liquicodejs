@@ -3,7 +3,7 @@
 
 var Liquicode = {};
 
-Liquicode.version = 'v0.0.1';
+Liquicode.version = 'v0.0.16';
 Liquicode.environment = 'node-min';
 
 Liquicode.Types = require( './000-Types/000-Types.js' )( Liquicode );
