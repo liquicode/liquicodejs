@@ -1,5 +1,5 @@
 exports = {
-    "version": "0.0.2",
+    "version": "0.0.16",
     "Schemas": [
         {
             "id": "000",
@@ -406,9 +406,89 @@ exports = {
                     "type": "string",
                     "required": true,
                     "default": ""
+                },
+                "MaxTimes": {
+                    "name": "MaxTimes",
+                    "type": "number",
+                    "required": false,
+                    "default": 1
                 }
             },
             "source_filename": "200-Text\\211-Text.ReplaceText.js"
+        },
+        {
+            "id": "213",
+            "member_of": "Text",
+            "name": "FindBetween",
+            "type": "function",
+            "returns": "string",
+            "returns_description": "The text found between StartText and EndText.",
+            "summary": "Search a string and return the text found between StartText and EndText.",
+            "description": "\nThis function searches a string for StartText and EndText and returns all text found between the two.\n\nIf StartText is missing, then the search will return all text up to the found EndText.\n\nIf EndText is missing, then the search will return all text found after StartText.\n\nIf both StartText and EndText are missing, then the entire Text string will be returned.\n\nIf StartText or EndText are not found within Text, then a `null` is returned.\n\n",
+            "Parameters": {
+                "Text": {
+                    "name": "Text",
+                    "type": "string",
+                    "required": true,
+                    "default": ""
+                },
+                "StartText": {
+                    "name": "StartText",
+                    "type": "string",
+                    "required": false,
+                    "default": ""
+                },
+                "EndText": {
+                    "name": "EndText",
+                    "type": "string",
+                    "required": false,
+                    "default": ""
+                }
+            },
+            "source_filename": "200-Text\\213-Text.FindBetween.js"
+        },
+        {
+            "id": "214",
+            "member_of": "Text",
+            "name": "ReplaceBetween",
+            "type": "function",
+            "returns": "integer",
+            "returns_description": "The new string with replacements performed.",
+            "summary": "Search a string for StartText and EndText and replace the text found between the two.",
+            "description": "\nThis function searches a string for StartText and EndText and replaces all text found between the two.\n\nIf StartText is missing, then all text found up to EndText will be replaced.\n\nIf EndText is missing, then all text found after StartText will be replaced.\n\nIf both StartText and EndText are missing, then the entire Text string will be replaced.\n\nIf StartText or EndText are not found within Text, then this function returns `0` to indicate that no replacements were performed.\n\nThe MaxTimes parameter specifies the maximum number of replacements to perform.\nIf MaxTimes is `-1`, then all possible replacements will be made throughout Text.\n",
+            "Parameters": {
+                "Text": {
+                    "name": "Text",
+                    "type": "string",
+                    "required": true,
+                    "default": ""
+                },
+                "StartText": {
+                    "name": "StartText",
+                    "type": "string",
+                    "required": false,
+                    "default": ""
+                },
+                "EndText": {
+                    "name": "EndText",
+                    "type": "string",
+                    "required": false,
+                    "default": ""
+                },
+                "ReplacementText": {
+                    "name": "ReplacementText",
+                    "type": "string",
+                    "required": true,
+                    "default": ""
+                },
+                "MaxTimes": {
+                    "name": "MaxTimes",
+                    "type": "number",
+                    "required": false,
+                    "default": 1
+                }
+            },
+            "source_filename": "200-Text\\214-Text.ReplaceBetween.js"
         },
         {
             "id": "220",
@@ -839,10 +919,8 @@ exports = {
             "name": "EmptyFolder",
             "type": "function",
             "returns": "number",
-            "description": [
-                "Empties a folder by removing all of its sub-folders and files.",
-                "Returns the number of folders and files deleted."
-            ],
+            "return_description": "Number of folders and files removed.",
+            "description": "\nEmpties a folder by removing all of its sub-folders and files.\n\nReturns the number of folders and files removed.\n",
             "Parameters": {
                 "Folder": {
                     "name": "Folder",
@@ -851,6 +929,28 @@ exports = {
                 }
             },
             "source_filename": "800-System\\815-System.EmptyFolder.js"
+        },
+        {
+            "id": "816",
+            "member_of": "System",
+            "name": "WithFileText",
+            "type": "function",
+            "returns": "boolean",
+            "returns_description": "False if no changes were made or True if changes were saved.",
+            "description": "\nLoads content from a file and passes it to a callback function for processing.\n\nThe callback function takes two parameters: Filename and Text.\nFilename is the Filename passed to `WithFileText` and Text is the content of that file.\nThe callback function is expected to return either `undefined` or `null` if no changes are made to the text.\nIf changes are made, the callback function can return the new text which will be saved back to Filename.\n\nIf the file content is changed during callback processing, then `WithFileText` will return True.\n",
+            "Parameters": {
+                "Filename": {
+                    "name": "Filename",
+                    "type": "string",
+                    "required": true
+                },
+                "FileTextCallback": {
+                    "name": "FileTextCallback",
+                    "type": "function",
+                    "required": true
+                }
+            },
+            "source_filename": "800-System\\816-System.WithFileText.js"
         },
         {
             "id": "820",

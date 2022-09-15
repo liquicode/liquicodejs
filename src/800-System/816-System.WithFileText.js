@@ -42,12 +42,22 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function EmptyFolder
-	 * @returns {number}
+	 * @function WithFileText
+	 * @returns {boolean}
+	 * False if no changes were made or True if changes were saved.
 	 * @description
-	 * Empties a folder by removing all of its sub-folders and files.
-	 * Returns the number of folders and files deleted.
-	 * @param {string} Folder
+	 * 
+Loads content from a file and passes it to a callback function for processing.
+
+The callback function takes two parameters: Filename and Text.
+Filename is the Filename passed to `WithFileText` and Text is the content of that file.
+The callback function is expected to return either `undefined` or `null` if no changes are made to the text.
+If changes are made, the callback function can return the new text which will be saved back to Filename.
+
+If the file content is changed during callback processing, then `WithFileText` will return True.
+
+	 * @param {string} Filename
+	 * @param {function} FileTextCallback
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 

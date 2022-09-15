@@ -53,11 +53,26 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function ReplaceText
+	 * @function FindBetween
 	 * @returns {string}
+	 * The text found between StartText and EndText.
+	 * @summary Search a string and return the text found between StartText and EndText.
+	 * @description
+	 * 
+This function searches a string for StartText and EndText and returns all text found between the two.
+
+If StartText is missing, then the search will return all text up to the found EndText.
+
+If EndText is missing, then the search will return all text found after StartText.
+
+If both StartText and EndText are missing, then the entire Text string will be returned.
+
+If StartText or EndText are not found within Text, then a `null` is returned.
+
+
 	 * @param {string} Text
-	 * @param {string} SearchText
-	 * @param {string} ReplacementText
+	 * @param {string} [StartText]
+	 * @param {string} [EndText]
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 

@@ -67,11 +67,30 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function ReplaceText
-	 * @returns {string}
+	 * @function ReplaceBetween
+	 * @returns {integer}
+	 * The new string with replacements performed.
+	 * @summary Search a string for StartText and EndText and replace the text found between the two.
+	 * @description
+	 * 
+This function searches a string for StartText and EndText and replaces all text found between the two.
+
+If StartText is missing, then all text found up to EndText will be replaced.
+
+If EndText is missing, then all text found after StartText will be replaced.
+
+If both StartText and EndText are missing, then the entire Text string will be replaced.
+
+If StartText or EndText are not found within Text, then this function returns `0` to indicate that no replacements were performed.
+
+The MaxTimes parameter specifies the maximum number of replacements to perform.
+If MaxTimes is `-1`, then all possible replacements will be made throughout Text.
+
 	 * @param {string} Text
-	 * @param {string} SearchText
+	 * @param {string} [StartText]
+	 * @param {string} [EndText]
 	 * @param {string} ReplacementText
+	 * @param {number} [MaxTimes=1]
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 

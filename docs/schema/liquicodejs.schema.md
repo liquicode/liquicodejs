@@ -749,11 +749,11 @@ Returns the modified string.
 <details>
 <summary>
 <strong>
-ReplaceText( Text, SearchText, ReplacementText )
+ReplaceText( Text, SearchText, ReplacementText, MaxTimes )
 </strong>
 </summary>
 
-> ### Text.***ReplaceText***( Text, SearchText, ReplacementText )
+> ### Text.***ReplaceText***( Text, SearchText, ReplacementText, MaxTimes )
 > 
 > undefined
 > 
@@ -766,6 +766,101 @@ ReplaceText( Text, SearchText, ReplacementText )
 | Text               | `string` | required |                   | 
 | SearchText         | `string` | required |                   | 
 | ReplacementText    | `string` | required |                   | 
+| MaxTimes           | `number` | -        | 1                 | 
+
+
+---
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+FindBetween( Text, StartText, EndText )
+</strong>
+<small>
+- Search a string and return the text found between StartText and EndText.
+</small>
+</summary>
+
+> ### Text.***FindBetween***( Text, StartText, EndText )
+> 
+> Search a string and return the text found between StartText and EndText.
+> 
+> **Returns**: `string` - The text found between StartText and EndText.
+
+***Parameters***
+
+|  Name              |  Type   | Required  |  Default          |  Description  
+|--------------------|---------|-----------|-------------------|---------------
+| Text               | `string` | required |                   | 
+| StartText          | `string` | -        |                   | 
+| EndText            | `string` | -        |                   | 
+
+***Description***
+
+
+This function searches a string for StartText and EndText and returns all text found between the two.
+
+If StartText is missing, then the search will return all text up to the found EndText.
+
+If EndText is missing, then the search will return all text found after StartText.
+
+If both StartText and EndText are missing, then the entire Text string will be returned.
+
+If StartText or EndText are not found within Text, then a `null` is returned.
+
+
+
+
+---
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+ReplaceBetween( Text, StartText, EndText, ReplacementText, MaxTimes )
+</strong>
+<small>
+- Search a string for StartText and EndText and replace the text found between the two.
+</small>
+</summary>
+
+> ### Text.***ReplaceBetween***( Text, StartText, EndText, ReplacementText, MaxTimes )
+> 
+> Search a string for StartText and EndText and replace the text found between the two.
+> 
+> **Returns**: `integer` - The new string with replacements performed.
+
+***Parameters***
+
+|  Name              |  Type   | Required  |  Default          |  Description  
+|--------------------|---------|-----------|-------------------|---------------
+| Text               | `string` | required |                   | 
+| StartText          | `string` | -        |                   | 
+| EndText            | `string` | -        |                   | 
+| ReplacementText    | `string` | required |                   | 
+| MaxTimes           | `number` | -        | 1                 | 
+
+***Description***
+
+
+This function searches a string for StartText and EndText and replaces all text found between the two.
+
+If StartText is missing, then all text found up to EndText will be replaced.
+
+If EndText is missing, then all text found after StartText will be replaced.
+
+If both StartText and EndText are missing, then the entire Text string will be replaced.
+
+If StartText or EndText are not found within Text, then this function returns `0` to indicate that no replacements were performed.
+
+The MaxTimes parameter specifies the maximum number of replacements to perform.
+If MaxTimes is `-1`, then all possible replacements will be made throughout Text.
+
 
 
 ---
@@ -1497,8 +1592,50 @@ EmptyFolder( Folder )
 
 ***Description***
 
+
 Empties a folder by removing all of its sub-folders and files.
-Returns the number of folders and files deleted.
+
+Returns the number of folders and files removed.
+
+
+
+---
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+WithFileText( Filename, FileTextCallback )
+</strong>
+</summary>
+
+> ### System.***WithFileText***( Filename, FileTextCallback )
+> 
+> undefined
+> 
+> **Returns**: `boolean` - False if no changes were made or True if changes were saved.
+
+***Parameters***
+
+|  Name              |  Type   | Required  |  Default          |  Description  
+|--------------------|---------|-----------|-------------------|---------------
+| Filename           | `string` | required |                   | 
+| FileTextCallback   | `function` | required |                 | 
+
+***Description***
+
+
+Loads content from a file and passes it to a callback function for processing.
+
+The callback function takes two parameters: Filename and Text.
+Filename is the Filename passed to `WithFileText` and Text is the content of that file.
+The callback function is expected to return either `undefined` or `null` if no changes are made to the text.
+If changes are made, the callback function can return the new text which will be saved back to Filename.
+
+If the file content is changed during callback processing, then `WithFileText` will return True.
+
 
 
 ---

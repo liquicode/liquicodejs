@@ -51,6 +51,7 @@ module.exports = function ( Liquicode )
 	 * @param {string} Text
 	 * @param {string} SearchText
 	 * @param {string} ReplacementText
+	 * @param {number} [MaxTimes=1]
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 

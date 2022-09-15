@@ -90,8 +90,20 @@
 
 <br>
 
-#### Text.***ReplaceText***( Text, SearchText, ReplacementText )
+#### Text.***ReplaceText***( Text, SearchText, ReplacementText, MaxTimes )
 - Returns: `string`
+
+<br>
+
+#### Text.***FindBetween***( Text, StartText, EndText )
+- Search a string and return the text found between StartText and EndText.
+- Returns: `string` - The text found between StartText and EndText.
+
+<br>
+
+#### Text.***ReplaceBetween***( Text, StartText, EndText, ReplacementText, MaxTimes )
+- Search a string for StartText and EndText and replace the text found between the two.
+- Returns: `integer` - The new string with replacements performed.
 
 <br>
 
@@ -180,6 +192,11 @@
 
 #### System.***EmptyFolder***( Folder )
 - Returns: `number`
+
+<br>
+
+#### System.***WithFileText***( Filename, FileTextCallback )
+- Returns: `boolean` - False if no changes were made or True if changes were saved.
 
 <br>
 

@@ -35,8 +35,11 @@ module.exports = function ( Liquicode )
 	 * @function EmptyFolder
 	 * @returns {number}
 	 * @description
-	 * Empties a folder by removing all of its sub-folders and files.
-	 * Returns the number of folders and files deleted.
+	 * 
+Empties a folder by removing all of its sub-folders and files.
+
+Returns the number of folders and files removed.
+
 	 * @param {string} Folder
 	*/
 	//-end-jsdoc-----------------------------------------------------------

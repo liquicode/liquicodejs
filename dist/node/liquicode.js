@@ -2851,6 +2851,7 @@ module.exports = function ( Liquicode )
 	 * @param {string} Text
 	 * @param {string} SearchText
 	 * @param {string} ReplacementText
+	 * @param {number} [MaxTimes=1]
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 
@@ -2955,11 +2956,26 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function ReplaceText
+	 * @function FindBetween
 	 * @returns {string}
+	 * The text found between StartText and EndText.
+	 * @summary Search a string and return the text found between StartText and EndText.
+	 * @description
+	 * 
+This function searches a string for StartText and EndText and returns all text found between the two.
+
+If StartText is missing, then the search will return all text up to the found EndText.
+
+If EndText is missing, then the search will return all text found after StartText.
+
+If both StartText and EndText are missing, then the entire Text string will be returned.
+
+If StartText or EndText are not found within Text, then a `null` is returned.
+
+
 	 * @param {string} Text
-	 * @param {string} SearchText
-	 * @param {string} ReplacementText
+	 * @param {string} [StartText]
+	 * @param {string} [EndText]
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 
@@ -3073,11 +3089,30 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function ReplaceText
-	 * @returns {string}
+	 * @function ReplaceBetween
+	 * @returns {integer}
+	 * The new string with replacements performed.
+	 * @summary Search a string for StartText and EndText and replace the text found between the two.
+	 * @description
+	 * 
+This function searches a string for StartText and EndText and replaces all text found between the two.
+
+If StartText is missing, then all text found up to EndText will be replaced.
+
+If EndText is missing, then all text found after StartText will be replaced.
+
+If both StartText and EndText are missing, then the entire Text string will be replaced.
+
+If StartText or EndText are not found within Text, then this function returns `0` to indicate that no replacements were performed.
+
+The MaxTimes parameter specifies the maximum number of replacements to perform.
+If MaxTimes is `-1`, then all possible replacements will be made throughout Text.
+
 	 * @param {string} Text
-	 * @param {string} SearchText
+	 * @param {string} [StartText]
+	 * @param {string} [EndText]
 	 * @param {string} ReplacementText
+	 * @param {number} [MaxTimes=1]
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 
@@ -6640,8 +6675,11 @@ module.exports = function ( Liquicode )
 	 * @function EmptyFolder
 	 * @returns {number}
 	 * @description
-	 * Empties a folder by removing all of its sub-folders and files.
-	 * Returns the number of folders and files deleted.
+	 * 
+Empties a folder by removing all of its sub-folders and files.
+
+Returns the number of folders and files removed.
+
 	 * @param {string} Folder
 	*/
 	//-end-jsdoc-----------------------------------------------------------
@@ -6753,12 +6791,22 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function EmptyFolder
-	 * @returns {number}
+	 * @function WithFileText
+	 * @returns {boolean}
+	 * False if no changes were made or True if changes were saved.
 	 * @description
-	 * Empties a folder by removing all of its sub-folders and files.
-	 * Returns the number of folders and files deleted.
-	 * @param {string} Folder
+	 * 
+Loads content from a file and passes it to a callback function for processing.
+
+The callback function takes two parameters: Filename and Text.
+Filename is the Filename passed to `WithFileText` and Text is the content of that file.
+The callback function is expected to return either `undefined` or `null` if no changes are made to the text.
+If changes are made, the callback function can return the new text which will be saved back to Filename.
+
+If the file content is changed during callback processing, then `WithFileText` will return True.
+
+	 * @param {string} Filename
+	 * @param {function} FileTextCallback
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 
@@ -7679,7 +7727,7 @@ module.exports = function ( Liquicode )
 
 var Liquicode = {};
 
-Liquicode.version = 'v0.0.1';
+Liquicode.version = 'v0.0.16';
 Liquicode.environment = 'node';
 
 Liquicode.Types = __webpack_require__( /*! ./000-Types/000-Types.js */ "./src/000-Types/000-Types.js" )( Liquicode );

@@ -101,9 +101,23 @@
 </ul>
 <br>
 
-<h4 id="textreplacetext-text-searchtext-replacementtext-">Text.<em><strong>ReplaceText</strong></em>( Text, SearchText, ReplacementText )</h4>
+<h4 id="textreplacetext-text-searchtext-replacementtext-maxtimes-">Text.<em><strong>ReplaceText</strong></em>( Text, SearchText, ReplacementText, MaxTimes )</h4>
 <ul>
 <li>Returns: <code>string</code></li>
+</ul>
+<br>
+
+<h4 id="textfindbetween-text-starttext-endtext-">Text.<em><strong>FindBetween</strong></em>( Text, StartText, EndText )</h4>
+<ul>
+<li>Search a string and return the text found between StartText and EndText.</li>
+<li>Returns: <code>string</code> - The text found between StartText and EndText.</li>
+</ul>
+<br>
+
+<h4 id="textreplacebetween-text-starttext-endtext-replacementtext-maxtimes-">Text.<em><strong>ReplaceBetween</strong></em>( Text, StartText, EndText, ReplacementText, MaxTimes )</h4>
+<ul>
+<li>Search a string for StartText and EndText and replace the text found between the two.</li>
+<li>Returns: <code>integer</code> - The new string with replacements performed.</li>
 </ul>
 <br>
 
@@ -204,6 +218,12 @@
 <h4 id="systememptyfolder-folder-">System.<em><strong>EmptyFolder</strong></em>( Folder )</h4>
 <ul>
 <li>Returns: <code>number</code></li>
+</ul>
+<br>
+
+<h4 id="systemwithfiletext-filename-filetextcallback-">System.<em><strong>WithFileText</strong></em>( Filename, FileTextCallback )</h4>
+<ul>
+<li>Returns: <code>boolean</code> - False if no changes were made or True if changes were saved.</li>
 </ul>
 <br>
 

@@ -961,12 +961,12 @@ Returns the modified string.</p>
 <details>
 <summary>
 <strong>
-ReplaceText( Text, SearchText, ReplacementText )
+ReplaceText( Text, SearchText, ReplacementText, MaxTimes )
 </strong>
 </summary>
 
 <blockquote>
-<h3 id="textreplacetext-text-searchtext-replacementtext-">Text.<em><strong>ReplaceText</strong></em>( Text, SearchText, ReplacementText )</h3>
+<h3 id="textreplacetext-text-searchtext-replacementtext-maxtimes-">Text.<em><strong>ReplaceText</strong></em>( Text, SearchText, ReplacementText, MaxTimes )</h3>
 <p>undefined</p>
 <p><strong>Returns</strong>: <code>string</code></p>
 </blockquote>
@@ -1002,7 +1002,146 @@ ReplaceText( Text, SearchText, ReplacementText )
 <td></td>
 <td></td>
 </tr>
+<tr>
+<td>MaxTimes</td>
+<td><code>number</code></td>
+<td>-</td>
+<td>1</td>
+<td></td>
+</tr>
 </tbody></table>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+FindBetween( Text, StartText, EndText )
+</strong>
+<small>
+- Search a string and return the text found between StartText and EndText.
+</small>
+</summary>
+
+<blockquote>
+<h3 id="textfindbetween-text-starttext-endtext-">Text.<em><strong>FindBetween</strong></em>( Text, StartText, EndText )</h3>
+<p>Search a string and return the text found between StartText and EndText.</p>
+<p><strong>Returns</strong>: <code>string</code> - The text found between StartText and EndText.</p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Text</td>
+<td><code>string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>StartText</td>
+<td><code>string</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>EndText</td>
+<td><code>string</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>This function searches a string for StartText and EndText and returns all text found between the two.</p>
+<p>If StartText is missing, then the search will return all text up to the found EndText.</p>
+<p>If EndText is missing, then the search will return all text found after StartText.</p>
+<p>If both StartText and EndText are missing, then the entire Text string will be returned.</p>
+<p>If StartText or EndText are not found within Text, then a <code>null</code> is returned.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+ReplaceBetween( Text, StartText, EndText, ReplacementText, MaxTimes )
+</strong>
+<small>
+- Search a string for StartText and EndText and replace the text found between the two.
+</small>
+</summary>
+
+<blockquote>
+<h3 id="textreplacebetween-text-starttext-endtext-replacementtext-maxtimes-">Text.<em><strong>ReplaceBetween</strong></em>( Text, StartText, EndText, ReplacementText, MaxTimes )</h3>
+<p>Search a string for StartText and EndText and replace the text found between the two.</p>
+<p><strong>Returns</strong>: <code>integer</code> - The new string with replacements performed.</p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Text</td>
+<td><code>string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>StartText</td>
+<td><code>string</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>EndText</td>
+<td><code>string</code></td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>ReplacementText</td>
+<td><code>string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>MaxTimes</td>
+<td><code>number</code></td>
+<td>-</td>
+<td>1</td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>This function searches a string for StartText and EndText and replaces all text found between the two.</p>
+<p>If StartText is missing, then all text found up to EndText will be replaced.</p>
+<p>If EndText is missing, then all text found after StartText will be replaced.</p>
+<p>If both StartText and EndText are missing, then the entire Text string will be replaced.</p>
+<p>If StartText or EndText are not found within Text, then this function returns <code>0</code> to indicate that no replacements were performed.</p>
+<p>The MaxTimes parameter specifies the maximum number of replacements to perform.
+If MaxTimes is <code>-1</code>, then all possible replacements will be made throughout Text.</p>
 <hr>
 </details>
 <br>
@@ -1951,8 +2090,57 @@ EmptyFolder( Folder )
 </tr>
 </tbody></table>
 <p><em><strong>Description</strong></em></p>
-<p>Empties a folder by removing all of its sub-folders and files.
-Returns the number of folders and files deleted.</p>
+<p>Empties a folder by removing all of its sub-folders and files.</p>
+<p>Returns the number of folders and files removed.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+WithFileText( Filename, FileTextCallback )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systemwithfiletext-filename-filetextcallback-">System.<em><strong>WithFileText</strong></em>( Filename, FileTextCallback )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code>boolean</code> - False if no changes were made or True if changes were saved.</p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Filename</td>
+<td><code>string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>FileTextCallback</td>
+<td><code>function</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Loads content from a file and passes it to a callback function for processing.</p>
+<p>The callback function takes two parameters: Filename and Text.
+Filename is the Filename passed to <code>WithFileText</code> and Text is the content of that file.
+The callback function is expected to return either <code>undefined</code> or <code>null</code> if no changes are made to the text.
+If changes are made, the callback function can return the new text which will be saved back to Filename.</p>
+<p>If the file content is changed during callback processing, then <code>WithFileText</code> will return True.</p>
 <hr>
 </details>
 <br>
