@@ -47,8 +47,10 @@ Builder.LogMuted( `  - version = ${PACKAGE.version}` );
 Builder.LogHeading( `Building Docs ...` );
 {
 	let build_folder = LIB_PATH.join( package_folder, 'build' );
-	Builder.Execute( LIB_PATH.join( build_folder, '100-build-docs.js' ) );
-	Builder.Execute( LIB_PATH.join( build_folder, '200-inject-jsdoc-tags.js' ) );
+	let filename = LIB_PATH.join( build_folder, '100-build-docs.js' );
+	Builder.Execute( `node ${filename}` );
+	filename = LIB_PATH.join( build_folder, '200-inject-jsdoc-tags.js' );
+	Builder.Execute( `node ${filename}` );
 }
 
 

@@ -7727,7 +7727,7 @@ module.exports = function ( Liquicode )
 
 var Liquicode = {};
 
-Liquicode.version = 'v0.0.16';
+Liquicode.version = 'v0.0.17';
 Liquicode.environment = 'node';
 
 Liquicode.Types = __webpack_require__( /*! ./000-Types/000-Types.js */ "./src/000-Types/000-Types.js" )( Liquicode );
