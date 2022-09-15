@@ -119,40 +119,6 @@ ${testing_output}
 //=====================================================================
 
 
-{
-	// Update version numbers.
-	let source_folder = LIB_PATH.join( package_folder, 'src' );
-
-	Liquicode.System.WithFileText(
-		LIB_PATH.join( source_folder, 'liquicode-es5.js' ),
-		function ( Filename, Text )
-		{
-			return Liquicode.Text.ReplaceBetween( Text, `Liquicode.version = 'v`, `';`, PACKAGE.version );
-		} );
-
-	Liquicode.System.WithFileText(
-		LIB_PATH.join( source_folder, 'liquicode-es6.js' ),
-		function ( Filename, Text )
-		{
-			return Liquicode.Text.ReplaceBetween( Text, `Liquicode.version = 'v`, `';`, PACKAGE.version );
-		} );
-
-	Liquicode.System.WithFileText(
-		LIB_PATH.join( source_folder, 'liquicode-node-min.js' ),
-		function ( Filename, Text )
-		{
-			return Liquicode.Text.ReplaceBetween( Text, `Liquicode.version = 'v`, `';`, PACKAGE.version );
-		} );
-
-	Liquicode.System.WithFileText(
-		LIB_PATH.join( source_folder, 'liquicode-node.js' ),
-		function ( Filename, Text )
-		{
-			return Liquicode.Text.ReplaceBetween( Text, `Liquicode.version = 'v`, `';`, PACKAGE.version );
-		} );
-}
-
-
 Builder.LogHeading( `Build Distributables ...` );
 {
 	//---------------------------------------------------------------------
@@ -250,6 +216,40 @@ Liquicode.System.WithFileText(
 	{
 		return Liquicode.Text.ReplaceBetween( Text, '(v', ')', PACKAGE.version );
 	} );
+
+{
+	// Update version numbers.
+	let source_folder = LIB_PATH.join( package_folder, 'src' );
+
+	Liquicode.System.WithFileText(
+		LIB_PATH.join( source_folder, 'liquicode-es5.js' ),
+		function ( Filename, Text )
+		{
+			return Liquicode.Text.ReplaceBetween( Text, `Liquicode.version = 'v`, `';` );
+		} );
+
+	Liquicode.System.WithFileText(
+		LIB_PATH.join( source_folder, 'liquicode-es6.js' ),
+		function ( Filename, Text )
+		{
+			return Liquicode.Text.ReplaceBetween( Text, `Liquicode.version = 'v`, `';`, PACKAGE.version );
+		} );
+
+	Liquicode.System.WithFileText(
+		LIB_PATH.join( source_folder, 'liquicode-node-min.js' ),
+		function ( Filename, Text )
+		{
+			return Liquicode.Text.ReplaceBetween( Text, `Liquicode.version = 'v`, `';`, PACKAGE.version );
+		} );
+
+	Liquicode.System.WithFileText(
+		LIB_PATH.join( source_folder, 'liquicode-node.js' ),
+		function ( Filename, Text )
+		{
+			return Liquicode.Text.ReplaceBetween( Text, `Liquicode.version = 'v`, `';`, PACKAGE.version );
+		} );
+}
+
 
 Builder.Git_PrepareNewVersion( PACKAGE.version );
 

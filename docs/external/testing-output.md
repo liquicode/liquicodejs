@@ -2,7 +2,7 @@
 # Testing Output
 
 - Project: @liquicode/liquicodejs
-- Timestamp: 2022-09-15T04:52:30.824Z
+- Timestamp: 2022-09-15T05:02:57.727Z
 
 ~~~
 000) Types Module
@@ -127,7 +127,6 @@
     √ should return null when StartText or EndText is not found
 
   214) Text.ReplaceBetween Tests
-    √ should replace all text when StartText and EndText are missing
     √ should replace all text when StartText and EndText are empty strings
     √ should replace all text from StartText when EndText is empty
     √ should replace all text up to EndText when StartText is empty
@@ -366,5 +365,5 @@
     √ should start and stop a container
 
 
-  275 passing (2s)
+  274 passing (2s)
 ~~~

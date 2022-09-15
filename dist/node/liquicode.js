@@ -3037,12 +3037,6 @@ If MaxTimes is \`-1\`, then all possible replacements will be made throughout Te
 			required: true,
 			default: '',
 		},
-		ReplacementText: {
-			name: 'ReplacementText',
-			type: 'string',
-			required: true,
-			default: '',
-		},
 		StartText: {
 			name: 'StartText',
 			type: 'string',
@@ -3053,6 +3047,12 @@ If MaxTimes is \`-1\`, then all possible replacements will be made throughout Te
 			name: 'EndText',
 			type: 'string',
 			required: false,
+			default: '',
+		},
+		ReplacementText: {
+			name: 'ReplacementText',
+			type: 'string',
+			required: true,
 			default: '',
 		},
 		MaxTimes: {
@@ -3082,14 +3082,14 @@ module.exports = function ( Liquicode )
 	//-end-jsdoc-----------------------------------------------------------
 
 
-	function ReplaceBetween( Text, ReplacementText, StartText, EndText, MaxTimes ) 
+	function ReplaceBetween( Text, StartText, EndText, ReplacementText, MaxTimes ) 
 	{
 		if ( typeof Text !== 'string' ) { throw new Error( `The parameter [Text] is required and must be a string.` ); }
-		if ( typeof ReplacementText !== 'string' ) { throw new Error( `The parameter [ReplacementText] is required and must be a string.` ); }
 		if ( ( StartText === undefined ) || ( StartText === null ) ) { StartText = ''; }
 		if ( ( EndText === undefined ) || ( EndText === null ) ) { EndText = ''; }
 		if ( typeof StartText !== 'string' ) { throw new Error( `The parameter [StartText] is optional but must be a string.` ); }
 		if ( typeof EndText !== 'string' ) { throw new Error( `The parameter [EndText] is optional but must be a string.` ); }
+		if ( typeof ReplacementText !== 'string' ) { throw new Error( `The parameter [ReplacementText] is required and must be a string.` ); }
 		if ( MaxTimes === undefined ) { MaxTimes = 1; }
 		if ( typeof MaxTimes !== 'number' ) { throw new Error( `The parameter [MaxTimes] is optional but must be a number.` ); }
 
