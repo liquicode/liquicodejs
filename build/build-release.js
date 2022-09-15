@@ -225,7 +225,7 @@ Liquicode.System.WithFileText(
 		LIB_PATH.join( source_folder, 'liquicode-es5.js' ),
 		function ( Filename, Text )
 		{
-			return Liquicode.Text.ReplaceBetween( Text, `Liquicode.version = 'v`, `';` );
+			return Liquicode.Text.ReplaceBetween( Text, `Liquicode.version = 'v`, `';`, PACKAGE.version );
 		} );
 
 	Liquicode.System.WithFileText(

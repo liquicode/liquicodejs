@@ -1,5 +1,5 @@
 # LiquicodeJS
-***(v0.0.12)***
+***(v0.0.15)***
 
 LiquicodeJS is a general purpose library for NodeJS and Javascript.
 
