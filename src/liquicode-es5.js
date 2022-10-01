@@ -3,7 +3,7 @@
 
 var Liquicode = {};
 
-Liquicode.version = 'v0.0.18';
+Liquicode.version = 'v0.0.19';
 Liquicode.environment = 'es5';
 
 Liquicode.Types = require( './000-Types/000-Types.js' )( Liquicode );
