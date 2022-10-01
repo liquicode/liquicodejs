@@ -47,8 +47,10 @@ Builder.LogMuted( `  - version = ${PACKAGE.version}` );
 Builder.LogHeading( `Building Docs ...` );
 {
 	let build_folder = LIB_PATH.join( package_folder, 'build' );
+	
 	let filename = LIB_PATH.join( build_folder, '100-build-docs.js' );
 	Builder.Execute( `node ${filename}` );
+
 	filename = LIB_PATH.join( build_folder, '200-inject-jsdoc-tags.js' );
 	Builder.Execute( `node ${filename}` );
 }
@@ -92,6 +94,7 @@ Builder.LogHeading( `Run Tests and Update Docs Externals ...` );
 # Testing Output
 
 - Project: ${PACKAGE.name}
+- Version: v${PACKAGE.version}
 - Timestamp: ${TIMESTAMP}
 
 ~~~
@@ -267,6 +270,18 @@ Liquicode.System.WithFileText(
 		{
 			return Liquicode.Text.ReplaceBetween( Text, `Liquicode.version = 'v`, `';`, PACKAGE.version );
 		} );
+}
+
+
+Builder.LogHeading( `Building Docs Again ...` );
+{
+	let build_folder = LIB_PATH.join( package_folder, 'build' );
+
+	let filename = LIB_PATH.join( build_folder, '100-build-docs.js' );
+	Builder.Execute( `node ${filename}` );
+
+	filename = LIB_PATH.join( build_folder, '200-inject-jsdoc-tags.js' );
+	Builder.Execute( `node ${filename}` );
 }
 
 

@@ -3,12 +3,36 @@
 
 //---------------------------------------------------------------------
 let _Schema = {
-	id: '830',
+	id: '831',
 	member_of: 'System',
-	name: 'StartContainer',
+	name: 'RunContainer',
 	type: 'function',
 	returns: 'string',
-	description: `Starts a Docker Container.`,
+	description: `
+Runs a Docker Container.
+
+Options Parameter:
+~~~javascript
+{
+	name: '',           // Name of the container. Defaults to random name.
+	hostname: '',       // Hostname for the container.
+	network: '',        // Name of docker network for the container to use.
+	ports: [],          // Array of port object { localhost: 80, container: 80 }
+	volumes: [],        // Array of volume object { localhost: '/path', container: '/path' }
+	environment: {},    // Environment variables and values.
+}
+~~~
+
+Example:
+~~~javascript
+let container_id = Liquicode.RunContainer( 'mongo:latest',
+	{
+		name: 'mongo-server',
+		ports: [ { localhost: 27017, container: 27017 } ],
+	} );
+~~~
+
+`,
 	Parameters: {
 		ImageName: {
 			name: 'ImageName',
@@ -32,17 +56,41 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function StartContainer
+	 * @function RunContainer
 	 * @returns {string}
 	 * @description
-	 * Starts a Docker Container.
+	 * 
+Runs a Docker Container.
+
+Options Parameter:
+~~~javascript
+{
+	name: '',           // Name of the container. Defaults to random name.
+	hostname: '',       // Hostname for the container.
+	network: '',        // Name of docker network for the container to use.
+	ports: [],          // Array of port object { localhost: 80, container: 80 }
+	volumes: [],        // Array of volume object { localhost: '/path', container: '/path' }
+	environment: {},    // Environment variables and values.
+}
+~~~
+
+Example:
+~~~javascript
+let container_id = Liquicode.RunContainer( 'mongo:latest',
+	{
+		name: 'mongo-server',
+		ports: [ { localhost: 27017, container: 27017 } ],
+	} );
+~~~
+
+
 	 * @param {string} ImageName
 	 * @param {object} [Options]
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 
 
-	function StartContainer( ImageName, Options ) 
+	function RunContainer( ImageName, Options ) 
 	{
 		let command_line = `docker run --rm -d`;
 		if ( Options )
@@ -124,6 +172,6 @@ module.exports = function ( Liquicode )
 	// Return the module exports.
 	return {
 		_Schema: _Schema,
-		StartContainer: StartContainer,
+		RunContainer: RunContainer,
 	};
 };

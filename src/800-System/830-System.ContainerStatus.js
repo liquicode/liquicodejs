@@ -3,12 +3,12 @@
 
 //---------------------------------------------------------------------
 let _Schema = {
-	id: '831',
+	id: '830',
 	member_of: 'System',
-	name: 'StopContainer',
+	name: 'ContainerStatus',
 	type: 'function',
 	returns: 'string',
-	description: `Stops a running Docker Container.`,
+	description: `Gets the status of a running Docker Container.`,
 	Parameters: {
 		ContainerID: {
 			name: 'ContainerID',
@@ -27,21 +27,31 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function StopContainer
+	 * @function ContainerStatus
 	 * @returns {string}
 	 * @description
-	 * Stops a running Docker Container.
+	 * Gets the status of a running Docker Container.
 	 * @param {string} ContainerID
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 
 
-	function StopContainer( ContainerID ) 
+	function ContainerStatus( ContainerID ) 
 	{
-		let command_line = `docker kill ${ContainerID}`;
+		let command_line = `docker inspect ${ContainerID}`;
 		let result = Liquicode.System.ExecuteProcess( command_line );
-		if ( result.error ) { throw new Error( result.error ); }
-		return;
+		if ( result.error ) 
+		{
+			// if ( result.error === `Command failed: docker inspect ${ContainerID}\nError: No such object: ${ContainerID}\n` ) { return null; }
+			if ( result.error.indexOf( 'Error: No such object' ) ) { return null; }
+			throw new Error( result.error );
+		}
+		let status = JSON.parse( result.result );
+		if ( Array.isArray( status ) && status.length )
+		{
+			status = status[ 0 ];
+		}
+		return status;
 	}
 
 
@@ -49,6 +59,6 @@ module.exports = function ( Liquicode )
 	// Return the module exports.
 	return {
 		_Schema: _Schema,
-		StopContainer: StopContainer,
+		ContainerStatus: ContainerStatus,
 	};
 };

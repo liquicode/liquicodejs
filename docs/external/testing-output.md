@@ -2,7 +2,8 @@
 # Testing Output
 
 - Project: @liquicode/liquicodejs
-- Timestamp: 2022-09-15T05:13:06.326Z
+- Version: v0.0.18
+- Timestamp: 2022-10-01T07:30:48.476Z
 
 ~~~
 000) Types Module
@@ -361,8 +362,8 @@
     √ should visit all elements of a folder recursively
     √ should visit only files when a pattern is supplied
 
-  830) System.StartContainer Tests
-    √ should start and stop a container
+  831) System.RunContainer Tests
+    √ should run and kill a container
 
 
   274 passing (2s)

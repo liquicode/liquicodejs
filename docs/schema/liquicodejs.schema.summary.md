@@ -222,7 +222,17 @@
 
 <br>
 
-#### System.***StartContainer***( ImageName, Options )
+#### System.***ContainerStatus***( ContainerID )
+- Returns: `string`
+
+<br>
+
+#### System.***RunContainer***( ImageName, Options )
+- Returns: `string`
+
+<br>
+
+#### System.***StartContainer***( ContainerID )
 - Returns: `string`
 
 <br>
@@ -232,7 +242,7 @@
 
 <br>
 
-#### System.***ContainerStatus***( ContainerID )
+#### System.***KillContainer***( ContainerID )
 - Returns: `string`
 
 <br>

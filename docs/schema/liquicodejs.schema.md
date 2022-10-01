@@ -1779,11 +1779,40 @@ Stops a running process by its ProcessID.
 <details>
 <summary>
 <strong>
-StartContainer( ImageName, Options )
+ContainerStatus( ContainerID )
 </strong>
 </summary>
 
-> ### System.***StartContainer***( ImageName, Options )
+> ### System.***ContainerStatus***( ContainerID )
+> 
+> undefined
+> 
+> **Returns**: `string`
+
+***Parameters***
+
+|  Name              |  Type   | Required  |  Default          |  Description  
+|--------------------|---------|-----------|-------------------|---------------
+| ContainerID        | `string` | required |                   | 
+
+***Description***
+
+Gets the status of a running Docker Container.
+
+
+---
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+RunContainer( ImageName, Options )
+</strong>
+</summary>
+
+> ### System.***RunContainer***( ImageName, Options )
 > 
 > undefined
 > 
@@ -1798,7 +1827,60 @@ StartContainer( ImageName, Options )
 
 ***Description***
 
-Starts a Docker Container.
+
+Runs a Docker Container.
+
+Options Parameter:
+~~~javascript
+{
+	name: '',           // Name of the container. Defaults to random name.
+	hostname: '',       // Hostname for the container.
+	network: '',        // Name of docker network for the container to use.
+	ports: [],          // Array of port object { localhost: 80, container: 80 }
+	volumes: [],        // Array of volume object { localhost: '/path', container: '/path' }
+	environment: {},    // Environment variables and values.
+}
+~~~
+
+Example:
+~~~javascript
+let container_id = Liquicode.RunContainer( 'mongo:latest',
+	{
+		name: 'mongo-server',
+		ports: [ { localhost: 27017, container: 27017 } ],
+	} );
+~~~
+
+
+
+
+---
+</details>
+
+<br>
+
+<details>
+<summary>
+<strong>
+StartContainer( ContainerID )
+</strong>
+</summary>
+
+> ### System.***StartContainer***( ContainerID )
+> 
+> undefined
+> 
+> **Returns**: `string`
+
+***Parameters***
+
+|  Name              |  Type   | Required  |  Default          |  Description  
+|--------------------|---------|-----------|-------------------|---------------
+| ContainerID        | `string` | required |                   | 
+
+***Description***
+
+Stops a running Docker Container.
 
 
 ---
@@ -1838,11 +1920,11 @@ Stops a running Docker Container.
 <details>
 <summary>
 <strong>
-ContainerStatus( ContainerID )
+KillContainer( ContainerID )
 </strong>
 </summary>
 
-> ### System.***ContainerStatus***( ContainerID )
+> ### System.***KillContainer***( ContainerID )
 > 
 > undefined
 > 
@@ -1856,7 +1938,7 @@ ContainerStatus( ContainerID )
 
 ***Description***
 
-Gets the status of a running Docker Container.
+Kills a running Docker Container.
 
 
 ---

@@ -5875,9 +5875,11 @@ module.exports = function ( Liquicode )
 		StopProcess: __webpack_require__( /*! ./824-System.StopProcess.js */ "./src/800-System/824-System.StopProcess.js" )( Liquicode ).StopProcess,
 
 		// Docker
-		StartContainer: __webpack_require__( /*! ./830-System.StartContainer.js */ "./src/800-System/830-System.StartContainer.js" )( Liquicode ).StartContainer,
-		StopContainer: __webpack_require__( /*! ./831-System.StopContainer.js */ "./src/800-System/831-System.StopContainer.js" )( Liquicode ).StopContainer,
-		ContainerStatus: __webpack_require__( /*! ./832-System.ContainerStatus.js */ "./src/800-System/832-System.ContainerStatus.js" )( Liquicode ).ContainerStatus,
+		ContainerStatus: __webpack_require__( /*! ./830-System.ContainerStatus.js */ "./src/800-System/830-System.ContainerStatus.js" )( Liquicode ).ContainerStatus,
+		RunContainer: __webpack_require__( /*! ./831-System.RunContainer.js */ "./src/800-System/831-System.RunContainer.js" )( Liquicode ).RunContainer,
+		StartContainer: __webpack_require__( /*! ./832-System.StartContainer.js */ "./src/800-System/832-System.StartContainer.js" )( Liquicode ).StartContainer,
+		StopContainer: __webpack_require__( /*! ./833-System.StopContainer.js */ "./src/800-System/833-System.StopContainer.js" )( Liquicode ).StopContainer,
+		KillContainer: __webpack_require__( /*! ./834-System.KillContainer.js */ "./src/800-System/834-System.KillContainer.js" )( Liquicode ).KillContainer,
 
 	};
 };
@@ -7221,10 +7223,10 @@ module.exports = function ( Liquicode )
 
 /***/ }),
 
-/***/ "./src/800-System/830-System.StartContainer.js":
-/*!*****************************************************!*\
-  !*** ./src/800-System/830-System.StartContainer.js ***!
-  \*****************************************************/
+/***/ "./src/800-System/830-System.ContainerStatus.js":
+/*!******************************************************!*\
+  !*** ./src/800-System/830-System.ContainerStatus.js ***!
+  \******************************************************/
 /***/ ((module) => {
 
 
@@ -7234,10 +7236,108 @@ module.exports = function ( Liquicode )
 let _Schema = {
 	id: '830',
 	member_of: 'System',
-	name: 'StartContainer',
+	name: 'ContainerStatus',
 	type: 'function',
 	returns: 'string',
-	description: `Starts a Docker Container.`,
+	description: `Gets the status of a running Docker Container.`,
+	Parameters: {
+		ContainerID: {
+			name: 'ContainerID',
+			type: 'string',
+			required: true,
+		},
+	},
+};
+
+
+//---------------------------------------------------------------------
+module.exports = function ( Liquicode )
+{
+
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function ContainerStatus
+	 * @returns {string}
+	 * @description
+	 * Gets the status of a running Docker Container.
+	 * @param {string} ContainerID
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
+	function ContainerStatus( ContainerID ) 
+	{
+		let command_line = `docker inspect ${ContainerID}`;
+		let result = Liquicode.System.ExecuteProcess( command_line );
+		if ( result.error ) 
+		{
+			// if ( result.error === `Command failed: docker inspect ${ContainerID}\nError: No such object: ${ContainerID}\n` ) { return null; }
+			if ( result.error.indexOf( 'Error: No such object' ) ) { return null; }
+			throw new Error( result.error );
+		}
+		let status = JSON.parse( result.result );
+		if ( Array.isArray( status ) && status.length )
+		{
+			status = status[ 0 ];
+		}
+		return status;
+	}
+
+
+	//---------------------------------------------------------------------
+	// Return the module exports.
+	return {
+		_Schema: _Schema,
+		ContainerStatus: ContainerStatus,
+	};
+};
+
+
+/***/ }),
+
+/***/ "./src/800-System/831-System.RunContainer.js":
+/*!***************************************************!*\
+  !*** ./src/800-System/831-System.RunContainer.js ***!
+  \***************************************************/
+/***/ ((module) => {
+
+
+
+
+//---------------------------------------------------------------------
+let _Schema = {
+	id: '831',
+	member_of: 'System',
+	name: 'RunContainer',
+	type: 'function',
+	returns: 'string',
+	description: `
+Runs a Docker Container.
+
+Options Parameter:
+~~~javascript
+{
+	name: '',           // Name of the container. Defaults to random name.
+	hostname: '',       // Hostname for the container.
+	network: '',        // Name of docker network for the container to use.
+	ports: [],          // Array of port object { localhost: 80, container: 80 }
+	volumes: [],        // Array of volume object { localhost: '/path', container: '/path' }
+	environment: {},    // Environment variables and values.
+}
+~~~
+
+Example:
+~~~javascript
+let container_id = Liquicode.RunContainer( 'mongo:latest',
+	{
+		name: 'mongo-server',
+		ports: [ { localhost: 27017, container: 27017 } ],
+	} );
+~~~
+
+`,
 	Parameters: {
 		ImageName: {
 			name: 'ImageName',
@@ -7261,17 +7361,41 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function StartContainer
+	 * @function RunContainer
 	 * @returns {string}
 	 * @description
-	 * Starts a Docker Container.
+	 * 
+Runs a Docker Container.
+
+Options Parameter:
+~~~javascript
+{
+	name: '',           // Name of the container. Defaults to random name.
+	hostname: '',       // Hostname for the container.
+	network: '',        // Name of docker network for the container to use.
+	ports: [],          // Array of port object { localhost: 80, container: 80 }
+	volumes: [],        // Array of volume object { localhost: '/path', container: '/path' }
+	environment: {},    // Environment variables and values.
+}
+~~~
+
+Example:
+~~~javascript
+let container_id = Liquicode.RunContainer( 'mongo:latest',
+	{
+		name: 'mongo-server',
+		ports: [ { localhost: 27017, container: 27017 } ],
+	} );
+~~~
+
+
 	 * @param {string} ImageName
 	 * @param {object} [Options]
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 
 
-	function StartContainer( ImageName, Options ) 
+	function RunContainer( ImageName, Options ) 
 	{
 		let command_line = `docker run --rm -d`;
 		if ( Options )
@@ -7353,6 +7477,70 @@ module.exports = function ( Liquicode )
 	// Return the module exports.
 	return {
 		_Schema: _Schema,
+		RunContainer: RunContainer,
+	};
+};
+
+
+/***/ }),
+
+/***/ "./src/800-System/832-System.StartContainer.js":
+/*!*****************************************************!*\
+  !*** ./src/800-System/832-System.StartContainer.js ***!
+  \*****************************************************/
+/***/ ((module) => {
+
+
+
+
+//---------------------------------------------------------------------
+let _Schema = {
+	id: '832',
+	member_of: 'System',
+	name: 'StartContainer',
+	type: 'function',
+	returns: 'string',
+	description: `Stops a running Docker Container.`,
+	Parameters: {
+		ContainerID: {
+			name: 'ContainerID',
+			type: 'string',
+			required: true,
+		},
+	},
+};
+
+
+//---------------------------------------------------------------------
+module.exports = function ( Liquicode )
+{
+
+
+	//-start-jsdoc---------------------------------------------------------
+	/**
+	 * @public
+	 * @function StartContainer
+	 * @returns {string}
+	 * @description
+	 * Stops a running Docker Container.
+	 * @param {string} ContainerID
+	*/
+	//-end-jsdoc-----------------------------------------------------------
+
+
+	function StartContainer( ContainerID ) 
+	{
+		let command_line = `docker start ${ContainerID}`;
+		let result = Liquicode.System.ExecuteProcess( command_line );
+		if ( result.error ) { throw new Error( result.error ); }
+		return;
+	}
+
+
+	//---------------------------------------------------------------------
+	// Return the module exports.
+	return {
+		_Schema: _Schema,
 		StartContainer: StartContainer,
 	};
 };
@@ -7360,9 +7548,9 @@ module.exports = function ( Liquicode )
 
 /***/ }),
 
-/***/ "./src/800-System/831-System.StopContainer.js":
+/***/ "./src/800-System/833-System.StopContainer.js":
 /*!****************************************************!*\
-  !*** ./src/800-System/831-System.StopContainer.js ***!
+  !*** ./src/800-System/833-System.StopContainer.js ***!
   \****************************************************/
 /***/ ((module) => {
 
@@ -7371,7 +7559,7 @@ module.exports = function ( Liquicode )
 
 //---------------------------------------------------------------------
 let _Schema = {
-	id: '831',
+	id: '833',
 	member_of: 'System',
 	name: 'StopContainer',
 	type: 'function',
@@ -7406,7 +7594,7 @@ module.exports = function ( Liquicode )
 
 	function StopContainer( ContainerID ) 
 	{
-		let command_line = `docker kill ${ContainerID}`;
+		let command_line = `docker stop ${ContainerID}`;
 		let result = Liquicode.System.ExecuteProcess( command_line );
 		if ( result.error ) { throw new Error( result.error ); }
 		return;
@@ -7424,10 +7612,10 @@ module.exports = function ( Liquicode )
 
 /***/ }),
 
-/***/ "./src/800-System/832-System.ContainerStatus.js":
-/*!******************************************************!*\
-  !*** ./src/800-System/832-System.ContainerStatus.js ***!
-  \******************************************************/
+/***/ "./src/800-System/834-System.KillContainer.js":
+/*!****************************************************!*\
+  !*** ./src/800-System/834-System.KillContainer.js ***!
+  \****************************************************/
 /***/ ((module) => {
 
 
@@ -7435,12 +7623,12 @@ module.exports = function ( Liquicode )
 
 //---------------------------------------------------------------------
 let _Schema = {
-	id: '832',
+	id: '834',
 	member_of: 'System',
-	name: 'ContainerStatus',
+	name: 'KillContainer',
 	type: 'function',
 	returns: 'string',
-	description: `Gets the status of a running Docker Container.`,
+	description: `Kills a running Docker Container.`,
 	Parameters: {
 		ContainerID: {
 			name: 'ContainerID',
@@ -7459,31 +7647,21 @@ module.exports = function ( Liquicode )
 	//-start-jsdoc---------------------------------------------------------
 	/**
 	 * @public
-	 * @function ContainerStatus
+	 * @function KillContainer
 	 * @returns {string}
 	 * @description
-	 * Gets the status of a running Docker Container.
+	 * Kills a running Docker Container.
 	 * @param {string} ContainerID
 	*/
 	//-end-jsdoc-----------------------------------------------------------
 
 
-	function ContainerStatus( ContainerID ) 
+	function KillContainer( ContainerID ) 
 	{
-		let command_line = `docker inspect ${ContainerID}`;
+		let command_line = `docker kill ${ContainerID}`;
 		let result = Liquicode.System.ExecuteProcess( command_line );
-		if ( result.error ) 
-		{
-			// if ( result.error === `Command failed: docker inspect ${ContainerID}\nError: No such object: ${ContainerID}\n` ) { return null; }
-			if ( result.error.indexOf( 'Error: No such object' ) ) { return null; }
-			throw new Error( result.error );
-		}
-		let status = JSON.parse( result.result );
-		if ( Array.isArray( status ) && status.length )
-		{
-			status = status[ 0 ];
-		}
-		return status;
+		if ( result.error ) { throw new Error( result.error ); }
+		return;
 	}
 
 
@@ -7491,7 +7669,7 @@ module.exports = function ( Liquicode )
 	// Return the module exports.
 	return {
 		_Schema: _Schema,
-		ContainerStatus: ContainerStatus,
+		KillContainer: KillContainer,
 	};
 };
 
@@ -7727,7 +7905,7 @@ module.exports = function ( Liquicode )
 
 var Liquicode = {};
 
-Liquicode.version = 'v0.0.17';
+Liquicode.version = 'v0.0.18';
 Liquicode.environment = 'node';
 
 Liquicode.Types = __webpack_require__( /*! ./000-Types/000-Types.js */ "./src/000-Types/000-Types.js" )( Liquicode );

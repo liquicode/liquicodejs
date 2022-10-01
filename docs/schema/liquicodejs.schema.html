@@ -2366,12 +2366,49 @@ StopProcess( ProcessID )
 <details>
 <summary>
 <strong>
-StartContainer( ImageName, Options )
+ContainerStatus( ContainerID )
 </strong>
 </summary>
 
 <blockquote>
-<h3 id="systemstartcontainer-imagename-options-">System.<em><strong>StartContainer</strong></em>( ImageName, Options )</h3>
+<h3 id="systemcontainerstatus-containerid-">System.<em><strong>ContainerStatus</strong></em>( ContainerID )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code>string</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ContainerID</td>
+<td><code>string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Gets the status of a running Docker Container.</p>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+RunContainer( ImageName, Options )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systemruncontainer-imagename-options-">System.<em><strong>RunContainer</strong></em>( ImageName, Options )</h3>
 <p>undefined</p>
 <p><strong>Returns</strong>: <code>string</code></p>
 </blockquote>
@@ -2402,7 +2439,61 @@ StartContainer( ImageName, Options )
 </tr>
 </tbody></table>
 <p><em><strong>Description</strong></em></p>
-<p>Starts a Docker Container.</p>
+<p>Runs a Docker Container.</p>
+<p>Options Parameter:</p>
+<pre><code class="language-javascript">{
+    name: &#39;&#39;,           // Name of the container. Defaults to random name.
+    hostname: &#39;&#39;,       // Hostname for the container.
+    network: &#39;&#39;,        // Name of docker network for the container to use.
+    ports: [],          // Array of port object { localhost: 80, container: 80 }
+    volumes: [],        // Array of volume object { localhost: &#39;/path&#39;, container: &#39;/path&#39; }
+    environment: {},    // Environment variables and values.
+}
+</code></pre>
+<p>Example:</p>
+<pre><code class="language-javascript">let container_id = Liquicode.RunContainer( &#39;mongo:latest&#39;,
+    {
+        name: &#39;mongo-server&#39;,
+        ports: [ { localhost: 27017, container: 27017 } ],
+    } );
+</code></pre>
+<hr>
+</details>
+<br>
+
+<details>
+<summary>
+<strong>
+StartContainer( ContainerID )
+</strong>
+</summary>
+
+<blockquote>
+<h3 id="systemstartcontainer-containerid-">System.<em><strong>StartContainer</strong></em>( ContainerID )</h3>
+<p>undefined</p>
+<p><strong>Returns</strong>: <code>string</code></p>
+</blockquote>
+<p><em><strong>Parameters</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ContainerID</td>
+<td><code>string</code></td>
+<td>required</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em><strong>Description</strong></em></p>
+<p>Stops a running Docker Container.</p>
 <hr>
 </details>
 <br>
@@ -2447,12 +2538,12 @@ StopContainer( ContainerID )
 <details>
 <summary>
 <strong>
-ContainerStatus( ContainerID )
+KillContainer( ContainerID )
 </strong>
 </summary>
 
 <blockquote>
-<h3 id="systemcontainerstatus-containerid-">System.<em><strong>ContainerStatus</strong></em>( ContainerID )</h3>
+<h3 id="systemkillcontainer-containerid-">System.<em><strong>KillContainer</strong></em>( ContainerID )</h3>
 <p>undefined</p>
 <p><strong>Returns</strong>: <code>string</code></p>
 </blockquote>
@@ -2476,7 +2567,7 @@ ContainerStatus( ContainerID )
 </tr>
 </tbody></table>
 <p><em><strong>Description</strong></em></p>
-<p>Gets the status of a running Docker Container.</p>
+<p>Kills a running Docker Container.</p>
 <hr>
 </details>
 <br>

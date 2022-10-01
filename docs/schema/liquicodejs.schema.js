@@ -1,5 +1,5 @@
 exports = {
-    "version": "0.0.17",
+    "version": "0.0.18",
     "Schemas": [
         {
             "id": "000",
@@ -1062,10 +1062,26 @@ exports = {
         {
             "id": "830",
             "member_of": "System",
-            "name": "StartContainer",
+            "name": "ContainerStatus",
             "type": "function",
             "returns": "string",
-            "description": "Starts a Docker Container.",
+            "description": "Gets the status of a running Docker Container.",
+            "Parameters": {
+                "ContainerID": {
+                    "name": "ContainerID",
+                    "type": "string",
+                    "required": true
+                }
+            },
+            "source_filename": "800-System\\830-System.ContainerStatus.js"
+        },
+        {
+            "id": "831",
+            "member_of": "System",
+            "name": "RunContainer",
+            "type": "function",
+            "returns": "string",
+            "description": "\nRuns a Docker Container.\n\nOptions Parameter:\n~~~javascript\n{\n\tname: '',           // Name of the container. Defaults to random name.\n\thostname: '',       // Hostname for the container.\n\tnetwork: '',        // Name of docker network for the container to use.\n\tports: [],          // Array of port object { localhost: 80, container: 80 }\n\tvolumes: [],        // Array of volume object { localhost: '/path', container: '/path' }\n\tenvironment: {},    // Environment variables and values.\n}\n~~~\n\nExample:\n~~~javascript\nlet container_id = Liquicode.RunContainer( 'mongo:latest',\n\t{\n\t\tname: 'mongo-server',\n\t\tports: [ { localhost: 27017, container: 27017 } ],\n\t} );\n~~~\n\n",
             "Parameters": {
                 "ImageName": {
                     "name": "ImageName",
@@ -1078,10 +1094,26 @@ exports = {
                     "required": false
                 }
             },
-            "source_filename": "800-System\\830-System.StartContainer.js"
+            "source_filename": "800-System\\831-System.RunContainer.js"
         },
         {
-            "id": "831",
+            "id": "832",
+            "member_of": "System",
+            "name": "StartContainer",
+            "type": "function",
+            "returns": "string",
+            "description": "Stops a running Docker Container.",
+            "Parameters": {
+                "ContainerID": {
+                    "name": "ContainerID",
+                    "type": "string",
+                    "required": true
+                }
+            },
+            "source_filename": "800-System\\832-System.StartContainer.js"
+        },
+        {
+            "id": "833",
             "member_of": "System",
             "name": "StopContainer",
             "type": "function",
@@ -1094,15 +1126,15 @@ exports = {
                     "required": true
                 }
             },
-            "source_filename": "800-System\\831-System.StopContainer.js"
+            "source_filename": "800-System\\833-System.StopContainer.js"
         },
         {
-            "id": "832",
+            "id": "834",
             "member_of": "System",
-            "name": "ContainerStatus",
+            "name": "KillContainer",
             "type": "function",
             "returns": "string",
-            "description": "Gets the status of a running Docker Container.",
+            "description": "Kills a running Docker Container.",
             "Parameters": {
                 "ContainerID": {
                     "name": "ContainerID",
@@ -1110,7 +1142,7 @@ exports = {
                     "required": true
                 }
             },
-            "source_filename": "800-System\\832-System.ContainerStatus.js"
+            "source_filename": "800-System\\834-System.KillContainer.js"
         },
         {
             "id": "900",

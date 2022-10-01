@@ -43,9 +43,11 @@ module.exports = function ( Liquicode )
 		StopProcess: require( './824-System.StopProcess.js' )( Liquicode ).StopProcess,
 
 		// Docker
-		StartContainer: require( './830-System.StartContainer.js' )( Liquicode ).StartContainer,
-		StopContainer: require( './831-System.StopContainer.js' )( Liquicode ).StopContainer,
-		ContainerStatus: require( './832-System.ContainerStatus.js' )( Liquicode ).ContainerStatus,
+		ContainerStatus: require( './830-System.ContainerStatus.js' )( Liquicode ).ContainerStatus,
+		RunContainer: require( './831-System.RunContainer.js' )( Liquicode ).RunContainer,
+		StartContainer: require( './832-System.StartContainer.js' )( Liquicode ).StartContainer,
+		StopContainer: require( './833-System.StopContainer.js' )( Liquicode ).StopContainer,
+		KillContainer: require( './834-System.KillContainer.js' )( Liquicode ).KillContainer,
 
 	};
 };
