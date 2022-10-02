@@ -2,8 +2,8 @@
 # Testing Output
 
 - Project: @liquicode/liquicodejs
-- Version: v0.0.18
-- Timestamp: 2022-10-01T07:30:48.476Z
+- Version: v0.0.19
+- Timestamp: 2022-10-02T08:21:51.287Z
 
 ~~~
 000) Types Module
