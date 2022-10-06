@@ -1,5 +1,5 @@
 exports = {
-    "version": "0.0.21",
+    "version": "0.0.22",
     "Schemas": [
         {
             "id": "000",
