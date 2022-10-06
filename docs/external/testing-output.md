@@ -2,8 +2,8 @@
 # Testing Output
 
 - Project: @liquicode/liquicodejs
-- Version: v0.0.20
-- Timestamp: 2022-10-06T07:48:52.372Z
+- Version: v0.0.21
+- Timestamp: 2022-10-06T19:20:14.498Z
 
 ~~~
 000) Types Module
@@ -372,5 +372,5 @@
     √ should make a simple request
 
 
-  276 passing (3s)
+  276 passing (2s)
 ~~~
