@@ -344,7 +344,45 @@ Merge( Original, Updates )
 </tbody></table>
 <p><em><strong>Description</strong></em></p>
 <p>Merges the content of two objects and returns the composite result.</p>
-<p>Similar to Clone, this function will remove any non-data fields (i.e. functions and symbols) from the objects.</p>
+<p>Similar to Object.Clone, this function will remove any non-data fields (i.e. functions and symbols) from the objects.</p>
+<p>This function is similar to javascript&#39;s <code>Object.assign</code> function except that <code>Object.Merge</code> will do a recursive
+field-wise comparison, while <code>Object.assign</code> only compares top-level fields.</p>
+<p>In cases where a field is an array, the field value will be overwritten.
+There is no element-wise comparison performed.</p>
+<p><strong>Examples</strong></p>
+<p>Simple Object Merging</p>
+<pre><code class="language-javascript">let A = { one: 1, two: 0 };
+let B = { two: 2 };
+let C = LiquicodeJS.Object.Merge( A, B );
+// C = { one: 1, two: 2 };
+</code></pre>
+<p>Merging with Nested Objects</p>
+<pre><code class="language-javascript">let A = { misc: { foo: &#39;bar&#39; }, numbers: { one: 1, two: 0 } };
+let B = { numbers: { two: 2 } };
+let C = LiquicodeJS.Object.Merge( A, B );
+// C = {
+// 	misc: { foo: &#39;bar&#39; },
+// 	numbers: { one: 1, two: 2 }
+// };
+</code></pre>
+<p>Merging with Nested Arrays</p>
+<pre><code class="language-javascript">let A = { misc: { foo: &#39;bar&#39; }, numbers: &#39;&#39; };
+let B = {
+    numbers: [
+        { value: 1 },
+        { value: 2 }
+    ]
+};
+let C = LiquicodeJS.Object.Merge( A, B );
+
+// C = {
+// 	misc: { foo: &#39;bar&#39; },
+// 	numbers: [
+// 		{ value: 1 },
+// 		{ value: 2 }
+// 	]
+// };
+</code></pre>
 <hr>
 </details>
 <br>

@@ -2,8 +2,8 @@
 # Testing Output
 
 - Project: @liquicode/liquicodejs
-- Version: v0.0.21
-- Timestamp: 2022-10-06T19:20:14.498Z
+- Version: v0.0.22
+- Timestamp: 2022-10-06T20:51:32.126Z
 
 ~~~
 000) Types Module
@@ -41,6 +41,11 @@
 
   100) Object Module
     √ should load the Object module
+
+  103) Object.Merge Tests
+    √ should merge simple objects
+    √ should merge nested objects
+    √ should merge nested array
 
   120) Object.FromJson Tests
     Equivalence with Javascript's JSON.parse()
@@ -372,5 +377,5 @@
     √ should make a simple request
 
 
-  276 passing (2s)
+  279 passing (2s)
 ~~~

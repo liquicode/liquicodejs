@@ -1214,7 +1214,7 @@ Liquicode.Types.IsFormat( [ 1, 2, 3 ], 'object:string-array' )  // = false
 
 var Liquicode = {};
 
-Liquicode.version = 'v0.0.21';
+Liquicode.version = 'v0.0.22';
 Liquicode.environment = 'node';
 
 function build_library( Group, Filename )
