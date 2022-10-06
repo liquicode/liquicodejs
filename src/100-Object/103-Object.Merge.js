@@ -11,7 +11,60 @@ let _Schema = {
 	description: `
 Merges the content of two objects and returns the composite result.
 
-Similar to Clone, this function will remove any non-data fields (i.e. functions and symbols) from the objects.
+Similar to Object.Clone, this function will remove any non-data fields (i.e. functions and symbols) from the objects.
+
+This function is similar to javascript's \`Object.assign\` function except that \`Object.Merge\` will do a recursive
+field-wise comparison, while \`Object.assign\` only compares top-level fields.
+
+In cases where a field is an array, the field value will be overwritten.
+There is no element-wise comparison performed.
+
+**Examples**
+
+Simple Object Merging
+
+~~~javascript
+let A = { one: 1, two: 0 };
+let B = { two: 2 };
+let C = LiquicodeJS.Object.Merge( A, B );
+// C = { one: 1, two: 2 };
+~~~
+
+Merging with Nested Objects
+
+~~~javascript
+let A = { misc: { foo: 'bar' }, numbers: { one: 1, two: 0 } };
+let B = { numbers: { two: 2 } };
+let C = LiquicodeJS.Object.Merge( A, B );
+// C = {
+// 	misc: { foo: 'bar' },
+// 	numbers: { one: 1, two: 2 }
+// };
+~~~
+
+
+Merging with Nested Arrays
+
+~~~javascript
+let A = { misc: { foo: 'bar' }, numbers: '' };
+let B = {
+	numbers: [
+		{ value: 1 },
+		{ value: 2 }
+	]
+};
+let C = LiquicodeJS.Object.Merge( A, B );
+
+// C = {
+// 	misc: { foo: 'bar' },
+// 	numbers: [
+// 		{ value: 1 },
+// 		{ value: 2 }
+// 	]
+// };
+
+~~~
+
 `,
 	Parameters: {
 		Original: {

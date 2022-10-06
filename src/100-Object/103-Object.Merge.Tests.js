@@ -17,6 +17,7 @@ describe( `103) Object.Merge Tests`, function ()
 		let A = { one: 1, two: 0 };
 		let B = { two: 2 };
 		let C = LQC.Object.Merge( A, B );
+		// C = { one: 1, two: 2 };
 		LIB_ASSERT.ok( C );
 		LIB_ASSERT.ok( C.one === 1 );
 		LIB_ASSERT.ok( C.two === 2 );
@@ -29,6 +30,10 @@ describe( `103) Object.Merge Tests`, function ()
 		let A = { misc: { foo: 'bar' }, numbers: { one: 1, two: 0 } };
 		let B = { numbers: { two: 2 } };
 		let C = LQC.Object.Merge( A, B );
+		// C = {
+		// 	misc: { foo: 'bar' },
+		// 	numbers: { one: 1, two: 2 }
+		// };
 		LIB_ASSERT.ok( C );
 		LIB_ASSERT.ok( C.misc );
 		LIB_ASSERT.ok( C.misc.foo === 'bar' );
@@ -41,7 +46,7 @@ describe( `103) Object.Merge Tests`, function ()
 	//---------------------------------------------------------------------
 	it( `should merge nested array`, function ()
 	{
-		let A = { misc: { foo: 'bar' }, numbers: '' };
+		let A = { misc: { foo: 'bar' }, numbers: { fib: 'fab' } };
 		let B = {
 			numbers: [
 				{ value: 1 },
@@ -49,6 +54,13 @@ describe( `103) Object.Merge Tests`, function ()
 			]
 		};
 		let C = LQC.Object.Merge( A, B );
+		// C = {
+		// 	misc: { foo: 'bar' },
+		// 	numbers: [
+		// 		{ value: 1 },
+		// 		{ value: 2 }
+		// 	]
+		// };
 		LIB_ASSERT.ok( C );
 		LIB_ASSERT.ok( C.misc );
 		LIB_ASSERT.ok( C.misc.foo === 'bar' );
