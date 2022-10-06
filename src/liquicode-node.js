@@ -2,7 +2,7 @@
 
 var Liquicode = {};
 
-Liquicode.version = 'v0.0.20';
+Liquicode.version = 'v0.0.21';
 Liquicode.environment = 'node';
 
 function build_library( Group, Filename )
