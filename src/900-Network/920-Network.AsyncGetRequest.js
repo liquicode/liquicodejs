@@ -40,14 +40,14 @@ module.exports = function ( Liquicode )
 	const LIB_HTTPS = require( 'https' );
 
 
-	function AsyncGetRequest( Url )
+	async function AsyncGetRequest( Url )
 	{
 		let http_engine = null;
 		if ( Url.toLowerCase().startsWith( 'http:' ) ) { http_engine = LIB_HTTP; }
 		else if ( Url.toLowerCase().startsWith( 'https:' ) ) { http_engine = LIB_HTTPS; }
 		else { throw new Error( `Unsupported protocol. Must be http or https.` ); }
 
-		return new Promise(
+		let result = await new Promise(
 			( resolve, reject ) =>
 			{
 				try
@@ -67,6 +67,12 @@ module.exports = function ( Liquicode )
 					reject( error );
 				}
 			} );
+
+		if ( result )
+		{
+			result = result.toString();
+		}
+		return result;
 	};
 
 

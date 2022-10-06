@@ -184,7 +184,7 @@
 			"internalConsoleOptions": "openOnSessionStart",
 		},
 		{
-			"name": "900) Net Tests",
+			"name": "900) Network Tests",
 			"type": "node",
 			"request": "launch",
 			"skipFiles": [
@@ -195,7 +195,7 @@
 			"args": [
 				"-u",
 				"bdd",
-				"src/900-Net/*.Tests.js",
+				"src/900-Network/*.Tests.js",
 				"--timeout",
 				"0",
 				"--slow",

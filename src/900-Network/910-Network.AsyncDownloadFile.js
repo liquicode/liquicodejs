@@ -31,16 +31,17 @@ module.exports = function ( Liquicode )
 
 	const LIB_HTTP = require( 'http' );
 	const LIB_HTTPS = require( 'https' );
+	const LIB_FS = require( 'fs' );
 
 
-	function AsyncDownloadFile( Url, Filename )
+	async function AsyncDownloadFile( Url, Filename )
 	{
 		let http_engine = null;
 		if ( Url.toLowerCase().startsWith( 'http:' ) ) { http_engine = LIB_HTTP; }
 		else if ( Url.toLowerCase().startsWith( 'https:' ) ) { http_engine = LIB_HTTPS; }
 		else { throw new Error( `Unsupported protocol. Must be either http or https.` ); }
 
-		return new Promise(
+		return await new Promise(
 			( resolve, reject ) =>
 			{
 				try
