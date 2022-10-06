@@ -71,23 +71,30 @@ Similar to Clone, this function will remove any non-data fields (i.e. functions 
 					{
 						if ( typeof value === 'object' )
 						{
-							// Merge objects.
-							if ( ( ParentA[ key ] === null ) && ( value === null ) )
+							if ( Array.isArray( value ) )
 							{
-								// Do nothing.
+								ParentA[ key ] = JSON.parse( JSON.stringify( value ) );
 							}
-							else if ( ( ParentA[ key ] !== null ) && ( value === null ) )
+							else
 							{
-								ParentA[ key ] = null;
-							}
-							else if ( ( ParentA[ key ] === null ) && ( value !== null ) )
-							{
-								ParentA[ key ] = {};
-								update_children( ParentA[ key ], value );
-							}
-							else if ( ( ParentA[ key ] !== null ) && ( value !== null ) )
-							{
-								update_children( ParentA[ key ], value );
+								// Merge objects.
+								if ( ( ParentA[ key ] === null ) && ( value === null ) )
+								{
+									// Do nothing.
+								}
+								else if ( ( ParentA[ key ] !== null ) && ( value === null ) )
+								{
+									ParentA[ key ] = null;
+								}
+								else if ( ( ParentA[ key ] === null ) && ( value !== null ) )
+								{
+									ParentA[ key ] = {};
+									update_children( ParentA[ key ], value );
+								}
+								else if ( ( ParentA[ key ] !== null ) && ( value !== null ) )
+								{
+									update_children( ParentA[ key ], value );
+								}
 							}
 						}
 						else
