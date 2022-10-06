@@ -52,13 +52,11 @@ module.exports = function ( Liquicode )
 						{
 							const file_stream = LIB_FS.createWriteStream( Filename );
 							response.pipe( file_stream );
-							file_stream.on(
-								'finish',
-								function ()
-								{
-									file_stream.close();
-									resolve( true );
-								} );
+							file_stream.on( 'finish', function () 
+							{
+								file_stream.close();
+								resolve( true );
+							} );
 						} );
 				}
 				catch ( error )

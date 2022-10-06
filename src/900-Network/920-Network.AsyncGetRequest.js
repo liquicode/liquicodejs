@@ -52,14 +52,13 @@ module.exports = function ( Liquicode )
 			{
 				try
 				{
+					let text = '';
 					http_engine.get(
 						Url,
 						function ( response ) 
 						{
-							response.on( 'data', data =>
-							{
-								resolve( data );
-							} );
+							response.on( 'data', data => text += data.toString() );
+							response.on( 'end', () => resolve( text ) );
 						} );
 				}
 				catch ( error )
@@ -68,10 +67,6 @@ module.exports = function ( Liquicode )
 				}
 			} );
 
-		if ( result )
-		{
-			result = result.toString();
-		}
 		return result;
 	};
 
