@@ -2,8 +2,8 @@
 # Testing Output
 
 - Project: @liquicode/liquicodejs
-- Version: v0.0.19
-- Timestamp: 2022-10-02T08:21:51.287Z
+- Version: v0.0.20
+- Timestamp: 2022-10-06T07:48:52.372Z
 
 ~~~
 000) Types Module
@@ -365,6 +365,12 @@
   831) System.RunContainer Tests
     √ should run and kill a container
 
+  910) Network.AsyncDownloadFile Tests
+    √ should download a single file
 
-  274 passing (2s)
+  920) Network.AsyncGetRequest Tests
+    √ should make a simple request
+
+
+  276 passing (3s)
 ~~~
